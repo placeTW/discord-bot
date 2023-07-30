@@ -1,0 +1,56 @@
+import os
+
+import discord
+from discord import app_commands
+from discord.ext import commands
+from dotenv import load_dotenv
+
+# user modules
+# from modules import ping
+
+# user commands
+# from commands import ping
+
+# load environment vars
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+GUILD = os.getenv("DISCORD_GUILD")
+
+# setting up the bot
+intents = discord.Intents.default()
+# if you don't want all intents you can do discord.Intents.default()
+client = discord.Client(intents=intents)
+tree = discord.app_commands.CommandTree(client)
+
+
+# sync the slash command to your server
+@client.event
+async def on_ready():
+    await tree.sync(guild=discord.Object(id=GUILD))
+    # print "ready" in the console when the bot is ready to work
+    print("ready")
+
+
+# ! These are basic test commands that should not exist when deployed
+# * simple hi command
+@tree.command(
+    name="test",
+    description="Responds with a hardcoded string",
+    guild=discord.Object(id=GUILD),
+)
+async def test_slash_command(interaction: discord.Interaction):
+    await interaction.response.send_message("Hi I was called")
+
+
+# * simple echo command with param explanation
+@tree.command(
+    name="echo",
+    description="Echoes whatever string is fed",
+    guild=discord.Object(id=GUILD),
+)
+@app_commands.describe(given_str="The string you want echoed backed")
+async def test_slash_command(interaction: discord.Interaction, given_str: str):
+    await interaction.response.send_message(f"You sent this: `{given_str}`")
+
+
+client.run(TOKEN)
