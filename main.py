@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # from modules import ping
 
 # user commands
-# from commands import ping
+from commands import fetch_entry
 
 # load environment vars
 load_dotenv()
@@ -21,12 +21,13 @@ intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
+this_guild = discord.Object(id=GUILD)
 
 
 # sync the slash command to your server
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=GUILD))
+    await tree.sync(guild=this_guild)
     # print "ready" in the console when the bot is ready to work
     print("ready")
 
@@ -36,7 +37,7 @@ async def on_ready():
 @tree.command(
     name="test",
     description="Responds with a hardcoded string",
-    guild=discord.Object(id=GUILD),
+    guild=this_guild,
 )
 async def test_slash_command(interaction: discord.Interaction):
     await interaction.response.send_message("Hi I was called")
@@ -46,11 +47,14 @@ async def test_slash_command(interaction: discord.Interaction):
 @tree.command(
     name="echo",
     description="Echoes whatever string is fed",
-    guild=discord.Object(id=GUILD),
+    guild=this_guild,
 )
 @app_commands.describe(given_str="The string you want echoed backed")
 async def test_slash_command(interaction: discord.Interaction, given_str: str):
     await interaction.response.send_message(f"You sent this: `{given_str}`")
 
+
+# register commands from other files
+fetch_entry.register_commands(tree, this_guild)
 
 client.run(TOKEN)
