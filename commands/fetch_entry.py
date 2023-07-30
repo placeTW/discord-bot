@@ -1,11 +1,11 @@
 import aiohttp
 import discord
 from discord import app_commands
-from .modules import async_utils
+from .modules import async_utils, postprocess
 import typing
 
 SUPPORTED_LANGUAGE_CODES = typing.Literal["en", "et", "lt", "lv", "zh", "fr"]
-SUPPORTED_ART_FIELDS = typing.Literal["title", "blurb", "desc"]
+SUPPORTED_ART_FIELDS = typing.Literal["title", "blurb", "desc", "links"]
 
 
 async def get_json(how="url", json_url=""):
@@ -33,15 +33,17 @@ def register_commands(tree, this_guild: discord.Object):
             interaction (discord.Interaction): idk
             index (int): A number. DELETE THIS
             lang (str): The language of the entry to fetch.
-            field (str): The field to fetch: title, blurb or description.
+            field (str): Field to fetch: title, blurb, description or links.
         """
         link_to_fetch = f"https://placetw.com/locales/{lang}/art-pieces.json"
         result_json = await get_json(
             how="url",
             json_url=link_to_fetch,
         )
+        requested_entry = result_json[index][field]
+        requested_entry = postprocess.postprocess_fetch_item(requested_entry)
         await interaction.response.send_message(
-            f"The {field} for {lang} is:\n`{result_json[index][field]}`"
+            f"The {field} for {lang} is:\n{requested_entry}"
         )
 
 
