@@ -3,9 +3,34 @@ import discord
 from discord import app_commands
 from .modules import async_utils, postprocess
 import typing
+from discord.app_commands import Choice
 
 SUPPORTED_LANGUAGE_CODES = typing.Literal["en", "et", "lt", "lv", "zh", "fr"]
 SUPPORTED_ART_FIELDS = typing.Literal["title", "blurb", "desc", "links"]
+
+SUPPORTED_ART2023_IDS = [
+    "capoo",
+    "chip",
+    "taipei_101",
+    "tw_flag",
+    "formosan_bear",
+    "boba_tea_bear",
+    "tw_magpie",
+    "heart_baltics",
+    "heart_bretons",
+    "lt_pengiun_boba",
+    "indep_flag",
+    "tw_beer",
+    "apple_cider",
+    "tatung_rice_cooker",
+    "tsmc_logo",
+]
+
+POSSIBLE_ART2023_IDS = [
+    Choice(name=id, value=i) for i, id in enumerate(SUPPORTED_ART2023_IDS)
+]
+
+# For reverse lookup
 
 
 async def get_json(how="url", json_url=""):
@@ -18,33 +43,44 @@ async def get_json(how="url", json_url=""):
 def register_commands(tree, this_guild: discord.Object):
     @tree.command(
         name="fetch",
-        description="Fetches r/place Taiwan art entries",
+        description="Fetches r/place Taiwan art entries.",
         guild=this_guild,
     )
+    @app_commands.choices(entry=POSSIBLE_ART2023_IDS)
     async def fetch_entry(
         interaction: discord.Interaction,
-        index: int,
+        entry: Choice[int],
         lang: SUPPORTED_LANGUAGE_CODES,
-        field: SUPPORTED_ART_FIELDS,
+        field: SUPPORTED_ART_FIELDS = None,
     ):
         """This function does some shit
 
         Args:
             interaction (discord.Interaction): idk
-            index (int): A number. DELETE THIS
+            entry (str): The entry to edit.
             lang (str): The language of the entry to fetch.
-            field (str): Field to fetch: title, blurb, description or links.
+            field (str, optional): Field to fetch: title, blurb, description,
+                or links.
+                If not passed, return the entire entry.
         """
         link_to_fetch = f"https://placetw.com/locales/{lang}/art-pieces.json"
         result_json = await get_json(
             how="url",
             json_url=link_to_fetch,
         )
-        requested_entry = result_json[index][field]
-        requested_entry = postprocess.postprocess_fetch_item(requested_entry)
-        await interaction.response.send_message(
-            f"The {field} for {lang} is:\n{requested_entry}"
-        )
+        if field is None:  # * return entire entry
+            result = result_json[entry.value]
+            result = postprocess.postprocess_fetch_item(result)
+            await interaction.response.send_message(
+                result, suppress_embeds=True
+            )
+
+        else:  # * return only specific field
+            result = result_json[entry.value][field]
+            result = postprocess.postprocess_fetch_field(result)
+            await interaction.response.send_message(
+                f"The {field} for {lang} is:\n{result}", suppress_embeds=True
+            )
 
 
 if __name__ == "__main__":
