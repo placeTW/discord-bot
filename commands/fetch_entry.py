@@ -30,8 +30,6 @@ POSSIBLE_ART2023_IDS = [
     Choice(name=id, value=i) for i, id in enumerate(SUPPORTED_ART2023_IDS)
 ]
 
-# For reverse lookup
-
 
 async def get_json(how="url", json_url=""):
     assert how in ("url",)
@@ -68,6 +66,14 @@ def register_commands(tree, this_guild: discord.Object):
             how="url",
             json_url=link_to_fetch,
         )
+        # * if some error happens, notify user and stop
+        if result_json is None:
+            await interaction.response.send_message(
+                "Sorry, your requested information is not \
+                      available at the moment."
+            )
+            return
+
         if field is None:  # * return entire entry
             result = result_json[entry.value]
             result = postprocess.postprocess_fetch_item(result)
