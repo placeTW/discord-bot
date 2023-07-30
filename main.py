@@ -2,11 +2,9 @@ import os
 
 import discord
 from discord import app_commands
-from discord.ext import commands
-from dotenv import load_dotenv
 
-# user modules
-# from modules import ping
+# from discord.ext import commands
+from dotenv import load_dotenv
 
 # user commands
 from commands import fetch_entry
