@@ -22,12 +22,12 @@ tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)
 
 
-# sync the slash command to your server
+# sync the slash command to server
 @client.event
 async def on_ready():
     await tree.sync(guild=this_guild)
     # print "ready" in the console when the bot is ready to work
-    print("ready")
+    print("Bot is ready.")
 
 
 # ! These are basic test commands that should not exist when deployed
