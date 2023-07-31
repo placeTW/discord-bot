@@ -4,6 +4,7 @@ from discord import app_commands
 from ..modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
+from .fetch_entry_main import _fetch_entry_with_json
 
 from .consts import (
     SUPPORTED_ART2023_IDS,
@@ -31,8 +32,12 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose an entry",
         options=[
-            discord.SelectOption(label=entry_id, description=entry_desc)
-            for entry_id, entry_desc in SUPPORTED_ART2023_IDS.items()
+            discord.SelectOption(
+                label=entry_id, description=entry_desc, value=i
+            )
+            for i, (entry_id, entry_desc) in enumerate(
+                SUPPORTED_ART2023_IDS.items()
+            )
         ],
         row=1,
     )
@@ -77,10 +82,16 @@ class FetchEntryView(discord.ui.View):
         user_id = interaction.user.id
         if not (self.selected_entry and self.selected_language):
             await interaction.response.send_message(
-                f"<@{user_id}> Please make sure you have chosen an entry and language!"
+                f"<@{user_id}> Please make sure you have chosen an entry and language!",
+                ephemeral=True,
             )
             return
-
+        return await _fetch_entry_with_json(
+            interaction,
+            int(self.selected_entry),
+            self.selected_language,
+            self.selected_field,
+        )
         await interaction.response.send_message(
             f"<@{user_id}> Your results:\n* \
                 chosen entry: {self.selected_entry}\n \
