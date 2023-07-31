@@ -1,4 +1,3 @@
-import typing
 from discord.app_commands import Choice
 
 

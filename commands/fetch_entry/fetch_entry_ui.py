@@ -6,19 +6,21 @@ import typing
 from discord.app_commands import Choice
 
 from .consts import (
-    SUPPORTED_LANGUAGE_CODES,
-    SUPPORTED_ART_FIELDS,
     SUPPORTED_ART2023_IDS,
     POSSIBLE_ART2023_IDS,
+    POSSIBLE_LANGUAGE_CODES,
+    SUPPORTED_LANGUAGE_CODES,
 )
 
 
 class FetchEntryView(discord.ui.View):
     def __init__(self):
         super().__init__()
+        self.selected_entry = None
         self.selected_language = None
 
     # * There should be fields for:
+    # * - entry (drop down menu)
     # * - lang (drop down menu)
     # * - field (drop down menu)
     # * - year (drop down menu, only has 2023 atm)
@@ -32,21 +34,25 @@ class FetchEntryView(discord.ui.View):
         ],
         row=1,
     )
-    async def select_callback(self, interaction: discord.Interaction, select):
-        self.selected_language = select.values[0]
+    async def select_entry_callback(
+        self, interaction: discord.Interaction, select
+    ):
+        self.selected_entry = select.values[0]
         return await interaction.response.defer()
 
-    # @discord.ui.select(
-    #     placeholder="Choose a language",
-    #     options=[
-    #         discord.SelectOption(label=entry_id, description="desc")
-    #         for entry_id in SUPPORTED_ART2023_IDS
-    #     ],
-    #     row=2,
-    # )
-    # async def select_callback(self, interaction: discord.Interaction, select):
-    #     self.selected_language = select.values[0]
-    #     return await interaction.response.defer()
+    @discord.ui.select(
+        placeholder="Choose a language",
+        options=[
+            discord.SelectOption(label=lang_id, description=lang_id)
+            for lang_id in SUPPORTED_LANGUAGE_CODES
+        ],
+        row=2,
+    )
+    async def select_lang_callback(
+        self, interaction: discord.Interaction, select
+    ):
+        self.selected_language = select.values[0]
+        return await interaction.response.defer()
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=3)
     async def hgs_button_submit(
@@ -56,7 +62,8 @@ class FetchEntryView(discord.ui.View):
 
         await interaction.response.send_message(
             f"<@{user_id}> Your results:\n* \
-                chosen entry: {self.selected_language}"
+                chosen entry: {self.selected_entry}\n \
+                chosen language: {self.selected_language}"
         )
 
 
