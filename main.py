@@ -8,17 +8,24 @@ from dotenv import load_dotenv
 
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
+from commands.translation_stat import translation_stat
 from commands import hgs
 
 # load environment vars
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
+GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
+
+translation_stat.trans_db_lock.acquire()
+worker = translation_stat.bg_worker(GH_TOKEN)
 
 # setting up the bot
 intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
 client = discord.Client(intents=intents)
+
+
 tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)
 
@@ -56,5 +63,6 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 # register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
 hgs.register_commands(tree, this_guild)
+translation_stat.register_commands(tree, this_guild)
 
 client.run(TOKEN)
