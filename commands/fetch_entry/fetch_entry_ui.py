@@ -65,7 +65,7 @@ class FetchEntryView(discord.ui.View):
         placeholder="Choose a field (leave empty to fetch entire entry)",
         options=[
             discord.SelectOption(label=field_id, description=field_id)
-            for field_id in SUPPORTED_ART_FIELDS
+            for field_id in SUPPORTED_ART_FIELDS + ["fetch entire entry"]
         ],
         row=3,
     )
@@ -73,6 +73,8 @@ class FetchEntryView(discord.ui.View):
         self, interaction: discord.Interaction, select: discord.ui.Select
     ):
         self.selected_field = select.values[0]
+        if self.selected_field == "fetch entire entry":
+            self.selected_field = None
         return await interaction.response.defer()
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=4)
