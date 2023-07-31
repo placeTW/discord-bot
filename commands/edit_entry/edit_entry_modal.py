@@ -1,4 +1,5 @@
 from typing import Optional
+from ..fetch_entry.consts import SUPPORTED_ART2023_IDS
 import discord
 from discord import ui
 from discord.utils import MISSING
@@ -7,8 +8,10 @@ WAITING_APPROVAL_CHANNEL_ID = 1135250604751601716
 
 
 class Questionnaire(ui.Modal):
-    name = ui.TextInput(label="Name")
-    answer = ui.TextInput(label="Answer", style=discord.TextStyle.paragraph)
+    proposed_entry = ui.TextInput(
+        label="New entry",
+        style=discord.TextStyle.paragraph,
+    )
 
     def __init__(
         self,
@@ -23,11 +26,11 @@ class Questionnaire(ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(
-            f"Thanks for your response, {self.name}!", ephemeral=True
+            f"Thanks for your response!", ephemeral=True
         )
         user_name = interaction.user.name
         await self.approval_channel.send(
-            f"user {user_name} sent `{self.answer}`"
+            f"x`user {user_name} sent `{self.proposed_entry}`"
         )
 
 

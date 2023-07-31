@@ -50,7 +50,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 # register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
 fetch_entry_ui.register_commands(tree, this_guild)
-edit_entry_modal.register_commands(tree, this_guild, client)
+# edit_entry_modal.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
 
 
