@@ -8,6 +8,7 @@ from discord.app_commands import Choice
 from .consts import (
     SUPPORTED_ART2023_IDS,
     POSSIBLE_ART2023_IDS,
+    SUPPORTED_ART_FIELDS,
     POSSIBLE_LANGUAGE_CODES,
     SUPPORTED_LANGUAGE_CODES,
 )
@@ -18,6 +19,7 @@ class FetchEntryView(discord.ui.View):
         super().__init__()
         self.selected_entry = None
         self.selected_language = None
+        self.selected_field = None
 
     # * There should be fields for:
     # * - entry (drop down menu)
@@ -35,7 +37,7 @@ class FetchEntryView(discord.ui.View):
         row=1,
     )
     async def select_entry_callback(
-        self, interaction: discord.Interaction, select
+        self, interaction: discord.Interaction, select: discord.ui.Select
     ):
         self.selected_entry = select.values[0]
         return await interaction.response.defer()
@@ -49,21 +51,41 @@ class FetchEntryView(discord.ui.View):
         row=2,
     )
     async def select_lang_callback(
-        self, interaction: discord.Interaction, select
+        self, interaction: discord.Interaction, select: discord.ui.Select
     ):
         self.selected_language = select.values[0]
         return await interaction.response.defer()
 
-    @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=3)
+    @discord.ui.select(
+        placeholder="Choose a field (leave empty to fetch entire entry)",
+        options=[
+            discord.SelectOption(label=field_id, description=field_id)
+            for field_id in SUPPORTED_ART_FIELDS
+        ],
+        row=3,
+    )
+    async def select_field_callback(
+        self, interaction: discord.Interaction, select: discord.ui.Select
+    ):
+        self.selected_field = select.values[0]
+        return await interaction.response.defer()
+
+    @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=4)
     async def hgs_button_submit(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         user_id = interaction.user.id
+        if not (self.selected_entry and self.selected_language):
+            await interaction.response.send_message(
+                f"<@{user_id}> Please make sure you have chosen an entry and language!"
+            )
+            return
 
         await interaction.response.send_message(
             f"<@{user_id}> Your results:\n* \
                 chosen entry: {self.selected_entry}\n \
-                chosen language: {self.selected_language}"
+                chosen language: {self.selected_language}\n \
+                chosen field: {self.selected_field}"
         )
 
 
