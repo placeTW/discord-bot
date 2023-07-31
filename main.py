@@ -7,7 +7,8 @@ from discord import app_commands
 from dotenv import load_dotenv
 
 # user commands
-from commands import fetch_entry, hgs
+from commands.fetch_entry import fetch_entry_cmd
+from commands import hgs
 
 # load environment vars
 load_dotenv()
@@ -53,7 +54,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 
 
 # register commands from other files
-fetch_entry.register_commands(tree, this_guild)
+fetch_entry_cmd.register_commands(tree, this_guild)
 hgs.register_commands(tree, this_guild)
 
 client.run(TOKEN)
