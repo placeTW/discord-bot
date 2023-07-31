@@ -37,8 +37,9 @@ async def _fetch_entry_with_json(
 
     else:  # * return only specific field
         result = result_json[entry][field]
+        art_id = result_json[entry]["art_id"]
         result = postprocess.postprocess_fetch_field(result)
         await interaction.response.send_message(
-            f"The {field} for {lang} is:\n{result}",
+            f"The {field} for `{art_id}` in `{lang}` is:\n{result}",
             suppress_embeds=True,
         )
