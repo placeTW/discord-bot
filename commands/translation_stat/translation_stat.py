@@ -1,8 +1,10 @@
 from github import Github
 import json
 import os
+import time
+import atexit
 from multiprocessing import Process
-from filelock import FileLock
+from threading import Lock
 
 g = Github()
 repo = g.get_repo("placeTW/website")
@@ -37,10 +39,13 @@ def write_data(locale: str, filename: str, full_path: str, commit_ref: str = Non
 
 class locale_t:
     def __init__(self) -> None:
-        self.owned_files: list[str] = []
+        self.owned_files: list[str] = None
         self.pr_files: list[str] = []
         self.pr_no: str = None
+        self.mutex: Lock = Lock()
     def add_file(self, filename) -> None:
+        if not self.owned_files:
+            self.owned_files = list[str]()
         if not filename in self.owned_files:
             self.owned_files.append(filename)
     def add_pr_file(self, filename) -> None:
@@ -71,10 +76,11 @@ def load_pr_map () -> None:
     with open("trans_data/pr_map.json", "r") as config:
         parsed = json.loads(config.read())
         for key, item in parsed:
-            trans_db[key].pr_no = str(item["pr_no"])
-            get_by_pr(key, int(item["pr_no"]))
+            with trans_db[key].mutex:
+                trans_db[key].pr_no = str(item["pr_no"])
+                get_by_pr(key, int(item["pr_no"]))
 
-def init_repo () -> None:
+def update_repo () -> None:
     def iter_contents (content, sectors: int) -> None:
         while content:
             file_content = content.pop(0)
@@ -82,16 +88,20 @@ def init_repo () -> None:
                 content.extend(repo.get_contents(file_content.path))
             else:
                 filename, locale = handle_filename(file_content.path, sectors)
-                if trans_db[locale].pr_files and file_content.path in trans_db[locale].pr_files:
-                    return
-                write_data(locale, filename, file_content.path, success_callback = lambda: trans_db[locale].add_file(filename))
+                with trans_db[locale].mutex:
+                    if trans_db[locale].pr_files and file_content.path in trans_db[locale].pr_files:
+                        return
+                    write_data(locale, filename, file_content.path, success_callback = lambda: trans_db[locale].add_file(filename))
 
     template_contents = repo.get_contents("public/templates")
     locale_contents = repo.get_contents("public/locales")
     for item in locale_contents:
         if item.type == "dir":
-            trans_db[filename_rm_sector(item.path, 2)] = locale_t()
-    trans_db["templates"] = locale_t()
+            locale_name = filename_rm_sector(item.path, 2)
+            if not trans_db.get(locale_name):
+                trans_db[locale_name] = locale_t()
+    if not trans_db.get("templates"):
+        trans_db["templates"] = locale_t()
     load_pr_map()
     iter_contents(template_contents, 1)
     iter_contents(locale_contents, 2)
@@ -101,5 +111,16 @@ def write_trans_db() -> None:
     json.dump(trans_db, config)
     config.close()
 
-init_repo()
-print(trans_db)
+def bg_worker() -> None:
+    while True:
+        update_repo()
+        time.sleep(3600) # Hourly
+
+bg_worker_thread = Process(target = bg_worker)
+bg_worker_thread.start()
+
+def worker_killer() -> None:
+    bg_worker_thread.terminate()
+    bg_worker_thread.join()
+
+atexit.register(worker_killer)
