@@ -6,9 +6,9 @@ import typing
 from discord.app_commands import Choice
 
 from .consts import (
-    SUPPORTED_LANGUAGE_CODES,
-    SUPPORTED_ART_FIELDS,
     POSSIBLE_ART2023_IDS,
+    POSSIBLE_LANGUAGE_CODES,
+    POSSIBLE_ART_FIELD_CODES,
 )
 
 
@@ -26,11 +26,13 @@ def register_commands(tree, this_guild: discord.Object):
         guild=this_guild,
     )
     @app_commands.choices(entry=POSSIBLE_ART2023_IDS)
+    @app_commands.choices(lang=POSSIBLE_LANGUAGE_CODES)
+    @app_commands.choices(field=POSSIBLE_ART_FIELD_CODES)
     async def fetch_entry(
         interaction: discord.Interaction,
         entry: Choice[int],
-        lang: SUPPORTED_LANGUAGE_CODES,
-        field: SUPPORTED_ART_FIELDS = None,
+        lang: Choice[str],
+        field: Choice[str] = None,
     ):
         """This function does some shit
 
@@ -42,7 +44,9 @@ def register_commands(tree, this_guild: discord.Object):
                 or links.
                 If not passed, return the entire entry.
         """
-        link_to_fetch = f"https://placetw.com/locales/{lang}/art-pieces.json"
+        link_to_fetch = (
+            f"https://placetw.com/locales/{lang.value}/art-pieces.json"
+        )
         result_json = await get_json(
             how="url",
             json_url=link_to_fetch,
@@ -63,10 +67,11 @@ def register_commands(tree, this_guild: discord.Object):
             )
 
         else:  # * return only specific field
-            result = result_json[entry.value][field]
+            result = result_json[entry.value][field.value]
             result = postprocess.postprocess_fetch_field(result)
             await interaction.response.send_message(
-                f"The {field} for {lang} is:\n{result}", suppress_embeds=True
+                f"The {field.value} for {lang.value} is:\n{result}",
+                suppress_embeds=True,
             )
 
 
