@@ -78,7 +78,7 @@ class FetchEntryView(discord.ui.View):
         return await interaction.response.defer()
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=4)
-    async def hgs_button_submit(
+    async def fetch_entry_button_submit(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         user_id = interaction.user.id
