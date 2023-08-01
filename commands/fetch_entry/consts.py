@@ -1,7 +1,9 @@
 from discord.app_commands import Choice
 
-
+# TODO: This should become a dict like SUPPORTED_ART2023_IDS
 SUPPORTED_LANGUAGE_CODES = ["en", "et", "lt", "lv", "zh", "fr"]
+
+# TODO: This should become a dict like SUPPORTED_ART2023_IDS
 SUPPORTED_ART_FIELDS = ["title", "blurb", "desc", "links"]
 
 SUPPORTED_ART2023_IDS = {

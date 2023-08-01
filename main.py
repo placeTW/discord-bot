@@ -12,7 +12,7 @@ from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_modal
 from commands import hgs
 
-# load environment vars
+# load environment vars (from .env)
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
@@ -21,8 +21,9 @@ GUILD = os.getenv("DISCORD_GUILD")
 intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
 client = discord.Client(intents=intents)
+# CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
-this_guild = discord.Object(id=GUILD)
+this_guild = discord.Object(id=GUILD)  # basically refers to this server
 
 
 # ! These are basic test commands that should not exist when deployed
@@ -47,14 +48,14 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
     await interaction.response.send_message(f"You sent this: `{given_str}`")
 
 
-# register commands from other files
+# * register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
 fetch_entry_ui.register_commands(tree, this_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
 
 
-# sync the slash command to server
+# sync the slash commands to server
 @client.event
 async def on_ready():
     await tree.sync(guild=this_guild)
