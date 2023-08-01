@@ -17,40 +17,6 @@ from ..entry_consts.consts import (
 WAITING_APPROVAL_CHANNEL_ID = 1135250604751601716
 
 
-class SubmitEntryModal(discord.ui.Modal):
-    def __init__(
-        self,
-        client: discord.Client,
-        lang: str,
-        entry_id: int,
-        entry_name: str,
-        title: str,
-        field: str,
-        *,
-        timeout: float = None,
-    ) -> None:
-        super().__init__(title=title, timeout=timeout)
-        self.the_client = client
-        self.approval_channel = client.get_channel(WAITING_APPROVAL_CHANNEL_ID)
-        self.proposed_entry = discord.ui.TextInput(
-            label=f"New entry for entry: {entry_name} language: {lang} field: {field}",
-            style=discord.TextStyle.paragraph,
-            min_length=1,
-            placeholder="Enter the new entry here",
-        )
-        self.add_item(self.proposed_entry)
-
-    async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(
-            f"Thanks for your response! The team will review your request soon.",
-            ephemeral=True,
-        )
-        user_name = interaction.user.name
-        await self.approval_channel.send(
-            f"user {user_name} sent `{self.proposed_entry.value}`"
-        )
-
-
 def register_commands(
     tree, this_guild: discord.Object, client: discord.Client
 ):
@@ -84,6 +50,106 @@ def register_commands(
         )
 
         await interaction.response.send_modal(form)
+
+
+class SubmitEntryModal(discord.ui.Modal):
+    def __init__(
+        self,
+        client: discord.Client,
+        form_title: str,
+        lang: str,
+        entry_id: int,
+        entry_name: str,
+        field: str,
+        *,
+        timeout: float = None,
+    ) -> None:
+        super().__init__(title=form_title, timeout=timeout)
+        self.the_client = client
+        self.approval_channel = client.get_channel(WAITING_APPROVAL_CHANNEL_ID)
+        self.proposed_entry = discord.ui.TextInput(
+            label=f"Add your new entry here",
+            style=discord.TextStyle.paragraph,
+            min_length=1,
+            placeholder=f"Add your new text here.\nEntry: {entry_name} Language: {lang} Field: {field}",
+        )
+        self.add_item(self.proposed_entry)
+
+        # save relevant vars
+        self.lang = lang
+        self.entry_id = entry_id
+        self.entry_name = entry_name
+        self.field = field
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            f"Thanks for your response! The team will review your request soon.",
+            ephemeral=True,
+        )
+        user_name = interaction.user.name
+        user_id = interaction.user.id
+        approve_deny_view = ApproveDenyTranslationEntryView(
+            self,
+            self.lang,
+            self.entry_id,
+            self.entry_name,
+            self.field,
+            user_id,
+            # self.proposed_entry.value,
+            interaction.channel_id,
+        )
+        self.sent_msg = await self.approval_channel.send(
+            f"User {user_name} has proposed a change for this entry:\n"
+            + f"* Entry: {self.entry_name} \n"
+            + f"* Language: {self.lang} \n"
+            + f"* Field: {self.field} \n"
+            + f"* The proposed change is: \n"
+            + f"`{self.proposed_entry.value}`",
+            view=approve_deny_view,
+            silent=True,
+        )
+
+        # approve_deny_view.set_msg_id(sent_msg.id)
+
+
+class ApproveDenyTranslationEntryView(discord.ui.View):
+    def __init__(  # we need this extra info to create PR
+        self,
+        the_modal: SubmitEntryModal,
+        lang: str,
+        entry_id: int,
+        entry_name: str,
+        field: str,
+        proposing_user_id: int,
+        proposed_text: str,
+        # proposed_channel_id: int,
+        year: int = 2023,
+    ):
+        super().__init__()
+        self.the_modal = the_modal
+
+    def set_msg_id(self, msg_id: int):
+        self.msg_id = msg_id
+        print(f"msg id: {msg_id}")
+
+    async def disable_buttons(self):
+        for button in self.children:
+            button.disabled = True
+        await self.the_modal.sent_msg.edit(view=self)
+
+    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
+    async def edit_entry_button_approve(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await self.disable_buttons()
+        await interaction.response.send_message("Approved change!")
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
+    async def edit_entry_button_deny(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await self.disable_buttons(interaction)
+        await interaction.response.send_message("Denied change!")
 
 
 if __name__ == "__main__":
