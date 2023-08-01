@@ -164,3 +164,6 @@ envvv
 
 # for black
 pyproject.toml
+
+# for testing github api
+test-git.ipynb
