@@ -6,7 +6,7 @@ import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json
 
-from .consts import (
+from ..entry_consts.consts import (
     POSSIBLE_ART2023_IDS,
     POSSIBLE_LANGUAGE_CODES,
     POSSIBLE_ART_FIELD_CODES,

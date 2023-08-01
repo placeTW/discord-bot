@@ -8,7 +8,7 @@ NOTE: This file was created before I realised that you could
 ! basically: don't use this file!
 """
 from typing import Optional
-from ..fetch_entry.consts import SUPPORTED_ART2023_IDS
+from ..entry_consts.consts import SUPPORTED_ART2023_IDS
 import discord
 from discord import ui
 from discord.utils import MISSING

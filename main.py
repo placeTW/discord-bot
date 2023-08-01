@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_modal
+from commands.edit_entry import edit_entry_cmd
 from commands import hgs
 
 # load environment vars (from .env)
@@ -52,6 +53,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 fetch_entry_cmd.register_commands(tree, this_guild)
 fetch_entry_ui.register_commands(tree, this_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
+edit_entry_cmd.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
 
 
