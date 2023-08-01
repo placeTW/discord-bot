@@ -5,6 +5,9 @@ from ..modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
 from .github_pullrequest import modify_json_and_create_pull_request
+import tempfile, json
+import os
+import stat
 
 # from .fetch_entry_main import _fetch_entry_with_json
 
@@ -102,6 +105,7 @@ class SubmitEntryModal(discord.ui.Modal):
             proposing_user_id=user_id,
             proposed_text=self.proposed_entry.value,
             proposed_channel=proposed_channel,
+            approval_channel=self.approval_channel,
         )
         self.sent_msg = await self.approval_channel.send(
             f"User {user_name} has proposed a change for this entry:\n"
@@ -112,8 +116,6 @@ class SubmitEntryModal(discord.ui.Modal):
             + f"`{self.proposed_entry.value}`",
             view=approve_deny_view,
         )
-
-        # approve_deny_view.set_msg_id(sent_msg.id)
 
 
 class ApproveDenyTranslationEntryView(discord.ui.View):
@@ -127,6 +129,7 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         proposing_user_id: int,
         proposed_text: str,
         proposed_channel: discord.TextChannel,
+        approval_channel: discord.TextChannel,
         year: int = 2023,
     ):
         super().__init__(timeout=None)
@@ -138,6 +141,7 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         self.entry_name = entry_name
         self.field = field
         self.proposed_text = proposed_text
+        self.approval_channel = approval_channel
 
     async def disable_buttons(self):
         for button in self.children:
@@ -156,13 +160,38 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
             + " Expect to see the changes soon. 🎉"
         )
 
-        modify_json_and_create_pull_request(
+        resulting_json = await modify_json_and_create_pull_request(
             self.lang,
             self.entry_id,
             self.entry_name,
             self.field,
             self.proposed_text,
         )
+
+        # create temporary file
+        temporary_file = tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", delete=False, dir=".", suffix=".json"
+        )
+        tempfilename = temporary_file.name
+        os.chmod(tempfilename, 777)
+        json.dump(resulting_json, temporary_file, ensure_ascii=False, indent=2)
+        temporary_file.flush()
+        temporary_file.close()
+
+        temporary_file_again = open(tempfilename, "rb")
+        file_to_send = discord.File(
+            temporary_file_again, filename="user_proposal.json"
+        )
+        # upload file so mods can see
+        await self.approval_channel.send(
+            "User's proposed changes:",
+            reference=self.the_modal.sent_msg,
+            file=file_to_send,
+        )
+        temporary_file_again.close()
+        # delete the temp file afterwards
+        os.chmod(tempfilename, stat.S_IWRITE)
+        os.unlink(tempfilename)
 
     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
     async def edit_entry_button_deny(
