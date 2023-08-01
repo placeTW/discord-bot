@@ -6,7 +6,7 @@ import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json
 
-from .consts import (
+from ..entry_consts.consts import (
     SUPPORTED_ART2023_IDS,
     POSSIBLE_ART2023_IDS,
     SUPPORTED_ART_FIELDS,
@@ -15,19 +15,21 @@ from .consts import (
 )
 
 
+# for views tutorial: see
 class FetchEntryView(discord.ui.View):
     def __init__(self):
         super().__init__()
+        # these are for storing the user's choices
         self.selected_entry = None
         self.selected_language = None
         self.selected_field = None
 
     # * There should be fields for:
-    # * - entry (drop down menu)
-    # * - lang (drop down menu)
-    # * - field (drop down menu)
+    # * - entry (drop down menu), done
+    # * - lang (drop down menu), done
+    # * - field (drop down menu), done
     # * - year (drop down menu, only has 2023 atm)
-    # * - submit (button)
+    # * - submit (button), done
 
     @discord.ui.select(
         placeholder="Choose an entry",
@@ -44,8 +46,9 @@ class FetchEntryView(discord.ui.View):
     async def select_entry_callback(
         self, interaction: discord.Interaction, select: discord.ui.Select
     ):
+        # either the chosen value or None
         self.selected_entry = select.values[0]
-        return await interaction.response.defer()
+        return await interaction.response.defer()  # i.e. "do nothing"
 
     @discord.ui.select(
         placeholder="Choose a language",
@@ -58,8 +61,9 @@ class FetchEntryView(discord.ui.View):
     async def select_lang_callback(
         self, interaction: discord.Interaction, select: discord.ui.Select
     ):
+        # either the chosen value or None
         self.selected_language = select.values[0]
-        return await interaction.response.defer()
+        return await interaction.response.defer()  # i.e. "do nothing"
 
     @discord.ui.select(
         placeholder="Choose a field (leave empty to fetch entire entry)",
@@ -78,14 +82,14 @@ class FetchEntryView(discord.ui.View):
         return await interaction.response.defer()
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=4)
-    async def hgs_button_submit(
+    async def fetch_entry_button_submit(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         user_id = interaction.user.id
         if not (self.selected_entry and self.selected_language):
             await interaction.response.send_message(
                 f"<@{user_id}> Please make sure you have chosen an entry and language!",
-                ephemeral=True,
+                ephemeral=True,  # only the user who called it can see this msg
             )
             return
         return await _fetch_entry_with_json(
@@ -93,12 +97,6 @@ class FetchEntryView(discord.ui.View):
             int(self.selected_entry),
             self.selected_language,
             self.selected_field,
-        )
-        await interaction.response.send_message(
-            f"<@{user_id}> Your results:\n* \
-                chosen entry: {self.selected_entry}\n \
-                chosen language: {self.selected_language}\n \
-                chosen field: {self.selected_field}"
         )
 
 
@@ -108,7 +106,7 @@ def register_commands(tree, this_guild: discord.Object):
         description="Eady-to-use entry selector",
         guild=this_guild,
     )
-    async def hgs(interaction: discord.Interaction):
+    async def ui_fetch(interaction: discord.Interaction):
         button = FetchEntryView()
         await interaction.response.send_message(
             "What would you like to see?", view=button

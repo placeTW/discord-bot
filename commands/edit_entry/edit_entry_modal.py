@@ -1,9 +1,20 @@
+"""
+NOTE: This file was created before I realised that you could
+      only put in text fields for modals.
+      As a result, this code will not be used until discord
+      supports using selects, otherwise users would have to
+      manually fill out the art_id and other fields,
+      which would be a giant pain.
+! basically: don't use this file!
+"""
 from typing import Optional
-from ..fetch_entry.consts import SUPPORTED_ART2023_IDS
+from ..entry_consts.consts import SUPPORTED_ART2023_IDS
 import discord
 from discord import ui
 from discord.utils import MISSING
 
+
+# channel to receive approval requests
 WAITING_APPROVAL_CHANNEL_ID = 1135250604751601716
 
 

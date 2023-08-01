@@ -6,7 +6,7 @@ import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json
 
-from .consts import (
+from ..entry_consts.consts import (
     POSSIBLE_ART2023_IDS,
     POSSIBLE_LANGUAGE_CODES,
     POSSIBLE_ART_FIELD_CODES,
@@ -28,10 +28,11 @@ def register_commands(tree, this_guild: discord.Object):
         lang: Choice[str],
         field: Choice[str] = None,
     ):
-        """This function does some shit
+        """This function fetches an entry's field as needed.
+        If field is empty, the entire entry is returned.
 
         Args:
-            interaction (discord.Interaction): idk
+            interaction (discord.Interaction): required by discord.py
             entry (str): The entry to edit.
             lang (str): The language of the entry to fetch.
             field (str, optional): Field to fetch: title, blurb, description,
