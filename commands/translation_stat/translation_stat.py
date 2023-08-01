@@ -1,10 +1,9 @@
 from github import Github, Repository
 import json
 import os
-import time
 from threading import Lock
-from discord.ext import tasks, commands
 import discord
+from discord import app_commands
 from discord.app_commands import Choice
 from contextlib import nullcontext
 
@@ -80,12 +79,8 @@ class locale_t:
         self.pr_files.append(filename)
 
     def __repr__(self) -> str:
-        return "Owned files: {}\nPR files: {}\nPR number: {}\n".format(
-            self.owned_files, self.pr_files, self.pr_no
-        )
+        return f"Owned files: {self.owned_files}\nPR files: {self.pr_files}\nPR number: {self.pr_no}\n"
 
-    def toJSON(self):
-        return '{ "pr_no": "{}" }'.format(self.pr_no)
 
 
 trans_db_lock = Lock()
@@ -105,7 +100,7 @@ def get_by_pr(locale_check: str, pr_no: int) -> None:
             file.filename,
             commit_ref=commit.sha,
             success_callback=lambda: trans_db[locale].add_pr_file(
-                file.filename
+                filename
             ),
         )
 
@@ -113,17 +108,20 @@ def get_by_pr(locale_check: str, pr_no: int) -> None:
 def load_pr_map() -> None:
     if not os.path.exists("trans_data/pr_map.json"):
         return
-    with open("trans_data/pr_map.json", "r") as config:
-        parsed = json.loads(config.read())
+    with open("trans_data/pr_map.json", "r") as config, trans_db_lock:
+        filestr = config.read()
+        if not len(filestr):
+            return
+        parsed = json.loads(filestr)
         for key, item in parsed:
+            if not trans_db.get(key):
+                trans_db[key] = locale_t()
             with trans_db[key].mutex:
                 trans_db[key].pr_no = str(item["pr_no"])
                 get_by_pr(key, int(item["pr_no"]))
 
 
 def update_repo() -> None:
-    print("UPDATE REPO INVOKED")
-
     def iter_contents(content, sectors: int) -> None:
         while content:
             file_content = content.pop(0)
@@ -157,13 +155,12 @@ def update_repo() -> None:
         # if not trans_db.get("templates"):
         #     trans_db["templates"] = locale_t()
     trans_db_lock.release()
-    load_pr_map()
     # iter_contents(template_contents, 1)
     iter_contents(locale_contents, 2)
 
 
 def get_file_stat(lang: str) -> dict[str, bool]:
-    concat = lambda entry: entry.owned_files + entry.pr_files
+    def concat(entry: locale_t): return entry.owned_files + entry.pr_files
 
     def inner(base: list[str], target: list[str]) -> dict[str, bool]:
         ret = dict[str, bool]()
@@ -176,16 +173,20 @@ def get_file_stat(lang: str) -> dict[str, bool]:
                 ret[item] = False
         return ret
 
-        with trans_db["eng"].mutex, trans_db[
-            lang
-        ].mutex if lang != "eng" else nullcontext():
-            return inner(concat(trans_db["eng"]), concat(trans_db[str]))
+    with trans_db["en"].mutex, trans_db[
+        lang
+    ].mutex if lang != "en" else nullcontext():
+        return inner(concat(trans_db["en"]), concat(trans_db[lang]))
 
 
-def write_trans_db() -> None:
-    with open("trans_data/trans_db.json", "w") as config:
-        json.dump(trans_db, config)
-        config.close()
+def write_pr_map() -> None:
+    out: dict[str, str] = {}
+    with open("trans_data/pr_map.json", "w") as config:
+        with trans_db_lock:
+            for key, value in trans_db.items():
+                if value.pr_no:
+                    out[key] = value.pr_no
+        config.write(json.dumps(out))
 
 
 def initialize_github(token: str) -> None:
@@ -194,43 +195,49 @@ def initialize_github(token: str) -> None:
     repo = g.get_repo("placeTW/website")
 
 
-class bg_worker(commands.Cog):
-    def __init__(self, github_token: str):
-        initialize_github(github_token)
-        self.task.start()
-
-    @tasks.loop(hours=1)
-    async def task(self) -> None:
-        update_repo()
-
-
 def register_commands(tree, this_guild: discord.Object):
-    print("READY")
     with trans_db_lock:
-        for lang in trans_db.keys():
-            print(lang)
-        return
         @tree.command(
             name="trans_stat",
             description="Get translation status",
             guild=this_guild,
         )
         @discord.app_commands.choices(
-            lang=[
-                Choice(name=lang, value=lang) for lang in trans_db.keys()
-            ]
+            lang=[Choice(name=lang, value=lang) for lang in trans_db.keys()]
         )
         async def trans_stat(interaction: discord.Interaction, lang: Choice[str]):
             files_status = get_file_stat(lang.value)
-            files_string = ""
-            for key, value in files_status:
-                files_string.join(
-                    "{}: {}\n".format(key, value and "Available" or "Unavailable")
-                )
+            files_string = [f"{key}: {'Available' if value else 'Unavailable'}" for key, value in files_status.items()]
             embed = discord.Embed(
                 title="Translation Status",
-                description="Comparing {} -> {}".format(lang.value, "eng"),
+                description="Comparing {} -> {}".format(lang.value, "en"),
             )
             embed.add_field(name="Files", value=files_string, inline=False)
             await interaction.response.send_message(embed=embed)
             return
+
+        @tree.command(
+            name="track_pr",
+            description="Make language track translation pull request",
+            guild=this_guild
+        )
+        @discord.app_commands.choices(
+            lang=[Choice(name=lang, value=lang) for lang in trans_db.keys()]
+        )
+        @app_commands.describe(pr_no="The string you want echoed backed")
+        async def track_pr(interaction: discord.Interaction, lang: Choice[str], pr_no: int):
+            with trans_db[lang.value].mutex:
+                loading_msg = interaction.response.send_message("Performing action...")
+                get_by_pr(lang.value, pr_no)
+                ref = trans_db[lang.value]
+                ref.pr_no = pr_no
+                embed = discord.Embed(
+                    title=f"Translation for {lang.value}",
+                    description=f"{lang.value} is now tracking PR {ref.pr_no}"
+                )
+                pr_files: str = "".join([f"{file}\n" for file in ref.pr_files])
+                master_files: str = "".join([f"{file}" for file in ref.owned_files])
+                embed.add_field(name="Files from pull request", value=pr_files if len(pr_files) else "None", inline=False)
+                embed.add_field(name="Files from master", value=master_files if len(master_files) else "None", inline=False)
+                await loading_msg
+                await interaction.edit_original_response(content=None, embed=embed)

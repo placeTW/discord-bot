@@ -2,6 +2,7 @@ import os
 
 import discord
 from discord import app_commands
+from discord.ext import tasks
 
 # from discord.ext import commands
 from dotenv import load_dotenv
@@ -17,15 +18,35 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
 
-translation_stat.trans_db_lock.acquire()
-worker = translation_stat.bg_worker(GH_TOKEN)
 
 # setting up the bot
 intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
-client = discord.Client(intents=intents)
+
+translation_stat.load_pr_map()
+translation_stat.initialize_github(GH_TOKEN)
+translation_stat.trans_db_lock.acquire()
 
 
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def setup_hook(self):
+        print("MY CLINET SETUP HOOK")
+        self.bg_worker.start()
+
+    @tasks.loop(hours=1)
+    async def bg_worker(self):
+        print("MyCLIENT TASK RUN")
+        translation_stat.update_repo()
+
+    @bg_worker.after_loop
+    async def write_pr_file(self):
+        translation_stat.write_pr_map()
+
+
+client = MyClient(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)
 
@@ -33,9 +54,13 @@ this_guild = discord.Object(id=GUILD)
 # sync the slash command to server
 @client.event
 async def on_ready():
+    # register commands from other files
+    fetch_entry_cmd.register_commands(tree, this_guild)
+    hgs.register_commands(tree, this_guild)
+    translation_stat.register_commands(tree, this_guild)
     await tree.sync(guild=this_guild)
     # print "ready" in the console when the bot is ready to work
-    print("Bot is ready.")
+    print("READYYYYY")
 
 
 # ! These are basic test commands that should not exist when deployed
@@ -59,10 +84,5 @@ async def test_slash_command(interaction: discord.Interaction):
 async def test_slash_command(interaction: discord.Interaction, given_str: str):
     await interaction.response.send_message(f"You sent this: `{given_str}`")
 
-
-# register commands from other files
-fetch_entry_cmd.register_commands(tree, this_guild)
-hgs.register_commands(tree, this_guild)
-translation_stat.register_commands(tree, this_guild)
 
 client.run(TOKEN)
