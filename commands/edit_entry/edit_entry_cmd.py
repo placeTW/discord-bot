@@ -4,6 +4,7 @@ from discord import app_commands
 from ..modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
+from .github_pullrequest import modify_json_and_create_pull_request
 
 # from .fetch_entry_main import _fetch_entry_with_json
 
@@ -72,8 +73,8 @@ class SubmitEntryModal(discord.ui.Modal):
             style=discord.TextStyle.paragraph,
             min_length=1,
             placeholder=f"Add your new text here.\n"
-            + f"Entry: {entry_name} Language: {lang} Field: {field}\n"
-            + "For links, please seperate all links by commas, e.g.: www.ac.om,www.b.com,www.c.com",
+            # + f"Entry: {entry_name} Language: {lang} Field: {field}\n",
+            + f"For links, separate all links with commas.",
         )
         self.add_item(self.proposed_entry)
 
@@ -132,6 +133,11 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         self.the_modal = the_modal
         self.proposed_channel = proposed_channel
         self.proposing_user_id = proposing_user_id
+        self.lang = lang
+        self.entry_id = entry_id
+        self.entry_name = entry_name
+        self.field = field
+        self.proposed_text = proposed_text
 
     async def disable_buttons(self):
         for button in self.children:
@@ -146,8 +152,16 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         await self.disable_buttons()
         await interaction.response.send_message("Approved change!")
         await self.proposed_channel.send(
-            f"<@{self.proposing_user_id}>' submussion has been accepted!"
+            f"<@{self.proposing_user_id}>' submission has been accepted!"
             + " Expect to see the changes soon. 🎉"
+        )
+
+        modify_json_and_create_pull_request(
+            self.lang,
+            self.entry_id,
+            self.entry_name,
+            self.field,
+            self.proposed_text,
         )
 
     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
