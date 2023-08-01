@@ -14,7 +14,7 @@ from ..entry_consts.consts import (
 )
 
 # channel to receive approval requests
-WAITING_APPROVAL_CHANNEL_ID = 1135250604751601716
+WAITING_APPROVAL_CHANNEL_ID = 1135991380242608259
 
 
 def register_commands(
@@ -71,7 +71,9 @@ class SubmitEntryModal(discord.ui.Modal):
             label=f"Add your new entry here",
             style=discord.TextStyle.paragraph,
             min_length=1,
-            placeholder=f"Add your new text here.\nEntry: {entry_name} Language: {lang} Field: {field}",
+            placeholder=f"Add your new text here.\n"
+            + f"Entry: {entry_name} Language: {lang} Field: {field}\n"
+            + "For links, please seperate all links by commas, e.g.: www.ac.om,www.b.com,www.c.com",
         )
         self.add_item(self.proposed_entry)
 
@@ -86,17 +88,19 @@ class SubmitEntryModal(discord.ui.Modal):
             f"Thanks for your response! The team will review your request soon.",
             ephemeral=True,
         )
+        submitted_msg = await interaction.original_response()
         user_name = interaction.user.name
         user_id = interaction.user.id
+        proposed_channel = self.the_client.get_channel(interaction.channel_id)
         approve_deny_view = ApproveDenyTranslationEntryView(
-            self,
-            self.lang,
-            self.entry_id,
-            self.entry_name,
-            self.field,
-            user_id,
-            # self.proposed_entry.value,
-            interaction.channel_id,
+            the_modal=self,
+            lang=self.lang,
+            entry_id=self.entry_id,
+            entry_name=self.entry_name,
+            field=self.field,
+            proposing_user_id=user_id,
+            proposed_text=self.proposed_entry.value,
+            proposed_channel=proposed_channel,
         )
         self.sent_msg = await self.approval_channel.send(
             f"User {user_name} has proposed a change for this entry:\n"
@@ -106,7 +110,6 @@ class SubmitEntryModal(discord.ui.Modal):
             + f"* The proposed change is: \n"
             + f"`{self.proposed_entry.value}`",
             view=approve_deny_view,
-            silent=True,
         )
 
         # approve_deny_view.set_msg_id(sent_msg.id)
@@ -122,19 +125,18 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         field: str,
         proposing_user_id: int,
         proposed_text: str,
-        # proposed_channel_id: int,
+        proposed_channel: discord.TextChannel,
         year: int = 2023,
     ):
-        super().__init__()
+        super().__init__(timeout=None)
         self.the_modal = the_modal
-
-    def set_msg_id(self, msg_id: int):
-        self.msg_id = msg_id
-        print(f"msg id: {msg_id}")
+        self.proposed_channel = proposed_channel
+        self.proposing_user_id = proposing_user_id
 
     async def disable_buttons(self):
         for button in self.children:
             button.disabled = True
+        self.stop()
         await self.the_modal.sent_msg.edit(view=self)
 
     @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
@@ -143,13 +145,21 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
     ):
         await self.disable_buttons()
         await interaction.response.send_message("Approved change!")
+        await self.proposed_channel.send(
+            f"<@{self.proposing_user_id}>' submussion has been accepted!"
+            + " Expect to see the changes soon. 🎉"
+        )
 
     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
     async def edit_entry_button_deny(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        await self.disable_buttons(interaction)
+        await self.disable_buttons()
         await interaction.response.send_message("Denied change!")
+        # await self.proposed_channel.send(
+        #     "Unfortunately, your submission entry has been denied. "
+        #     + "Please let us know if you have questions."
+        # )
 
 
 if __name__ == "__main__":
