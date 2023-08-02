@@ -35,7 +35,7 @@ class FetchEntryView(discord.ui.View):
         placeholder="Choose an entry",
         options=[
             discord.SelectOption(
-                label=entry_id, description=entry_desc, value=entry_id
+                label=entry_desc, description=entry_desc, value=entry_id
             )
             for entry_id, entry_desc in SUPPORTED_ART2023_IDS.items()
         ],
@@ -51,8 +51,8 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose a language",
         options=[
-            discord.SelectOption(label=lang_id, description=lang_id)
-            for lang_id in SUPPORTED_LANGUAGE_CODES
+            discord.SelectOption(label=lang_id, description=lang_name)
+            for lang_id, lang_name in SUPPORTED_LANGUAGE_CODES.items()
         ],
         row=2,
     )
