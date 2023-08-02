@@ -33,7 +33,7 @@ def register_commands(tree, this_guild: discord.Object):
 
         Args:
             interaction (discord.Interaction): required by discord.py
-            entry (str): The entry to edit.
+            entry (str): The entry to fetch.
             lang (str): The language of the entry to fetch.
             field (str, optional): Field to fetch: title, blurb, description,
                 or links.
