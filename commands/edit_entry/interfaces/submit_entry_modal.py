@@ -107,10 +107,11 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
     ):
         await self.disable_buttons()
         await interaction.response.send_message("Approved change!")
-        await self.proposed_channel.send(
-            f"<@{self.proposing_user_id}>' submission has been accepted!"
-            + " Expect to see the changes soon. 🎉"
-        )
+        if self.proposed_channel:
+            await self.proposed_channel.send(
+                f"<@{self.proposing_user_id}>' submission has been accepted!"
+                + " Expect to see the changes soon. 🎉"
+            )
 
         resulting_json = await modify_json_and_create_pull_request(
             self.lang,
