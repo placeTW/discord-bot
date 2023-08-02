@@ -5,7 +5,7 @@ import asyncio
 # note: this might need to become async
 async def modify_json_and_create_pull_request(
     lang: str,  # en, lt, et, etc
-    entry_id: int,  # entry INDEX (i.e., from 0 to 15)
+    entry_id: str,  # entry INDEX (i.e., from 0 to 15)
     entry_name: str,  # entry id
     field: str,  # title, desc, etc
     proposed_text: str,
@@ -20,11 +20,18 @@ async def modify_json_and_create_pull_request(
         the_json = await get_blank_json()
 
     # print("Modifying the json to reflect the changes...")
+    if field == "links":
+        proposed_text = process_list(proposed_text)
     the_json[entry_id][field] = proposed_text
+    print(the_json[entry_id])
     # print("Creating a pull request...")
     # print("Done!")
     return the_json
     # await asyncio.sleep(0)
+
+
+def process_list(list_str: str):
+    return list_str.split(",")
 
 
 async def get_blank_json():
@@ -44,10 +51,10 @@ if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(
         modify_json_and_create_pull_request(
-            lang="sadadwen",
-            entry_id=1,
-            entry_name="chip",
-            field="desc",
-            proposed_text="hot gay sex",
+            lang="en",
+            entry_id="chip",
+            entry_name="ignored",
+            field="links",
+            proposed_text="hot,gay,sex",
         )
     )
