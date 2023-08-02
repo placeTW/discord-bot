@@ -1,5 +1,7 @@
 import discord
 from discord import app_commands
+
+from commands.fetch_entry.fetch_entry_main import _fetch_entry_with_json
 from ..modules import async_utils
 from discord.app_commands import Choice
 from .interfaces import submit_entry_modal
@@ -36,6 +38,9 @@ def register_commands(
         selected_entry_id = entry.value  # entry always exists
         selected_entry_name = entry.name  # entry always exists
         selected_field = field.value  # field is mandatory here
+        initial_value = await _fetch_entry_with_json(
+            interaction, selected_entry_id, selected_lang, selected_field
+        )
         form = submit_entry_modal.SubmitEntryModal(
             client,
             "Entry Edit Submission",
@@ -43,6 +48,7 @@ def register_commands(
             selected_entry_id,
             selected_entry_name,
             selected_field,
+            initial_value
         )
 
         await interaction.response.send_modal(form)
