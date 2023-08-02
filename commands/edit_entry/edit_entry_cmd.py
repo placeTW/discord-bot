@@ -48,7 +48,7 @@ def register_commands(
             selected_entry_id,
             selected_entry_name,
             selected_field,
-            initial_value
+            ",".join(initial_value) if isinstance(initial_value, list) else initial_value,
         )
 
         await interaction.response.send_modal(form)
