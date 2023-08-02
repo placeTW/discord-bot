@@ -60,7 +60,7 @@ class SubmitEntryModal(discord.ui.Modal):
             approval_channel=self.approval_channel,
         )
         self.sent_msg = await self.approval_channel.send(
-            f"User {user_name} has proposed a change for this entry:\n"
+            f"User {user_name} <@{user_id}> has proposed a change for this entry:\n"
             + f"* Entry: {self.entry_name} \n"
             + f"* Language: {self.lang} \n"
             + f"* Field: {self.field} \n"
