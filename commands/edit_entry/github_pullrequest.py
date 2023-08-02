@@ -11,7 +11,7 @@ async def modify_json_and_create_pull_request(
     field: str,  # title, desc, etc
     proposed_text: str,
 ):
-    print("Fetching the relevant json file from url...")
+    # print("Fetching the relevant json file from url...")
     json_url = f"https://placetw.com/locales/{lang}/art-pieces.json"
     the_json = await get_json(how="url", json_url=json_url)
     # * in case `art-pieces.json` doesn't exist:
@@ -20,14 +20,14 @@ async def modify_json_and_create_pull_request(
         # print("failed to find such lang file, returning blank version")
         the_json = await get_blank_json()
 
-    print("Modifying the json to reflect the changes...")
+    # print("Modifying the json to reflect the changes...")
     if field == "links":
         proposed_text = process_list(proposed_text)
     the_json[entry_id][field] = proposed_text
     # print(the_json[entry_id])
-    print("Creating a pull request...")
+    # print("Creating a pull request...")
     create_pull_request(lang, the_json, entry_id, field)
-    print("Done!")
+    # print("Done!")
     return the_json
 
 
