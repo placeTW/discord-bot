@@ -24,7 +24,7 @@ def register_commands(tree, this_guild: discord.Object):
     @app_commands.choices(field=POSSIBLE_ART_FIELD_CODES)
     async def fetch_entry(
         interaction: discord.Interaction,
-        entry: Choice[int],
+        entry: Choice[str],
         lang: Choice[str],
         field: Choice[str] = None,
     ):

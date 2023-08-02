@@ -35,11 +35,9 @@ class FetchEntryView(discord.ui.View):
         placeholder="Choose an entry",
         options=[
             discord.SelectOption(
-                label=entry_id, description=entry_desc, value=i
+                label=entry_id, description=entry_desc, value=entry_id
             )
-            for i, (entry_id, entry_desc) in enumerate(
-                SUPPORTED_ART2023_IDS.items()
-            )
+            for entry_id, entry_desc in SUPPORTED_ART2023_IDS.items()
         ],
         row=1,
     )
@@ -94,7 +92,7 @@ class FetchEntryView(discord.ui.View):
             return
         return await _fetch_entry_with_json(
             interaction,
-            int(self.selected_entry),
+            self.selected_entry,
             self.selected_language,
             self.selected_field,
         )

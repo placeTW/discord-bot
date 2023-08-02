@@ -26,7 +26,7 @@ async def get_json(how="url", json_url="") -> dict:
 
 
 async def _fetch_entry_with_json(
-    interaction: discord.Interaction, entry: int, lang: str, field: str = None
+    interaction: discord.Interaction, entry: str, lang: str, field: str = None
 ):
     """Function to fetch entry based on json entries.
     This is called by both the cmd and ui version of fectch_entry,
@@ -61,9 +61,8 @@ async def _fetch_entry_with_json(
 
     else:  # * return only specific field
         result = result_json[entry][field]
-        art_id = result_json[entry]["art_id"]
         result = postprocess.postprocess_fetch_field(result)
         await interaction.response.send_message(
-            f"The {field} for `{art_id}` in `{lang}` is:\n{result}",
+            f"The {field} for `{entry}` in `{lang}` is:\n{result}",
             suppress_embeds=True,
         )

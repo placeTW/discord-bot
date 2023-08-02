@@ -35,7 +35,7 @@ def register_commands(
     @app_commands.checks.has_any_role("admin", "translator", "dev")
     async def edit_entry_cmd(
         interaction: discord.Interaction,
-        entry: Choice[int],
+        entry: Choice[str],
         lang: Choice[str],
         field: Choice[str],  # field CANNOT be empty in this case
     ):
