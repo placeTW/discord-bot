@@ -13,10 +13,12 @@ from commands.edit_entry import edit_entry_modal
 from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
+import sys
 
 # load environment vars (from .env)
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+prod = len(sys.argv) > 1 and sys.argv[1] == 'prod'
+TOKEN = os.getenv('DISCORD_TOKEN_DEV' if not prod else 'DISCORD_TOKEN')
 GUILD = os.getenv("DISCORD_GUILD")
 
 # setting up the bot
