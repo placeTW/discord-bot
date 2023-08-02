@@ -1,5 +1,6 @@
 from ..fetch_entry.fetch_entry_main import get_json
 import asyncio
+from .git_utils import create_pull_request
 
 
 # note: this might need to become async
@@ -10,7 +11,7 @@ async def modify_json_and_create_pull_request(
     field: str,  # title, desc, etc
     proposed_text: str,
 ):
-    # print("Fetching the relevant json file from url...")
+    print("Fetching the relevant json file from url...")
     json_url = f"https://placetw.com/locales/{lang}/art-pieces.json"
     the_json = await get_json(how="url", json_url=json_url)
     # * in case `art-pieces.json` doesn't exist:
@@ -19,15 +20,15 @@ async def modify_json_and_create_pull_request(
         # print("failed to find such lang file, returning blank version")
         the_json = await get_blank_json()
 
-    # print("Modifying the json to reflect the changes...")
+    print("Modifying the json to reflect the changes...")
     if field == "links":
         proposed_text = process_list(proposed_text)
     the_json[entry_id][field] = proposed_text
-    print(the_json[entry_id])
-    # print("Creating a pull request...")
-    # print("Done!")
+    # print(the_json[entry_id])
+    print("Creating a pull request...")
+    create_pull_request(lang, the_json, entry_id, field)
+    print("Done!")
     return the_json
-    # await asyncio.sleep(0)
 
 
 def process_list(list_str: str):
@@ -35,9 +36,9 @@ def process_list(list_str: str):
 
 
 async def get_blank_json():
-    # * link = "https://placetw.com/locales/en/art-pieces.json"
-    default_entries = await get_json(how="url", json_url=link)
-    for default_entry in default_entries:
+    default_link = "https://placetw.com/locales/en/art-pieces.json"
+    default_entries = await get_json(how="url", json_url=default_link)
+    for entry_id, default_entry in default_entries.items():
         default_entry["title"] = ""
         default_entry["blurb"] = ""
         default_entry["desc"] = ""
