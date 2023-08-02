@@ -17,6 +17,7 @@ class SubmitEntryModal(discord.ui.Modal):
         entry_id: int,
         entry_name: str,
         field: str,
+        initial_value: str = None,
         *,
         timeout: float = None,
     ) -> None:
@@ -25,6 +26,7 @@ class SubmitEntryModal(discord.ui.Modal):
         self.approval_channel = client.get_channel(WAITING_APPROVAL_CHANNEL_ID)
         self.proposed_entry = discord.ui.TextInput(
             label=f"Add your new entry here",
+            default=initial_value,
             style=discord.TextStyle.paragraph,
             min_length=1,
             placeholder=f"Add your new text here.\n"

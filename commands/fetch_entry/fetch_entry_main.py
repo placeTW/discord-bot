@@ -46,23 +46,15 @@ async def _fetch_entry_with_json(
         how="url",
         json_url=link_to_fetch,
     )
+    
     # * if some error happens, notify user and stop
     if result_json is None:
-        await interaction.response.send_message(
-            "Sorry, your requested information is not available at the moment.",
-            ephemeral=True,
-        )
         return
 
     if field is None:  # * return entire entry
         result = result_json[entry]
         result = postprocess.postprocess_fetch_item(result)
-        await interaction.response.send_message(result, suppress_embeds=True)
+        return result
 
     else:  # * return only specific field
-        result = result_json[entry][field]
-        result = postprocess.postprocess_fetch_field(result)
-        await interaction.response.send_message(
-            f"The {field} for `{entry}` in `{lang}` is:\n{result}",
-            suppress_embeds=True,
-        )
+        return result_json[entry][field]
