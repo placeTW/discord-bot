@@ -1,4 +1,4 @@
-from github import Github, Repository
+from github import Github, Repository, GithubObject
 import json
 import os
 from threading import Lock
@@ -6,12 +6,21 @@ import discord
 from discord import app_commands
 from discord.app_commands import Choice
 from contextlib import nullcontext
+import re
 
 g: Github = None
 repo: Repository = None
 
 # repo = g.get_repo("placeTW/website")
-tracking_files = ["translation.json", "art-pieces.json"]
+main_lang = "en"
+json_matches: dict[str, list[str]] = {
+    "translation.json": [r".*\/(title|blurb|desc)"],
+    "art-pieces.json": [r".*"]
+}
+
+
+def check_file_include_rule(path: str) -> bool:
+    return re.search("public\/locales\/.*\/(art-pieces\.json|translation\.json)", path)
 
 
 def filename_rm_sector(filename: str, sectors: int) -> str:
@@ -32,30 +41,76 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
     return filename, locale
 
 
+def generate_progress_str(percentage: float, size: int) -> str:
+    slice = 1 / size
+    return "[{}]".format(
+        f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
+        for it in range(size)
+    )
+
+
+class transfile_progress:
+    def __init__(self, total_indexes=0, json_data={}):
+        self.all_fields: dict[str, bool] = {}
+        self.ready_indexes = int()
+        self.total_indexes = (
+            total_indexes if total_indexes else self.ready_indexes
+        )
+        if json_data:
+            for key, value in json_data.items():
+                self.all_fields[key] = value
+        for _, value in self.all_fields.items():
+            if value:
+                self.ready_indexes += 1
+
+    def progress_str_fwd(self) -> str:
+        return generate_progress_str(self.ready_indexs / self.total_indexes, 10)
+
+    def load_file(self, filename, json_data: dict) -> None:
+        standards: list[list[str]] = []
+        for item in json_matches[filename]:
+            standards.append(item.split('/'))
+
+        def match(iter: int, target: dict, pre_str="") -> None:
+            nonlocal standards, self
+            for key, value in target.items():
+                for item in standards:
+                    if re.match(key, item):
+                        if iter + 1 == len(item):
+                            self.all_fields[pre_str] = str(value)
+                            break
+                        pre_str += f"/{key}"
+                        match(iter + 1, value, pre_str=pre_str)
+                        break
+
+        match(0, json_data)
+
+
+# test = transfile_progress()
+# with open("../../trans_data/zh/art-pieces.json", "r") as fff:
+#     test.load_file("art-pieces.json", json.loads(fff.read()))
+#
+# print(test.all_fields)
+
+# exit(0)
+
+
 def write_data(
     locale: str,
     filename: str,
     full_path: str,
-    commit_ref: str = None,
-    success_callback=None,
+    commit_ref: str = GithubObject.NotSet,
 ) -> None:
-    if filename not in tracking_files:
+    if filename not in json_matches.keys():
         return
     if not os.path.exists("trans_data/{}".format(locale)):
         os.makedirs("trans_data/{}".format(locale))
     with open("trans_data/{}/{}".format(locale, filename), "w+") as out:
-        if not commit_ref:
-            out.write(
-                repo.get_contents(full_path).decoded_content.decode("utf-8")
-            )
-        else:
-            out.write(
-                repo.get_contents(
-                    full_path, ref=commit_ref
-                ).decoded_content.decode("utf-8")
-            )
-    if success_callback:
-        success_callback()
+        out.write(
+            repo.get_contents(
+                full_path, ref=commit_ref
+            ).decoded_content.decode("utf-8")
+        )
 
 
 class locale_t:
@@ -65,22 +120,17 @@ class locale_t:
         self.pr_no: str = None
         self.mutex: Lock = Lock()
 
-    def add_file(self, filename) -> None:
-        if not self.owned_files:
-            self.owned_files = list[str]()
-        if filename not in self.owned_files:
-            self.owned_files.append(filename)
+    def sync_pr_files(self, filenames: list[str] = None):
+        if filenames:
+            if self.owned_files:
+                self.owned_files = list(set(self.owned_files) - set(filenames))
+        self.pr_files = filenames
 
-    def add_pr_file(self, filename) -> None:
-        if not self.pr_files:
-            self.pr_files = list[str]()
-        if filename in self.owned_files:
-            self.owned_files.remove(filename)
-        self.pr_files.append(filename)
-
-    def __repr__(self) -> str:
-        return f"Owned files: {self.owned_files}\nPR files: {self.pr_files}\nPR number: {self.pr_no}\n"
-
+    def sync_master_files(self, filenames: list[str] = None):
+        if filenames:
+            if self.pr_files:
+                self.pr_files = list(set(self.pr_files) - set(filenames))
+        self.owned_files = filenames
 
 
 trans_db_lock = Lock()
@@ -89,20 +139,25 @@ trans_db: dict[str, locale_t] = {}
 
 def get_by_pr(locale_check: str, pr_no: int) -> None:
     pr = repo.get_pull(pr_no)
-    commit = pr.get_commits()[pr.commits - 1]
-    for file in commit.files:
-        filename, locale = handle_filename(file.filename, 2)
-        if locale_check != locale:
-            continue
-        write_data(
-            locale,
-            filename,
-            file.filename,
-            commit_ref=commit.sha,
-            success_callback=lambda: trans_db[locale].add_pr_file(
-                filename
-            ),
-        )
+    pr_files_to_add: list[str] = []
+    all_commits = pr.get_commits()
+    for iter in reversed(range(pr.commits)):
+        commit = all_commits[iter]
+        for file in commit.files:
+            if not check_file_include_rule(file.filename):
+                continue
+            filename, locale = handle_filename(file.filename, 2)
+            if filename in pr_files_to_add or locale_check != locale:
+                continue
+            write_data(
+                locale,
+                filename,
+                file.filename,
+                commit_ref=commit.sha,
+            )
+            pr_files_to_add.append(filename)
+            print(file)
+    trans_db[locale_check].sync_pr_files(pr_files_to_add)
 
 
 def load_pr_map() -> None:
@@ -113,36 +168,51 @@ def load_pr_map() -> None:
         if not len(filestr):
             return
         parsed = json.loads(filestr)
-        for key, item in parsed:
-            if not trans_db.get(key):
-                trans_db[key] = locale_t()
-            with trans_db[key].mutex:
-                trans_db[key].pr_no = str(item["pr_no"])
-                get_by_pr(key, int(item["pr_no"]))
+        for lang, pr_str in parsed.items():
+            if not trans_db.get(lang):
+                trans_db[lang] = locale_t()
+            with trans_db[lang].mutex:
+                trans_db[lang].pr_no = pr_str
+                get_by_pr(lang, int(pr_str))
 
 
 def update_repo() -> None:
     def iter_contents(content, sectors: int) -> None:
+        categorised: dict[str, dict[str, str]] = {}
         while content:
             file_content = content.pop(0)
             if file_content.type == "dir":
                 content.extend(repo.get_contents(file_content.path))
             else:
+                if not check_file_include_rule(file_content.path):
+                    continue
                 filename, locale = handle_filename(file_content.path, sectors)
-                with trans_db[locale].mutex:
+                if not categorised.get(locale):
+                    categorised[locale] = dict[str, str]()
+                categorised[locale][filename] = file_content.path
+
+        def process_locale(locale: str, files: dict[str, str]):
+            ref = trans_db[locale]
+            with ref.mutex:
+                master_files_to_add: list[str] = []
+                for filename, file_path in files.items():
                     if (
-                        trans_db[locale].pr_files
-                        and file_content.path in trans_db[locale].pr_files
+                        ref.pr_files
+                        and filename in ref.pr_files
                     ):
-                        return
+                        continue
                     write_data(
                         locale,
                         filename,
-                        file_content.path,
-                        success_callback=lambda: trans_db[locale].add_file(
-                            filename
-                        ),
+                        file_path,
                     )
+                    master_files_to_add.append(filename)
+                ref.sync_master_files(master_files_to_add)
+
+        process_locale(main_lang, categorised.pop(main_lang))
+
+        for locale, files in categorised.items():
+            process_locale(locale, files)
 
     # template_contents = repo.get_contents("public/templates")
     locale_contents = repo.get_contents("public/locales")
@@ -160,7 +230,8 @@ def update_repo() -> None:
 
 
 def get_file_stat(lang: str) -> dict[str, bool]:
-    def concat(entry: locale_t): return entry.owned_files + entry.pr_files
+    def concat(entry: locale_t):
+        return entry.owned_files + entry.pr_files
 
     def inner(base: list[str], target: list[str]) -> dict[str, bool]:
         ret = dict[str, bool]()
@@ -173,10 +244,10 @@ def get_file_stat(lang: str) -> dict[str, bool]:
                 ret[item] = False
         return ret
 
-    with trans_db["en"].mutex, trans_db[
+    with trans_db[main_lang].mutex, trans_db[
         lang
-    ].mutex if lang != "en" else nullcontext():
-        return inner(concat(trans_db["en"]), concat(trans_db[lang]))
+    ].mutex if lang != main_lang else nullcontext():
+        return inner(concat(trans_db[main_lang]), concat(trans_db[lang]))
 
 
 def write_pr_map() -> None:
@@ -184,8 +255,9 @@ def write_pr_map() -> None:
     with open("trans_data/pr_map.json", "w") as config:
         with trans_db_lock:
             for key, value in trans_db.items():
-                if value.pr_no:
-                    out[key] = value.pr_no
+                with value.mutex:
+                    if value.pr_no:
+                        out[key] = value.pr_no
         config.write(json.dumps(out))
 
 
@@ -197,6 +269,7 @@ def initialize_github(token: str) -> None:
 
 def register_commands(tree, this_guild: discord.Object):
     with trans_db_lock:
+
         @tree.command(
             name="trans_stat",
             description="Get translation status",
@@ -205,9 +278,14 @@ def register_commands(tree, this_guild: discord.Object):
         @discord.app_commands.choices(
             lang=[Choice(name=lang, value=lang) for lang in trans_db.keys()]
         )
-        async def trans_stat(interaction: discord.Interaction, lang: Choice[str]):
+        async def trans_stat(
+            interaction: discord.Interaction, lang: Choice[str]
+        ):
             files_status = get_file_stat(lang.value)
-            files_string = [f"{key}: {'Available' if value else 'Unavailable'}" for key, value in files_status.items()]
+            files_string = [
+                f"{key}: {'Available' if value else 'Unavailable'}"
+                for key, value in files_status.items()
+            ]
             embed = discord.Embed(
                 title="Translation Status",
                 description="Comparing {} -> {}".format(lang.value, "en"),
@@ -219,25 +297,41 @@ def register_commands(tree, this_guild: discord.Object):
         @tree.command(
             name="track_pr",
             description="Make language track translation pull request",
-            guild=this_guild
+            guild=this_guild,
         )
         @discord.app_commands.choices(
             lang=[Choice(name=lang, value=lang) for lang in trans_db.keys()]
         )
         @app_commands.describe(pr_no="The string you want echoed backed")
-        async def track_pr(interaction: discord.Interaction, lang: Choice[str], pr_no: int):
+        async def track_pr(
+            interaction: discord.Interaction, lang: Choice[str], pr_no: int
+        ):
             with trans_db[lang.value].mutex:
-                loading_msg = interaction.response.send_message("Performing action...")
+                loading_msg = interaction.response.send_message(
+                    "Performing action..."
+                )
                 get_by_pr(lang.value, pr_no)
                 ref = trans_db[lang.value]
                 ref.pr_no = pr_no
                 embed = discord.Embed(
                     title=f"Translation for {lang.value}",
-                    description=f"{lang.value} is now tracking PR {ref.pr_no}"
+                    description=f"{lang.value} is now tracking PR {ref.pr_no}",
                 )
                 pr_files: str = "".join([f"{file}\n" for file in ref.pr_files])
-                master_files: str = "".join([f"{file}" for file in ref.owned_files])
-                embed.add_field(name="Files from pull request", value=pr_files if len(pr_files) else "None", inline=False)
-                embed.add_field(name="Files from master", value=master_files if len(master_files) else "None", inline=False)
+                master_files: str = "".join(
+                    [f"{file}" for file in ref.owned_files]
+                )
+                embed.add_field(
+                    name="Files from pull request",
+                    value=pr_files if len(pr_files) else "None",
+                    inline=False,
+                )
+                embed.add_field(
+                    name="Files from master",
+                    value=master_files if len(master_files) else "None",
+                    inline=False,
+                )
                 await loading_msg
-                await interaction.edit_original_response(content=None, embed=embed)
+                await interaction.edit_original_response(
+                    content=None, embed=embed
+                )
