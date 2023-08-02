@@ -1,5 +1,6 @@
 from ..fetch_entry.fetch_entry_main import get_json
 import asyncio
+from .git_utils import create_pull_request
 
 
 # note: this might need to become async
@@ -23,11 +24,11 @@ async def modify_json_and_create_pull_request(
     if field == "links":
         proposed_text = process_list(proposed_text)
     the_json[entry_id][field] = proposed_text
-    print(the_json[entry_id])
+    # print(the_json[entry_id])
     # print("Creating a pull request...")
+    create_pull_request(lang, the_json, entry_id, field)
     # print("Done!")
     return the_json
-    # await asyncio.sleep(0)
 
 
 def process_list(list_str: str):
@@ -35,9 +36,9 @@ def process_list(list_str: str):
 
 
 async def get_blank_json():
-    # * link = "https://placetw.com/locales/en/art-pieces.json"
-    default_entries = await get_json(how="url", json_url=link)
-    for default_entry in default_entries:
+    default_link = "https://placetw.com/locales/en/art-pieces.json"
+    default_entries = await get_json(how="url", json_url=default_link)
+    for entry_id, default_entry in default_entries.items():
         default_entry["title"] = ""
         default_entry["blurb"] = ""
         default_entry["desc"] = ""

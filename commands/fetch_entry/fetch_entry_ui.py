@@ -35,7 +35,7 @@ class FetchEntryView(discord.ui.View):
         placeholder="Choose an entry",
         options=[
             discord.SelectOption(
-                label=entry_id, description=entry_desc, value=entry_id
+                label=entry_desc, description=entry_id, value=entry_id
             )
             for entry_id, entry_desc in SUPPORTED_ART2023_IDS.items()
         ],
@@ -51,8 +51,10 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose a language",
         options=[
-            discord.SelectOption(label=lang_id, description=lang_id)
-            for lang_id in SUPPORTED_LANGUAGE_CODES
+            discord.SelectOption(
+                label=lang_name, description=lang_id, value=lang_id
+            )
+            for lang_id, lang_name in SUPPORTED_LANGUAGE_CODES.items()
         ],
         row=2,
     )
@@ -66,8 +68,13 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose a field (leave empty to fetch entire entry)",
         options=[
-            discord.SelectOption(label=field_id, description=field_id)
-            for field_id in SUPPORTED_ART_FIELDS + ["fetch entire entry"]
+            discord.SelectOption(
+                label=field_desc, description=field_id, value=field_id
+            )
+            for field_id, field_desc in (
+                SUPPORTED_ART_FIELDS
+                | {"fetch_entire_entry": "Fetch entire entry"}
+            ).items()
         ],
         row=3,
     )
@@ -75,7 +82,7 @@ class FetchEntryView(discord.ui.View):
         self, interaction: discord.Interaction, select: discord.ui.Select
     ):
         self.selected_field = select.values[0]
-        if self.selected_field == "fetch entire entry":
+        if self.selected_field == "fetch_entire_entry":
             self.selected_field = None
         return await interaction.response.defer()
 

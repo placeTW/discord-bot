@@ -107,10 +107,11 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
     ):
         await self.disable_buttons()
         await interaction.response.send_message("Approved change!")
-        await self.proposed_channel.send(
-            f"<@{self.proposing_user_id}>' submission has been accepted!"
-            + " Expect to see the changes soon. 🎉"
-        )
+        if self.proposed_channel:
+            await self.proposed_channel.send(
+                f"<@{self.proposing_user_id}>' submission has been accepted!"
+                + " Expect to see the changes soon. 🎉"
+            )
 
         resulting_json = await modify_json_and_create_pull_request(
             self.lang,
@@ -121,29 +122,29 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         )
 
         # create temporary file
-        temporary_file = tempfile.NamedTemporaryFile(
-            mode="w", encoding="utf-8", delete=False, dir=".", suffix=".json"
-        )
-        tempfilename = temporary_file.name
-        os.chmod(tempfilename, 777)
-        json.dump(resulting_json, temporary_file, ensure_ascii=False, indent=2)
-        temporary_file.flush()
-        temporary_file.close()
+        # temporary_file = tempfile.NamedTemporaryFile(
+        #     mode="w", encoding="utf-8", delete=False, dir=".", suffix=".json"
+        # )
+        # tempfilename = temporary_file.name
+        # os.chmod(tempfilename, 777)
+        # json.dump(resulting_json, temporary_file, ensure_ascii=False, indent=2)
+        # temporary_file.flush()
+        # temporary_file.close()
 
-        temporary_file_again = open(tempfilename, "rb")
-        file_to_send = discord.File(
-            temporary_file_again, filename="user_proposal.json"
-        )
-        # upload file so mods can see
-        await self.approval_channel.send(
-            "User's proposed changes:",
-            reference=self.the_modal.sent_msg,
-            file=file_to_send,
-        )
-        temporary_file_again.close()
-        # delete the temp file afterwards
-        os.chmod(tempfilename, stat.S_IWRITE)
-        os.unlink(tempfilename)
+        # temporary_file_again = open(tempfilename, "rb")
+        # file_to_send = discord.File(
+        #     temporary_file_again, filename="user_proposal.json"
+        # )
+        # # upload file so mods can see
+        # await self.approval_channel.send(
+        #     "User's proposed changes:",
+        #     reference=self.the_modal.sent_msg,
+        #     file=file_to_send,
+        # )
+        # temporary_file_again.close()
+        # # delete the temp file afterwards
+        # os.chmod(tempfilename, stat.S_IWRITE)
+        # os.unlink(tempfilename)
 
     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
     async def edit_entry_button_deny(

@@ -1,20 +1,24 @@
 from discord.app_commands import Choice
 
 # TODO: This should become a dict like SUPPORTED_ART2023_IDS
-SUPPORTED_LANGUAGE_CODES = [
-    "en",
-    "cz",
-    "es",
-    "et",
-    "fr",
-    "lt",
-    "lv",
-    "ua",
-    "zh",
-]
+SUPPORTED_LANGUAGE_CODES = {
+    "en": "English",
+    "cz": "Czech",
+    "es": "Spanish",
+    "et": "Estonian",
+    "fr": "French",
+    "lt": "Lithuanian",
+    "lv": "Latvian",
+    "ua": "Ukranian",
+    "zh": "Mandarin",
+}
 
-# TODO: This should become a dict like SUPPORTED_ART2023_IDS
-SUPPORTED_ART_FIELDS = ["title", "blurb", "desc", "links"]
+SUPPORTED_ART_FIELDS = {
+    "title": "Title",
+    "blurb": "Blurb (Brief description below title)",
+    "desc": "Description",
+    "links": "Related Links",
+}
 
 SUPPORTED_ART2023_IDS = {
     "capoo": "BugCat Capoo",
@@ -35,13 +39,15 @@ SUPPORTED_ART2023_IDS = {
 }
 
 POSSIBLE_ART2023_IDS = [
-    Choice(name=id, value=id) for id in SUPPORTED_ART2023_IDS.keys()
+    Choice(name=desc, value=id) for id, desc in SUPPORTED_ART2023_IDS.items()
 ]
 
 POSSIBLE_LANGUAGE_CODES = [
-    Choice(name=lang, value=lang) for lang in SUPPORTED_LANGUAGE_CODES
+    Choice(name=desc, value=lang)
+    for lang, desc in SUPPORTED_LANGUAGE_CODES.items()
 ]
 
 POSSIBLE_ART_FIELD_CODES = [
-    Choice(name=lang, value=lang) for lang in SUPPORTED_ART_FIELDS
+    Choice(name=desc, value=field)
+    for field, desc in SUPPORTED_ART_FIELDS.items()
 ]
