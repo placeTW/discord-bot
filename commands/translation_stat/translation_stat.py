@@ -1,8 +1,9 @@
-import core
+from . import tr_core as core
 import discord
 from discord import app_commands
 from discord.app_commands import Choice
 import asyncio
+
 
 def register_commands(tree, this_guild: discord.Object):
 
@@ -58,17 +59,17 @@ def register_commands(tree, this_guild: discord.Object):
                 title=f"Translation for {lang.value}",
                 description=f"{lang.value} is now tracking PR {ref.pr_no}",
             )
-            pr_files: str = "".join([f"{file}\n" for file in ref.pr_files])
+            pr_files: str = "".join([f"{file} {core.get_transfile_progress(lang.value, file, False).progress_str_fwd()}\n" for file in ref.pr_files])
             master_files: str = "".join(
                 [f"{file}" for file in ref.owned_files]
             )
             embed.add_field(
-                name="Files from pull request",
+                name="Files provided by pull request",
                 value=pr_files if len(pr_files) else "None",
                 inline=False,
             )
             embed.add_field(
-                name="Files from master",
+                name="Files provided by master",
                 value=master_files if len(master_files) else "None",
                 inline=False,
             )

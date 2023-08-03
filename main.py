@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
-from commands.translation_stat import translation_stat, core
+from commands.translation_stat import translation_stat, tr_core
 from commands import hgs
 
 # load environment vars
@@ -23,8 +23,8 @@ GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
 intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
 
-core.initialize_github(GH_TOKEN)
-core.apply_pr_map()
+tr_core.initialize_github(GH_TOKEN)
+tr_core.apply_pr_map()
 
 
 class MyClient(discord.Client):
@@ -36,11 +36,11 @@ class MyClient(discord.Client):
 
     @tasks.loop(hours=1)
     async def bg_worker(self):
-        translation_stat.update_repo()
+        tr_core.update_repo()
 
     @bg_worker.after_loop
     async def write_pr_file(self):
-        translation_stat.write_pr_map()
+        tr_core.write_pr_map()
 
 
 client = MyClient(intents=intents)

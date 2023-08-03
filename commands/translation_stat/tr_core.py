@@ -44,10 +44,10 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
 
 def generate_progress_str(percentage: float, size: int) -> str:
     slice = 1 / size
-    return "[{}]".format(
+    return "[{}]".format(str().join([
         f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
         for it in range(size)
-    )
+    ]))
 
 
 class transfile_progress:
@@ -59,7 +59,7 @@ class transfile_progress:
 
     def progress_str_fwd(self) -> str:
         return generate_progress_str(
-            self.ready_indexs / self.total_indexes, 10
+            self.ready_indexes / self.total_indexes, 10
         )
 
     def load_file(
@@ -111,9 +111,17 @@ class transfile_progress:
 
     def read_json(self, locale, filename) -> None:
         with open(f"trans_data/{locale}/{filename}_progress.json", "r") as target:
-            self.total_indexes = target["total_indexes"]
-            self.ready_indexes = target["ready_indexes"]
-            self.all_fields = target["all_fields"]
+            parsed = json.loads(target.read())
+            self.total_indexes = parsed["total_indexes"]
+            self.ready_indexes = parsed["ready_indexes"]
+            self.all_fields = parsed["all_fields"]
+
+
+def get_transfile_progress(locale, filename, lock: bool) -> transfile_progress:
+    with trans_db[locale].mutex if lock else nullcontext():
+        ret = transfile_progress()
+        ret.read_json(locale, filename)
+        return ret
 
 
 def write_data(
@@ -229,16 +237,16 @@ def iter_contents(content, sectors: int) -> None:
                         file_path,
                     )
                     master_files_to_add.append(filename)
-                    with open(f"trans_data/{locale}/{filename}", "r") as target_file:
-                        if locale == main_lang:
-                            main_lang_progress[filename] = transfile_progress()
-                            main_lang_progress[filename].load_file(filename, json.loads(target_file.read()))
-                            main_lang_progress[filename].write_json(locale, filename)
-                        else:
-                            other_lang_progress = transfile_progress()
-                            other_lang_progress.load_file(filename, json.loads(target_file.read()), main_lang_progress[filename])
-                            other_lang_progress.write_json(locale, filename)
-                            
+                with open(f"trans_data/{locale}/{filename}", "r") as target_file:
+                    if locale == main_lang:
+                        main_lang_progress[filename] = transfile_progress()
+                        main_lang_progress[filename].load_file(filename, json.loads(target_file.read()))
+                        main_lang_progress[filename].write_json(locale, filename)
+                    else:
+                        other_lang_progress = transfile_progress()
+                        other_lang_progress.load_file(filename, json.loads(target_file.read()), main_lang_progress[filename])
+                        other_lang_progress.write_json(locale, filename)
+           
             ref.sync_master_files(master_files_to_add)
 
     if categorised.get(main_lang):
