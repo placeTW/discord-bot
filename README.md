@@ -15,6 +15,7 @@
 
 ## Planned Functionalities
 
+* `/track <lang>`: Track the translation progress of a language
 * `/coord-list`: Show a list of all canvas our/ally coordinates
 * `/coord <name>`: Show the canvas coordinates of one entry
 * `/edit-coord <name> <x> <y>`: Update the canvas coordinates for one entry
