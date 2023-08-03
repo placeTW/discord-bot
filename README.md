@@ -5,8 +5,8 @@
 ### For Website
 
 * `/ui-fetch`: Fetch placeTW entries by UI
-* `/fetch`: Fetch placeTW entries by command line
-* `/edit-entry`: Edit placeTW entries and get approved/rejected in `#translation-submissions` channel
+* `/fetch <entry> <lang>`: Fetch placeTW entries by command line
+* `/edit-entry <entry> <lang> <field>`: Edit placeTW entries and get approved/rejected in `#translation-submissions` channel
 
 ### For Fun
 
@@ -15,9 +15,10 @@
 
 ## Planned Functionalities
 
-* `/coords`: Show current canvas coordinates
-* `/edit-coords`: Update the canvas coordinates
-* `/update-plan`: Update a plan and post English text and translated Mandarin in some channels
+* `/coord-list`: Show a list of all canvas our/ally coordinates
+* `/coord <name>`: Show the canvas coordinates of one entry
+* `/edit-coord <name> <x> <y>`: Update the canvas coordinates for one entry
+* `/update-plan <announcement>`: Update a plan and post English text and translated Mandarin in some channels
 
 ## Future Functionalities
 no
