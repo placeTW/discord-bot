@@ -18,6 +18,7 @@ json_matches: dict[str, list[str]] = {
 commands_initialize_condition = Condition()
 commands_initialize_condition_flag = False
 
+
 def check_file_include_rule(path: str) -> bool:
     return re.search(
         r"public\/locales\/.*\/(art-pieces\.json|translation\.json)", path
@@ -43,7 +44,7 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
 
 
 def generate_progress_str(percentage: float, size: int) -> str:
-    slice = 1 / size
+    slice = (100 / size) + 1
     return "[{}]".format(str().join([
         f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
         for it in range(size)
@@ -59,8 +60,14 @@ class transfile_progress:
 
     def progress_str_fwd(self) -> str:
         return generate_progress_str(
-            self.ready_indexes / self.total_indexes, 10
+            (self.ready_indexes / self.total_indexes) * 100 + 1, 10
         )
+
+    def get_percentage(self) -> int:
+        return int((self.ready_indexes / self.total_indexes) * 100 + 1)
+
+    def to_progress_str(self) -> str:
+        return f"{self.ready_indexes}/{self.total_indexes}, {self.get_percentage()}%"
 
     def load_file(
         self, filename, json_data: dict, lang_cmp: "transfile_progress" = None
@@ -144,7 +151,7 @@ def write_data(
 
 class locale_t:
     def __init__(self) -> None:
-        self.owned_files: list[str] = None
+        self.owned_files: list[str] = []
         self.pr_files: list[str] = []
         self.pr_no: str = None
         self.mutex: Lock = Lock()
@@ -170,6 +177,7 @@ trans_db: dict[str, locale_t] = {}
 
 
 def shift2pr(locale_check: str, pr_no: int) -> None:
+    trans_db[locale_check].pr_no = str(pr_no)
     pr = repo.get_pull(pr_no)
     pr_files_to_add: list[str] = []
     all_commits = pr.get_commits()
@@ -207,8 +215,7 @@ def apply_pr_map() -> None:
                 shift2pr(lang, int(pr_str))
 
 
-
-def iter_contents(content, sectors: int) -> None:
+def iter_contents(content, sectors: int, lock: bool = True) -> None:
     categorised: dict[str, dict[str, str]] = {}
     while content:
         file_content = content.pop(0)
@@ -225,12 +232,12 @@ def iter_contents(content, sectors: int) -> None:
     main_lang_progress: dict[str, transfile_progress] = {}
 
     def process_locale(locale: str, files: dict[str, str]):
-        nonlocal main_lang_progress
+        nonlocal main_lang_progress, lock
         ref = trans_db[locale]
-        with ref.mutex:
+        with ref.mutex if lock else nullcontext():
             master_files_to_add: list[str] = []
             for filename, file_path in files.items():
-                if not (ref.pr_files and filename in ref.pr_files):
+                if not (filename in ref.pr_files):
                     write_data(
                         locale,
                         filename,
@@ -239,6 +246,7 @@ def iter_contents(content, sectors: int) -> None:
                     master_files_to_add.append(filename)
                 with open(f"trans_data/{locale}/{filename}", "r") as target_file:
                     if locale == main_lang:
+                        # TODO HEREHRHEHRIEHHEHRIEHOWEH
                         main_lang_progress[filename] = transfile_progress()
                         main_lang_progress[filename].load_file(filename, json.loads(target_file.read()))
                         main_lang_progress[filename].write_json(locale, filename)
@@ -281,10 +289,11 @@ def update_repo() -> None:
     iter_contents(locale_contents, 2)
 
 
-# FIXME This is likely to cause race condition idk how to prevent it
-def shift2master(locale: str) -> None:
-    trans_db[locale].pr_files = None
-    iter_contents(repo.get_contents(f"public/locales/{locale}", 2))
+def shift2master(locale: str, lock: bool) -> None:
+    with trans_db[locale].mutex if lock else nullcontext():
+        trans_db[locale].pr_no = None
+        trans_db[locale].pr_files.clear()
+        iter_contents(repo.get_contents(f"public/locales/{locale}"), 2, False)
 
 
 def get_file_stat(lang: str) -> dict[str, bool]:
