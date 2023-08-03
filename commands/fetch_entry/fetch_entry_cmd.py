@@ -4,7 +4,7 @@ from discord import app_commands
 from ..modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
-from .fetch_entry_main import _fetch_entry_with_json
+from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
 
 from ..entry_consts.consts import (
     POSSIBLE_ART2023_IDS,
@@ -49,23 +49,13 @@ def register_commands(tree, this_guild: discord.Object):
             interaction, selected_entry, selected_lang, selected_field
         )
 
-        # * if some error happens, notify user and stop
-        if res is None:
-            await interaction.response.send_message(
-                "Sorry, your requested information is not available at the moment.",
-                ephemeral=True,
-            )
-            return
-
-        if field is None:  # * return entire entry
-            await interaction.response.send_message(res, suppress_embeds=True)
-
-        else:  # * return only specific field
-            await interaction.response.send_message(
-                f"The {field} for `{entry}` in `{lang}` is:\n{res}",
-                suppress_embeds=True,
-            )
-
+        await send_fetch_response(
+            interaction,
+            res,
+            selected_entry,
+            selected_lang,
+            selected_field,
+        )
 
 
 if __name__ == "__main__":

@@ -46,7 +46,6 @@ async def _fetch_entry_with_json(
         how="url",
         json_url=link_to_fetch,
     )
-    
     # * if some error happens, notify user and stop
     if result_json is None:
         return
@@ -58,3 +57,26 @@ async def _fetch_entry_with_json(
 
     else:  # * return only specific field
         return result_json[entry][field]
+
+
+async def send_fetch_response(
+    interaction, fetched_result, entry: str, lang: str, field: str
+):
+    # * if some error happens, notify user and stop
+    if fetched_result is None:
+        await interaction.response.send_message(
+            "Sorry, your requested information is not available at the moment.",
+            ephemeral=True,
+        )
+        return
+
+    if field is None:  # * return entire entry
+        await interaction.response.send_message(
+            fetched_result, suppress_embeds=True
+        )
+
+    else:  # * return only specific field
+        await interaction.response.send_message(
+            f"The {field} for `{entry}` in `{lang}` is:\n{fetched_result}",
+            suppress_embeds=True,
+        )

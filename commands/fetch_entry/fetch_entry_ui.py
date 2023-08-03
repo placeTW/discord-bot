@@ -4,7 +4,7 @@ from discord import app_commands
 from ..modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
-from .fetch_entry_main import _fetch_entry_with_json
+from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
 
 from ..entry_consts.consts import (
     SUPPORTED_ART2023_IDS,
@@ -97,8 +97,15 @@ class FetchEntryView(discord.ui.View):
                 ephemeral=True,  # only the user who called it can see this msg
             )
             return
-        return await _fetch_entry_with_json(
+        result = await _fetch_entry_with_json(
             interaction,
+            self.selected_entry,
+            self.selected_language,
+            self.selected_field,
+        )
+        await send_fetch_response(
+            interaction,
+            result,
             self.selected_entry,
             self.selected_language,
             self.selected_field,
