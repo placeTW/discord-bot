@@ -3,7 +3,7 @@ import discord
 
 class HGSButtonView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=60)  # keep alive for 60 seconds
+        super().__init__(timeout=2)  # keep alive for 60 seconds
         self.msg = None  # msg associated with the hgs
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)

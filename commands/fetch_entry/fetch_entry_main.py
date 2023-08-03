@@ -60,7 +60,12 @@ async def _fetch_entry_with_json(
 
 
 async def send_fetch_response(
-    interaction, fetched_result, entry: str, lang: str, field: str
+    interaction,
+    fetched_result,
+    entry: str,
+    lang: str,
+    field: str,
+    is_ephermeral=True,  # whether to make the msg ephermeral or not
 ):
     # * if some error happens, notify user and stop
     if fetched_result is None:
@@ -72,11 +77,12 @@ async def send_fetch_response(
 
     if field is None:  # * return entire entry
         await interaction.response.send_message(
-            fetched_result, suppress_embeds=True
+            fetched_result, suppress_embeds=True, ephemeral=is_ephermeral
         )
 
     else:  # * return only specific field
         await interaction.response.send_message(
             f"The {field} for `{entry}` in `{lang}` is:\n{fetched_result}",
             suppress_embeds=True,
+            ephemeral=is_ephermeral,
         )
