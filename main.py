@@ -33,12 +33,12 @@ this_guild = discord.Object(id=GUILD)  # basically refers to this server
 # ! These are basic test commands that should not exist when deployed
 # * simple hi command
 @tree.command(
-    name="test",
-    description="Responds with a hardcoded string",
+    name="website",
+    description="Responds with the placeTW website link",
     guild=this_guild,
 )
 async def test_slash_command(interaction: discord.Interaction):
-    await interaction.response.send_message("Hi I was called")
+    await interaction.response.send_message("https://placetw.com/")
 
 
 # * simple echo command with param explanation
