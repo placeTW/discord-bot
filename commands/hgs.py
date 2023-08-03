@@ -3,8 +3,8 @@ import discord
 
 class HGSButtonView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=2)  # keep alive for 60 seconds
-        self.msg = None  # msg associated with the hgs
+        super().__init__(timeout=60)  # keep alive for 60 seconds
+        self.msg: discord.Message = None
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
     async def hgs_button_yes(
@@ -26,9 +26,6 @@ class HGSButtonView(discord.ui.View):
         """Delete message upon timeout."""
         await self.msg.delete()
 
-    def set_associated_msg(self, msg: discord.Message):
-        self.msg = msg
-
 
 def register_commands(tree, this_guild: discord.Object):
     @tree.command(
@@ -40,5 +37,4 @@ def register_commands(tree, this_guild: discord.Object):
         button = HGSButtonView()
 
         await interaction.response.send_message("Hot gay sex?", view=button)
-        the_msg = await interaction.original_response()
-        button.set_associated_msg(the_msg)
+        button.msg = await interaction.original_response()

@@ -23,6 +23,7 @@ class FetchEntryView(discord.ui.View):
         self.selected_entry = None
         self.selected_language = None
         self.selected_field = None
+        self.msg = None  # msg associated with the view
 
     # * There should be fields for:
     # * - entry (drop down menu), done
