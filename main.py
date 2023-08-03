@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
-from commands.translation_stat import translation_stat
+from commands.translation_stat import translation_stat, core
 from commands import hgs
 
 # load environment vars
@@ -23,9 +23,8 @@ GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
 intents = discord.Intents.default()
 # if you don't want all intents you can do discord.Intents.default()
 
-translation_stat.initialize_github(GH_TOKEN)
-translation_stat.load_pr_map()
-translation_stat.trans_db_lock.acquire()
+core.initialize_github(GH_TOKEN)
+core.apply_pr_map()
 
 
 class MyClient(discord.Client):
