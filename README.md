@@ -26,3 +26,8 @@ no
 
 ## Non-code-related steps
 no
+
+## Deployment & Testing
+
+* Main bot: Runs on main branch, should be stable and not used for developing new features
+* Dev bot: Runs on non-main branches, should test stuff with it
