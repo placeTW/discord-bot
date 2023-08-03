@@ -5,6 +5,7 @@ from discord import app_commands
 
 # from discord.ext import commands
 from dotenv import load_dotenv
+import datetime
 
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
@@ -20,6 +21,8 @@ load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == 'prod'
 TOKEN = os.getenv('DISCORD_TOKEN_DEV' if not prod else 'DISCORD_TOKEN')
 GUILD = os.getenv("DISCORD_GUILD")
+
+deployment_date = datetime.datetime.now()
 
 # setting up the bot
 intents = discord.Intents.default()
@@ -40,7 +43,6 @@ this_guild = discord.Object(id=GUILD)  # basically refers to this server
 async def test_slash_command(interaction: discord.Interaction):
     await interaction.response.send_message("https://placetw.com/")
 
-
 # * simple echo command with param explanation
 @tree.command(
     name="echo",
@@ -51,6 +53,19 @@ async def test_slash_command(interaction: discord.Interaction):
 async def test_slash_command(interaction: discord.Interaction, given_str: str):
     await interaction.response.send_message(f"You sent this: `{given_str}`")
 
+
+@tree.command(
+    name="deployment-info",
+    description="Returns information about the bot deployment",
+    guild=this_guild,
+)
+async def test_slash_command(interaction: discord.Interaction):
+    msg = f"""
+PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
+Deployed on {deployment_date}
+https://github.com/placeTW/discord-bot
+    """
+    await interaction.response.send_message(msg)
 
 # * register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
