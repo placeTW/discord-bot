@@ -14,13 +14,13 @@ repo: Repository = None
 # repo = g.get_repo("placeTW/website")
 main_lang = "en"
 json_matches: dict[str, list[str]] = {
-    "translation.json": [r".*\/(title|blurb|desc)"],
-    "art-pieces.json": [r".*"]
+    "art-pieces.json": [r".*#(title|blurb|desc)"],
+    "translation.json": [r".*"]
 }
 
 
 def check_file_include_rule(path: str) -> bool:
-    return re.search("public\/locales\/.*\/(art-pieces\.json|translation\.json)", path)
+    return re.search(r"public\/locales\/.*\/(art-pieces\.json|translation\.json)", path)
 
 
 def filename_rm_sector(filename: str, sectors: int) -> str:
@@ -51,7 +51,8 @@ def generate_progress_str(percentage: float, size: int) -> str:
 
 class transfile_progress:
     def __init__(self, total_indexes=0, json_data={}):
-        self.all_fields: dict[str, bool] = {}
+        # self.all_fields: dict[str, bool] = {}
+        self.all_fields: dict[str, str] = {}
         self.ready_indexes = int()
         self.total_indexes = (
             total_indexes if total_indexes else self.ready_indexes
@@ -69,30 +70,22 @@ class transfile_progress:
     def load_file(self, filename, json_data: dict) -> None:
         standards: list[list[str]] = []
         for item in json_matches[filename]:
-            standards.append(item.split('/'))
+            standards.append(item.split('#'))
 
-        def match(iter: int, target: dict, pre_str="") -> None:
+        def match(target: dict, iter=0, pre_str=[""]) -> None:
             nonlocal standards, self
             for key, value in target.items():
                 for item in standards:
-                    if re.match(key, item):
+                    if re.match(item[iter], key):
+                        pre_str[0] += f"{'/' if iter != 0 else ''}{key}"
                         if iter + 1 == len(item):
-                            self.all_fields[pre_str] = str(value)
-                            break
-                        pre_str += f"/{key}"
-                        match(iter + 1, value, pre_str=pre_str)
+                            self.all_fields[pre_str[0]] = str(value)
+                        else:
+                            match(value, iter + 1, pre_str=pre_str)
+                        pre_str[0] = pre_str[0][:pre_str[0].rfind('/')]
                         break
 
-        match(0, json_data)
-
-
-# test = transfile_progress()
-# with open("../../trans_data/zh/art-pieces.json", "r") as fff:
-#     test.load_file("art-pieces.json", json.loads(fff.read()))
-#
-# print(test.all_fields)
-
-# exit(0)
+        match(json_data)
 
 
 def write_data(
