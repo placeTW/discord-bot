@@ -62,7 +62,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 async def test_slash_command(interaction: discord.Interaction):
     msg = f"""
 PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
-Deployed on {deployment_date}
+Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
     """
     await interaction.response.send_message(msg)
