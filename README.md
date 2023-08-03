@@ -1,4 +1,4 @@
-# Place TW Discord bot
+# Place TW Discord Bot
 
 ## Current Functionalities
 
