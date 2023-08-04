@@ -1,4 +1,4 @@
-# content of conftest.py
+# credits: https://github.com/pytest-dev/pytest-asyncio/issues/30#issuecomment-226947196
 import asyncio, pytest
 
 
