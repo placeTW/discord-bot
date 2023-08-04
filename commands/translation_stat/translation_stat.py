@@ -5,6 +5,25 @@ from discord.app_commands import Choice
 from tabulate import tabulate
 
 
+class MoreDetailsButtonView(discord.ui.View):
+    def __init__(self, progresses: dict[str, core.transfile_progress], files_not_found: list[str]):
+        super().__init__()
+        self.progresses = progresses
+        self.files_not_found = files_not_found
+
+    @discord.ui.button(label="More Details", style=discord.ButtonStyle.primary, emoji='ℹ️')
+    async def button_callback(self, interaction: discord.Interaction, button: discord.ui.button):
+        await interaction.response.defer()
+        messages: list[str] = []
+        if (len(self.files_not_found)):
+            messages.append("Files not found:\n".join(f"{item}\n" for item in self.files_not_found))
+        for key, value in self.progresses.items():
+            messages.append(f"{key}:\n" + tabulate([["Field", "Status"] + [field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()], headers='firstrow', tablefmt='fancy_grid'))
+
+        for message in messages:
+            await interaction.followup.send(content=f"```{message}\n```")
+        
+
 def register_commands(tree, this_guild: discord.Object):
     core.commands_initialize_condition.wait()
 
@@ -101,7 +120,7 @@ def register_commands(tree, this_guild: discord.Object):
             else "None",
         )
         embed.set_footer(
-            text="See /trans_stat for more information"
+            text=f"See /trans_stat {locale} for more information"
         )
         await interaction.followup.send(content=None, embed=embed)
 
@@ -144,36 +163,40 @@ def register_commands(tree, this_guild: discord.Object):
             main_lang_progresses = core.gen_mainlang_progress_map(lang.value is not core.main_lang)
             all_progresses = get_file_progresses(lang.value, ref.all_files())
             all_progresses_str = progresses_to_str(all_progresses)
-            files_not_found: list[str] = []
-            for item in main_lang_progresses.keys():
-                if not all_progresses.get(item):
-                    files_not_found.append(item)
-            files_available = f"{len(all_progresses.keys())}/{len(main_lang_progresses.keys())}"
-            def get_total_progress(base: list[core.transfile_progress], target: list[core.transfile_progress]) -> str:
-                all_available_indexes = int()
-                all_total_indexes = int()
-                for item in base:
-                    all_total_indexes += item.total_indexes
-                for item in target:
-                    all_available_indexes += item.ready_indexes
-                return f"{all_available_indexes}/{all_total_indexes}, {core.float_to_percentage(all_available_indexes / all_total_indexes)}%"
-            total_progress = get_total_progress(main_lang_progresses.values(), all_progresses.values())
-            embed = discord.Embed(
-                title=f"Translation Progress for Language {lang.value}",
-                description=f"Files: {files_available}, Indexes: {total_progress}",
-                colour=discord.Colour.green()
-            )
+        files_not_found: list[str] = []
+        for item in main_lang_progresses.keys():
+            if not all_progresses.get(item):
+                files_not_found.append(item)
+        files_available = f"{len(all_progresses.keys())}/{len(main_lang_progresses.keys())}"
+
+        def get_total_progress(base: list[core.transfile_progress], target: list[core.transfile_progress]) -> str:
+            all_available_indexes = int()
+            all_total_indexes = int()
+            for item in base:
+                all_total_indexes += item.total_indexes
+            for item in target:
+                all_available_indexes += item.ready_indexes
+            return f"{all_available_indexes}/{all_total_indexes}, {core.float_to_percentage(all_available_indexes / all_total_indexes)}%"
+        total_progress = get_total_progress(main_lang_progresses.values(), all_progresses.values())
+        embed = discord.Embed(
+            title=f"Translation Progress for Language {lang.value}",
+            description=f"Files: {files_available}, Indexes: {total_progress}",
+            colour=discord.Colour.green()
+        )
+        embed.add_field(
+            name="Unavailable files",
+            value=(str().join([f"{item}\n" for item in files_not_found]) if len(files_not_found) else "None"),
+            inline=False
+        )
+        for index, key in enumerate(all_progresses):
+            value = str().join([all_progresses_str[index][1], f"\n{all_progresses[key].to_progress_str()}\n"])
+            value += (f"**Provided by PR {ref.pr_no}**" if ref.pr_no and key in ref.pr_files else "**Provided by Master**")
             embed.add_field(
-                name="Unavailable files",
-                value=(str().join([f"{item}\n" for item in files_not_found]) if len(files_not_found) else "None"),
+                name=key,
+                value=value,
                 inline=False
             )
-            for index, key in enumerate(all_progresses):
-                value = str().join([all_progresses_str[index][1], f"\n{all_progresses[key].to_progress_str()}\n"])
-                value += (f"**From PR {ref.pr_no}**" if ref.pr_no and key in ref.pr_files else "**From Master**")
-                embed.add_field(
-                    name=key,
-                    value=value,
-                    inline=False
-                )
-        await interaction.followup.send(content=None, embed=embed)
+
+        view = discord.ui.View()
+        button = discord.ui.Button(style=discord.ButtonStyle.primary, label="More Details")
+        await interaction.followup.send(content=None, embed=embed, view=MoreDetailsButtonView(all_progresses, files_not_found))
