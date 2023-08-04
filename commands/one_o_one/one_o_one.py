@@ -66,7 +66,7 @@ class OneOOne:
         building_type = self._get_random_building_type()
 
         messages: list[str] = []
-        messages.append(self._build_101_roof(building_type))
+        messages.extend(self._build_101_roofs(building_type))
         messages.extend(self._build_101_bodies(building_type))
         return "\n".join(messages)
 
@@ -75,15 +75,15 @@ class OneOOne:
         weights = [option.value for option in BuildingTypes]
         return random.choices(building_types, weights=weights)[0]
 
-    def _build_101_roof(self, building_type: BuildingTypes) -> str:
+    def _build_101_roofs(self, building_type: BuildingTypes) -> list[str]:
         if building_type == BuildingTypes.NORMAL_ROOF:
-            return self.EMOJI_101_TOP
+            return [self.EMOJI_101_TOP]
         elif building_type == BuildingTypes.TROLL_ROOF:
-            return random.choice(self.TROLL_ROOFS)
+            return [random.choice(self.TROLL_ROOFS)]
         elif building_type == BuildingTypes.TROLL_BODY:
-            return self.EMOJI_101_TOP
+            return [self.EMOJI_101_TOP]
         else:
-            return ""
+            return []
 
     def _build_101_bodies(self, building_type: BuildingTypes) -> list[str]:
         num_floors = random.randint(self.MIN_NUM_FLOORS, self.MAX_NUM_FLOORS)
