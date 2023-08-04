@@ -33,7 +33,7 @@ SUPPORTED_ART2023_IDS = {
     "lt_pengiun_boba": "Lithuanian Penguin with Boba",
     "indep_flag": "Taiwan Independence Flag",
     "tw_beer": "Taiwan Beer",
-    "apple_cider": "Apple Cider",
+    "apple_sidra": "Apple Cider",
     "tatung_rice_cooker": "Tatung Rice Cooker",
     "tsmc_logo": "TSMC Logo",
 }
