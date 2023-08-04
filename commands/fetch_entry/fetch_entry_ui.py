@@ -18,12 +18,12 @@ from ..entry_consts.consts import (
 # for views tutorial: see
 class FetchEntryView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=180)
         # these are for storing the user's choices
         self.selected_entry = None
         self.selected_language = None
         self.selected_field = None
-        self.msg = None  # msg associated with the view
+        self.msg: discord.Message = None  # associated msg
 
     # * There should be fields for:
     # * - entry (drop down menu), done
@@ -112,6 +112,17 @@ class FetchEntryView(discord.ui.View):
             self.selected_field,
         )
 
+    async def on_timeout(self) -> None:
+        button = self.children[-1]
+        self.remove_item(button)
+        for child in self.children:
+            child.disabled = True
+        await self.msg.edit(
+            content="This widget is no longer usable due to inactivity.\n"
+            + "You can also run the command yourself by typing `/ui-fetch` in chat.",
+            view=self,
+        )
+
 
 def register_commands(tree, this_guild: discord.Object):
     @tree.command(
@@ -124,3 +135,4 @@ def register_commands(tree, this_guild: discord.Object):
         await interaction.response.send_message(
             "What would you like to see?", view=button
         )
+        button.msg = await interaction.original_response()
