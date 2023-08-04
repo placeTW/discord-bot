@@ -58,8 +58,9 @@ this_guild = discord.Object(id=GUILD)
 # sync the slash command to server
 @client.event
 async def on_ready():
-    # print "ready"
     await tree.sync(guild=this_guild)
+    # print "ready"
+    print("Ready")
 
 
 # ! These are basic test commands that should not exist when deployed

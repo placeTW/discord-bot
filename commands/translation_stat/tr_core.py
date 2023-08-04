@@ -19,6 +19,8 @@ commands_initialize_condition = Event()
 
 lang_require_update: bool = False
 
+def float_to_percentage(target: float) -> int:
+    return int(target * 100 + 1)
 
 def check_file_include_rule(path: str) -> bool:
     return re.search(
@@ -44,7 +46,7 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
     return filename, locale
 
 
-def generate_progress_str(percentage: float, size: int) -> str:
+def generate_progress_str(percentage: int, size: int) -> str:
     slice = (100 / size) + 1
     return "[{}]".format(
         str().join(
@@ -65,11 +67,11 @@ class transfile_progress:
 
     def progress_str_fwd(self) -> str:
         return generate_progress_str(
-            (self.ready_indexes / self.total_indexes) * 100 + 1, 10
+            float_to_percentage(self.ready_indexes / self.total_indexes), 10
         )
 
     def get_percentage(self) -> int:
-        return int((self.ready_indexes / self.total_indexes) * 100 + 1)
+        return float_to_percentage(self.ready_indexes / self.total_indexes)
 
     def to_progress_str(self) -> str:
         return f"{self.ready_indexes}/{self.total_indexes}, {self.get_percentage()}%"
@@ -200,7 +202,7 @@ def shift2pr(locale_check: str, pr_no: int) -> None:
 
 
 def iter_pr(pr, locale_check: str, main_lang_progress=None):
-    print(f"{locale_check} iter PR {pr.id}")
+    print(f"{locale_check} iter PR {pr.number}")
     pr_files_to_add: list[str] = []
     all_commit = pr.get_commits()
     for iter in reversed(range(pr.commits)):

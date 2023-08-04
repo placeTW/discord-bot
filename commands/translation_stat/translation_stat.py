@@ -34,7 +34,6 @@ def register_commands(tree, this_guild: discord.Object):
             index = core.re.search(r"[^ ]", row[first_space_index:]).start()
             index += first_space_index
             ret.append("``" + row[:index] + "``" + row[index:])
-            print("``" + row[:index] + "``" + row[index:])
         return ret
 
     def match_table_rows(
@@ -139,5 +138,42 @@ def register_commands(tree, this_guild: discord.Object):
     )
     async def trans_stat(interaction: discord.Interaction, lang: Choice[str]):
         await interaction.response.defer()
-        with core.trans_db[lang.value].mutex:
-            pass
+        ref = core.trans_db[lang.value]
+        embed: discord.Embed = None
+        with ref.mutex:
+            main_lang_progresses = core.gen_mainlang_progress_map(lang.value is not core.main_lang)
+            all_progresses = get_file_progresses(lang.value, ref.all_files())
+            all_progresses_str = progresses_to_str(all_progresses)
+            files_not_found: list[str] = []
+            for item in main_lang_progresses.keys():
+                if not all_progresses.get(item):
+                    files_not_found.append(item)
+            files_available = f"{len(all_progresses.keys())}/{len(main_lang_progresses.keys())}"
+            def get_total_progress(base: list[core.transfile_progress], target: list[core.transfile_progress]) -> str:
+                all_available_indexes = int()
+                all_total_indexes = int()
+                for item in base:
+                    all_total_indexes += item.total_indexes
+                for item in target:
+                    all_available_indexes += item.ready_indexes
+                return f"{all_available_indexes}/{all_total_indexes}, {core.float_to_percentage(all_available_indexes / all_total_indexes)}%"
+            total_progress = get_total_progress(main_lang_progresses.values(), all_progresses.values())
+            embed = discord.Embed(
+                title=f"Translation Progress for Language {lang.value}",
+                description=f"Files: {files_available}, Indexes: {total_progress}",
+                colour=discord.Colour.green()
+            )
+            embed.add_field(
+                name="Unavailable files",
+                value=(str().join([f"{item}\n" for item in files_not_found]) if len(files_not_found) else "None"),
+                inline=False
+            )
+            for index, key in enumerate(all_progresses):
+                value = str().join([all_progresses_str[index][1], f"\n{all_progresses[key].to_progress_str()}\n"])
+                value += (f"**From PR {ref.pr_no}**" if ref.pr_no and key in ref.pr_files else "**From Master**")
+                embed.add_field(
+                    name=key,
+                    value=value,
+                    inline=False
+                )
+        await interaction.followup.send(content=None, embed=embed)
