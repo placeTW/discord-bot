@@ -63,7 +63,7 @@ def create_pull_request(
             commit_msg=f"Modified translation for: lang={lang}, entry_id={entry_id}, field={field}",
             new_contents=new_json_contents_str,
         )
-    except UnknownObjectException:
+    except (UnknownObjectException, AttributeError):
         # file doesn't exist, create and commit a new one
         # ! Note that this immediately commits the new file!
         json_file = WEBSITE_REPO.create_file(

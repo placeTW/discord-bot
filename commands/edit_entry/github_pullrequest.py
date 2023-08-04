@@ -23,9 +23,9 @@ async def modify_json_and_create_pull_request(
     # *   take the english version and blank everything out
     if not the_file:
         the_json = await get_blank_json()
-
-    # * at this point, it's a valid json
-    the_json = json.loads(the_file.decoded_content.decode())
+    else:
+        # * at this point, it's a valid json
+        the_json = json.loads(the_file.decoded_content.decode())
     # print("Modifying the json to reflect the changes...")
     if field == "links":
         proposed_text = process_list(proposed_text)
