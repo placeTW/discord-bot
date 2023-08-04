@@ -1,6 +1,6 @@
 from discord.app_commands import Choice
 
-I18N_JSON_URL = "https://raw.githubusercontent.com/placeTW/website/67645f0d0866438248f9bf5fa5f28f9b2ac09dfb/public"
+I18N_JSON_URL = "https://raw.githubusercontent.com/placeTW/website/bot-i18n-commits/public"
 
 # TODO: This should become a dict like SUPPORTED_ART2023_IDS
 SUPPORTED_LANGUAGE_CODES = {
