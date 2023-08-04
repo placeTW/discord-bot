@@ -1,7 +1,7 @@
 from github import Github, Repository, GithubObject
 import json
 import os
-from threading import Lock, Condition
+from threading import Lock, Event
 from contextlib import nullcontext
 import re
 
@@ -15,8 +15,9 @@ json_matches: dict[str, list[str]] = {
     "translation.json": [r".*"],
 }
 
-commands_initialize_condition = Condition()
-commands_initialize_condition_flag = False
+commands_initialize_condition = Event()
+
+lang_require_update: bool = False
 
 
 def check_file_include_rule(path: str) -> bool:
@@ -45,10 +46,14 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
 
 def generate_progress_str(percentage: float, size: int) -> str:
     slice = (100 / size) + 1
-    return "[{}]".format(str().join([
-        f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
-        for it in range(size)
-    ]))
+    return "[{}]".format(
+        str().join(
+            [
+                f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
+                for it in range(size)
+            ]
+        )
+    )
 
 
 class transfile_progress:
@@ -89,7 +94,9 @@ class transfile_progress:
                         else:
                             match(value, iter + 1, pre_str)
                         prev_slash = pre_str[0].rfind("/")
-                        pre_str[0] = pre_str[0][: prev_slash if prev_slash != -1 else 0]
+                        pre_str[0] = pre_str[0][
+                            : prev_slash if prev_slash != -1 else 0
+                        ]
                         break
 
         match(json_data)
@@ -112,23 +119,31 @@ class transfile_progress:
         if locale != main_lang:
             out["all_fields"] = self.all_fields
         else:
-            out["all_fields"] = dict(zip(self.all_fields.keys(), [True for _ in range(len(self.all_fields.keys()))]))
-        with open(f"trans_data/{locale}/{filename}_progress.json", "w+") as target:
+            out["all_fields"] = dict(
+                zip(
+                    self.all_fields.keys(),
+                    [True for _ in range(len(self.all_fields.keys()))],
+                )
+            )
+        with open(
+            f"trans_data/{locale}/{filename}_progress.json", "w+"
+        ) as target:
             target.write(json.dumps(out))
 
     def read_json(self, locale, filename) -> None:
-        with open(f"trans_data/{locale}/{filename}_progress.json", "r") as target:
+        with open(
+            f"trans_data/{locale}/{filename}_progress.json", "r"
+        ) as target:
             parsed = json.loads(target.read())
             self.total_indexes = parsed["total_indexes"]
             self.ready_indexes = parsed["ready_indexes"]
             self.all_fields = parsed["all_fields"]
 
 
-def get_transfile_progress(locale, filename, lock: bool) -> transfile_progress:
-    with trans_db[locale].mutex if lock else nullcontext():
-        ret = transfile_progress()
-        ret.read_json(locale, filename)
-        return ret
+def read_transfile_progress(locale, filename) -> transfile_progress:
+    ret = transfile_progress()
+    ret.read_json(locale, filename)
+    return ret
 
 
 def write_data(
@@ -153,7 +168,7 @@ class locale_t:
     def __init__(self) -> None:
         self.owned_files: list[str] = []
         self.pr_files: list[str] = []
-        self.pr_no: str = None
+        self.pr_no: int = None
         self.mutex: Lock = Lock()
 
     def sync_pr_files(self, filenames: list[str] = None):
@@ -176,13 +191,20 @@ trans_db_lock = Lock()
 trans_db: dict[str, locale_t] = {}
 
 
+# Lock b4 call this
 def shift2pr(locale_check: str, pr_no: int) -> None:
-    trans_db[locale_check].pr_no = str(pr_no)
-    pr = repo.get_pull(pr_no)
+    trans_db[locale_check].pr_no = pr_no
+    main_lang_progress = gen_mainlang_progress_map(locale_check != "en")
+    iter_pr(repo.get_pull(pr_no), locale_check, main_lang_progress)
+    print(f"{locale_check} => PR {pr_no}")
+
+
+def iter_pr(pr, locale_check: str, main_lang_progress=None):
+    print(f"{locale_check} iter PR {pr.id}")
     pr_files_to_add: list[str] = []
-    all_commits = pr.get_commits()
+    all_commit = pr.get_commits()
     for iter in reversed(range(pr.commits)):
-        commit = all_commits[iter]
+        commit = all_commit[iter]
         for file in commit.files:
             if not check_file_include_rule(file.filename):
                 continue
@@ -193,10 +215,12 @@ def shift2pr(locale_check: str, pr_no: int) -> None:
                 locale,
                 filename,
                 file.filename,
-                commit_ref=commit.sha,
+                commit_ref=commit.sha
             )
             pr_files_to_add.append(filename)
     trans_db[locale_check].sync_pr_files(pr_files_to_add)
+    for file in pr_files_to_add:
+        write_progress_proxy(locale_check, filename, main_lang_progress)
 
 
 def apply_pr_map() -> None:
@@ -207,16 +231,65 @@ def apply_pr_map() -> None:
         if not len(filestr):
             return
         parsed = json.loads(filestr)
-        for lang, pr_str in parsed.items():
+        for lang, pr_no in parsed.items():
             if not trans_db.get(lang):
                 trans_db[lang] = locale_t()
             with trans_db[lang].mutex:
-                trans_db[lang].pr_no = pr_str
-                shift2pr(lang, int(pr_str))
+                trans_db[lang].pr_no = pr_no
+            print(f"{lang} => PR {pr_no}")
+    global lang_require_update
+    lang_require_update = True
 
 
-def iter_contents(content, sectors: int, lock: bool = True) -> None:
-    categorised: dict[str, dict[str, str]] = {}
+def gen_mainlang_progress_map(
+    lock: bool,
+) -> dict[str, transfile_progress]:
+    with trans_db["en"].mutex if lock else nullcontext():
+        target_files: list[str] = []
+        for _, _, subfiles in os.walk("trans_data/en"):
+            for item in subfiles:
+                if not item.endswith("_progress.json"):
+                    target_files.append(item)
+        ret: dict[str, transfile_progress] = {}
+        for item in target_files:
+            progress = transfile_progress()
+            progress.read_json("en", item)
+            ret[item] = progress
+        return ret
+
+
+def write_transfile_progress(
+    locale: str, filename: str, main_lang_progress: transfile_progress = None
+) -> transfile_progress:
+    target = transfile_progress()
+    with open(f"trans_data/{locale}/{filename}", "r") as target_file:
+        if locale == main_lang_progress:
+            target.load_file(filename, json.loads(target_file.read()))
+        else:
+            target.load_file(
+                filename, json.loads(target_file.read()), main_lang_progress
+            )
+    target.write_json(locale, filename)
+    return target
+
+
+def write_progress_proxy(locale: str, filename: str, main_lang_progress: dict[str, transfile_progress] = None) -> None:
+    if locale == main_lang:
+        res = write_transfile_progress(locale, filename)
+        if main_lang_progress is not None:
+            main_lang_progress[filename] = res
+    else:
+        if main_lang_progress is None:
+            main_lang_progress = gen_mainlang_progress_map(True)
+        write_transfile_progress(
+            locale, filename, main_lang_progress[filename]
+        )
+
+
+def iter_master(locale_check: str, content, main_lang_progress=None, sectors: int = 2) -> None:
+    print(f"{locale_check} iter master")
+    ref = trans_db[locale_check]
+    files_to_add: list[str] = []
     while content:
         file_content = content.pop(0)
         if file_content.type == "dir":
@@ -225,79 +298,58 @@ def iter_contents(content, sectors: int, lock: bool = True) -> None:
             if not check_file_include_rule(file_content.path):
                 continue
             filename, locale = handle_filename(file_content.path, sectors)
-            if not categorised.get(locale):
-                categorised[locale] = dict[str, str]()
-            categorised[locale][filename] = file_content.path
+            if locale_check != locale or (ref.pr_no and filename in ref.pr_files):
+                continue
+            write_data(locale, filename, file_content.path)
+            files_to_add.append(filename)
 
-    main_lang_progress: dict[str, transfile_progress] = {}
+    ref.sync_master_files(files_to_add)
 
-    def process_locale(locale: str, files: dict[str, str]):
-        nonlocal main_lang_progress, lock
-        ref = trans_db[locale]
-        with ref.mutex if lock else nullcontext():
-            master_files_to_add: list[str] = []
-            for filename, file_path in files.items():
-                if not (filename in ref.pr_files):
-                    write_data(
-                        locale,
-                        filename,
-                        file_path,
-                    )
-                    master_files_to_add.append(filename)
-                with open(f"trans_data/{locale}/{filename}", "r") as target_file:
-                    if locale == main_lang:
-                        # TODO HEREHRHEHRIEHHEHRIEHOWEH
-                        main_lang_progress[filename] = transfile_progress()
-                        main_lang_progress[filename].load_file(filename, json.loads(target_file.read()))
-                        main_lang_progress[filename].write_json(locale, filename)
-                    else:
-                        other_lang_progress = transfile_progress()
-                        other_lang_progress.load_file(filename, json.loads(target_file.read()), main_lang_progress[filename])
-                        other_lang_progress.write_json(locale, filename)
-           
-            ref.sync_master_files(master_files_to_add)
+    for file in files_to_add:
+        write_progress_proxy(locale, file, main_lang_progress)
 
-    if categorised.get(main_lang):
-        process_locale(main_lang, categorised.pop(main_lang))
-    else:
-        ref = trans_db[main_lang]
-        with ref.mutex:
-            for file in ref.all_files():
-                main_lang_progress[file] = transfile_progress()
-                main_lang_progress[file].read_json(main_lang, file)
 
-    for locale, files in categorised.items():
-        process_locale(locale, files)
+def update_locale(locale: str, main_lang_progress: transfile_progress = None):
+    ref = trans_db[locale]
+    with ref.mutex:
+        if ref.pr_no:
+            iter_pr(repo.get_pull(ref.pr_no), locale, main_lang_progress)
+        try:
+            iter_master(locale, repo.get_contents(f"public/locales/{locale}"), main_lang_progress)
+        except Exception:
+            if not ref.pr_no:
+                raise
 
 
 def update_repo() -> None:
-    # template_contents = repo.get_contents("public/templates")
     locale_contents = repo.get_contents("public/locales")
+    lang_list: list[str] = []
     with trans_db_lock:
         for item in locale_contents:
             if item.type == "dir":
                 locale_name = filename_rm_sector(item.path, 2)
                 if not trans_db.get(locale_name):
                     trans_db[locale_name] = locale_t()
-        # if not trans_db.get("templates"):
-        #     trans_db["templates"] = locale_t()
-    with commands_initialize_condition:
-        commands_initialize_condition.notify()
-        global commands_initialize_condition_flag
-        commands_initialize_condition_flag = True
-    # iter_contents(template_contents, 1)
-    iter_contents(locale_contents, 2)
+                    global lang_require_update
+                    lang_require_update = True
+        lang_list = list(trans_db.keys())
+    if not commands_initialize_condition.is_set():
+        commands_initialize_condition.set()
+    main_lang_progress: dict[str, transfile_progress] = {}
+    update_locale(lang_list.pop(lang_list.index("en")), main_lang_progress)
+    for item in lang_list:
+        update_locale(item, main_lang_progress)
 
 
-def shift2master(locale: str, lock: bool) -> None:
-    with trans_db[locale].mutex if lock else nullcontext():
-        trans_db[locale].pr_no = None
-        trans_db[locale].pr_files.clear()
-        iter_contents(repo.get_contents(f"public/locales/{locale}"), 2, False)
+def shift2master(locale: str) -> None:
+    trans_db[locale].pr_no = None
+    trans_db[locale].pr_files.clear()
+    main_lang_progress = gen_mainlang_progress_map(locale != main_lang)
+    iter_master(locale, repo.get_contents(f"public/locales/{locale}"), main_lang_progress)
+    print(f"{locale} => master")
 
 
 def get_file_stat(lang: str) -> dict[str, bool]:
-
     def inner(base: list[str], target: list[str]) -> dict[str, bool]:
         ret = dict[str, bool]()
         for item in base:
@@ -312,7 +364,9 @@ def get_file_stat(lang: str) -> dict[str, bool]:
     with trans_db[main_lang].mutex, trans_db[
         lang
     ].mutex if lang != main_lang else nullcontext():
-        return inner(trans_db[main_lang].all_files(), trans_db[lang].all_files())
+        return inner(
+            trans_db[main_lang].all_files(), trans_db[lang].all_files()
+        )
 
 
 def write_pr_map() -> None:

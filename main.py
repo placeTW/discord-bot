@@ -1,4 +1,6 @@
 import os
+import time
+import sys
 
 import discord
 from discord import app_commands
@@ -14,7 +16,8 @@ from commands import hgs
 
 # load environment vars
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+prod = len(sys.argv) > 1 and sys.argv[1] == 'prod'
+TOKEN = os.getenv('DISCORD_TOKEN_DEV' if not prod else 'DISCORD_TOKEN')
 GUILD = os.getenv("DISCORD_GUILD")
 GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
 
@@ -34,9 +37,13 @@ class MyClient(discord.Client):
     async def setup_hook(self):
         self.bg_worker.start()
 
-    @tasks.loop(hours=1)
+    @tasks.loop(minutes=30)
     async def bg_worker(self):
         tr_core.update_repo()
+        if tr_core.lang_require_update:
+            while not all(var in globals() for var in ["tree", "this_guild"]):
+                time.sleep(1)
+            translation_stat.register_commands(tree, this_guild)
 
     @bg_worker.after_loop
     async def write_pr_file(self):
@@ -51,14 +58,8 @@ this_guild = discord.Object(id=GUILD)
 # sync the slash command to server
 @client.event
 async def on_ready():
-    # register commands from other files
-    print("Ready event emitted, registering slash commands...")
-    fetch_entry_cmd.register_commands(tree, this_guild)
-    hgs.register_commands(tree, this_guild)
-    translation_stat.register_commands(tree, this_guild)
+    # print "ready"
     await tree.sync(guild=this_guild)
-    # print "ready" in the console when the bot is ready to work
-    print("Slash commands ready")
 
 
 # ! These are basic test commands that should not exist when deployed
@@ -82,5 +83,8 @@ async def test_slash_command(interaction: discord.Interaction):
 async def test_slash_command(interaction: discord.Interaction, given_str: str):
     await interaction.response.send_message(f"You sent this: `{given_str}`")
 
+# register commands from other files
+fetch_entry_cmd.register_commands(tree, this_guild)
+hgs.register_commands(tree, this_guild)
 
 client.run(TOKEN)
