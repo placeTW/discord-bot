@@ -4,6 +4,8 @@ so that both fetch_entry and fetch_entry_ui can use it
 """
 
 import discord
+
+from commands.entry_consts.consts import I18N_JSON_URL
 from ..modules import async_utils, postprocess
 
 
@@ -26,7 +28,7 @@ async def get_json(how="url", json_url="") -> dict:
 
 
 async def _fetch_entry_with_json(
-    interaction: discord.Interaction, entry: str, lang: str, field: str = None
+    interaction: discord.Interaction, entry: str, lang: str, field: str = None, fromI18n: bool = False
 ):
     """Function to fetch entry based on json entries.
     This is called by both the cmd and ui version of fectch_entry,
@@ -41,7 +43,8 @@ async def _fetch_entry_with_json(
         field (str, optional): field to fetch (e.g. title). Defaults to None.
     """
     # TODO: Add assert that entry, land and field are valid choices
-    link_to_fetch = f"https://placetw.com/locales/{lang}/art-pieces.json"
+
+    link_to_fetch = f"{I18N_JSON_URL if fromI18n else 'https://placetw.com'}/locales/{lang}/art-pieces.json"
     result_json = await get_json(
         how="url",
         json_url=link_to_fetch,
