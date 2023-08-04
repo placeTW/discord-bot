@@ -24,16 +24,19 @@ WEBSITE_REPO = GITHUB_OBJECT.get_repo(REPO_NAME)
 BRANCH_NAME = "bot-i18n-commits"
 
 
-def determine_file_path(lang: str):
+def determine_file_path_on_repo(lang: str):
     if lang not in SUPPORTED_LANGUAGE_CODES:
         print(f"Language {lang} not supported!")
         return None
     return f"public/locales/{lang}/art-pieces.json"
 
 
-def get_json_file_from_repo(file_path: str, branch_name: str):
+def get_json_file_from_repo(file_path: str, branch_name: str = BRANCH_NAME):
     global WEBSITE_REPO
-    return WEBSITE_REPO.get_contents(file_path, ref=branch_name)
+    try:
+        return WEBSITE_REPO.get_contents(file_path, ref=branch_name)
+    except UnknownObjectException:
+        return None
 
 
 def create_pull_request(
@@ -41,7 +44,7 @@ def create_pull_request(
 ):
     # ! new_json_contents is the ENTIRE json, not just one entry or field
     global GITHUB_OBJECT, BRANCH_NAME
-    file_path = determine_file_path(lang)
+    file_path = determine_file_path_on_repo(lang)
     if file_path is None:  # unsupported language
         return None
     # * From this point, the dir must exist, so the only
