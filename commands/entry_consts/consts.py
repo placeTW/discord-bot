@@ -1,5 +1,7 @@
 from discord.app_commands import Choice
 
+I18N_JSON_URL = "https://raw.githubusercontent.com/placeTW/website/bot-i18n-commits/public"
+
 # TODO: This should become a dict like SUPPORTED_ART2023_IDS
 SUPPORTED_LANGUAGE_CODES = {
     "en": "English",
@@ -33,7 +35,7 @@ SUPPORTED_ART2023_IDS = {
     "lt_pengiun_boba": "Lithuanian Penguin with Boba",
     "indep_flag": "Taiwan Independence Flag",
     "tw_beer": "Taiwan Beer",
-    "apple_cider": "Apple Cider",
+    "apple_sidra": "Apple Cider",
     "tatung_rice_cooker": "Tatung Rice Cooker",
     "tsmc_logo": "TSMC Logo",
 }
