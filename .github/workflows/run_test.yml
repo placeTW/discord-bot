@@ -4,6 +4,7 @@ on:
     push:
       branches:
         - 'main'
+        - '11-add-more-tests'
     pull_request:
         types: [opened, reopened]
             
