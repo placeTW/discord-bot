@@ -40,12 +40,13 @@ async def test__fetch_entry_with_json_valid_input_links_returns_list(
     assert type(result) is list
 
 
-async def test__fetch_entry_with_json_invalid_input_returns_str():
+@pytest.mark.parametrize("lang", ["aaaa", "bbbb", None, 3])
+async def test__fetch_entry_with_json_invalid_lang_returns_none(lang):
     """
     Checks that _fetch_entry_with_json returns None when
     invalid input is given.
     """
     result = await fetch._fetch_entry_with_json(
-        interaction=None, entry="capoo", lang="bad_lang_code", field="title"
+        interaction=None, entry="capoo", lang=lang, field="title"
     )
     assert result is None
