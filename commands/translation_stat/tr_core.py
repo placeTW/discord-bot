@@ -41,10 +41,8 @@ def filename_rm_sector(filename: str, sectors: int) -> str:
 
 def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
     filename = filename_rm_sector(filename, sectors)
-    locale = filename[: re.match(r"\/|\\", filename)]
+    locale = filename[: filename.find("/")]
     filename = filename_rm_sector(filename, 1)
-    if os.name == "nt":
-        filename.replace("/", "\\")
     return filename, locale
 
 

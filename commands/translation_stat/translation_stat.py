@@ -19,15 +19,19 @@ class MoreDetailsButtonView(discord.ui.View):
         if (len(self.files_not_found)):
             message = "Files not found:\n".join(f"{item}\n" for item in self.files_not_found)
         for key, value in self.progresses.items():
-            message.join(f"{key}:\n" + tabulate([["Field", "Status"] + [field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()], headers='firstrow', tablefmt='fancy_grid'))
+            print(value)
+            message += f"{key}:\n" + tabulate([["Field", "Status"] + [field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()], headers='firstrow', tablefmt='fancy_grid')
+
+        print(message)
 
         tmp = "```"
         for line in message.splitlines():
             if len(tmp) + 4 + len(line) > 2000:
-                await interaction.client.send_message(interaction.channel, tmp + "\n```")
-                tmp = ""
+                await interaction.channel.send( tmp + "\n```")
+                tmp = "```"
             else:
-                tmp.append(f"\n{line}")
+                tmp += f"\n{line}"
+        await interaction.channel.send(tmp + "\n```")
         
 
 def register_commands(tree, this_guild: discord.Object):
