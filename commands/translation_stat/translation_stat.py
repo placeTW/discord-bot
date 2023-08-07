@@ -19,10 +19,9 @@ class MoreDetailsButtonView(discord.ui.View):
         if (len(self.files_not_found)):
             message = "Files not found:\n".join(f"{item}\n" for item in self.files_not_found)
         for key, value in self.progresses.items():
-            print(value)
-            message += f"{key}:\n" + tabulate([["Field", "Status"] + [field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()], headers='firstrow', tablefmt='fancy_grid')
-
-        print(message)
+            table = [["Field", "Status"]]
+            table.extend([[field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()])
+            message += f"\n{key}:\n" + tabulate(table, headers='firstrow', tablefmt='simple')
 
         tmp = "```"
         for line in message.splitlines():
