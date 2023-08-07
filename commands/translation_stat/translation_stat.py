@@ -15,22 +15,24 @@ class MoreDetailsButtonView(discord.ui.View):
     @discord.ui.button(label="More Details", style=discord.ButtonStyle.primary, emoji='ℹ️')
     async def button_callback(self, interaction: discord.Interaction, button: discord.ui.button):
         await interaction.response.defer()
-        message = str()
         if (len(self.files_not_found)):
-            message = "Files not found:\n".join(f"{item}\n" for item in self.files_not_found)
+            await interaction.channel.send("Files not found:\n".join(f"{item}\n" for item in self.files_not_found))
+
+        messages: list[str] = []
         for key, value in self.progresses.items():
             table = [["Field", "Status"]]
             table.extend([[field, "Available" if status else "Unavailable"] for field, status in value.all_fields.items()])
-            message += f"\n{key}:\n" + tabulate(table, headers='firstrow', tablefmt='simple')
+            messages.append(f"\n{key}:\n" + tabulate(table, headers='firstrow', tablefmt='simple'))
 
-        tmp = "```"
-        for line in message.splitlines():
-            if len(tmp) + 4 + len(line) > 2000:
-                await interaction.channel.send( tmp + "\n```")
-                tmp = "```"
-            else:
-                tmp += f"\n{line}"
-        await interaction.channel.send(tmp + "\n```")
+        for message in messages:
+            tmp = "```"
+            for line in message.splitlines():
+                if len(tmp) + 4 + len(line) > 2000:
+                    await interaction.channel.send( tmp + "\n```")
+                    tmp = "```"
+                else:
+                    tmp += f"\n{line}"
+            await interaction.channel.send(tmp + "\n```")
         
 
 def register_commands(tree, this_guild: discord.Object):
