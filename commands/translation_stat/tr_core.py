@@ -47,7 +47,7 @@ def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
 
 
 def generate_progress_str(percentage: int, size: int) -> str:
-    slice = (100 / size) + 1
+    slice = (100 / size)
     return "[{}]".format(
         str().join(
             [
