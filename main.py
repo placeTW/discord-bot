@@ -24,7 +24,7 @@ load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == 'prod'
 TOKEN = os.getenv('DISCORD_TOKEN_DEV' if not prod else 'DISCORD_TOKEN')
 GUILD = os.getenv("DISCORD_GUILD")
-GH_TOKEN = os.getenv("GITHUB_TOKEN", None)
+GH_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 deployment_date = datetime.datetime.now()

@@ -41,8 +41,10 @@ def filename_rm_sector(filename: str, sectors: int) -> str:
 
 def handle_filename(filename: str, sectors: int) -> tuple[str, str]:
     filename = filename_rm_sector(filename, sectors)
-    locale = filename[: filename.find("/")]
+    locale = filename[: re.match(r"\/|\\", filename)]
     filename = filename_rm_sector(filename, 1)
+    if os.name == "nt":
+        filename.replace("/", "\\")
     return filename, locale
 
 
@@ -128,13 +130,13 @@ class transfile_progress:
                 )
             )
         with open(
-            f"trans_data/{locale}/{filename}_progress.json", "w+"
+            os.path.join("trans_data", locale, f"{filename}_progress.json"), "w+"
         ) as target:
             target.write(json.dumps(out))
 
     def read_json(self, locale, filename) -> None:
         with open(
-            f"trans_data/{locale}/{filename}_progress.json", "r"
+            os.path.join("trans_data", locale, f"{filename}_progress.json"), "r"
         ) as target:
             parsed = json.loads(target.read())
             self.total_indexes = parsed["total_indexes"]
@@ -154,11 +156,9 @@ def write_data(
     full_path: str,
     commit_ref: str = GithubObject.NotSet,
 ) -> None:
-    if filename not in json_matches.keys():
-        return
-    if not os.path.exists("trans_data/{}".format(locale)):
-        os.makedirs("trans_data/{}".format(locale))
-    with open("trans_data/{}/{}".format(locale, filename), "w+") as out:
+    if not os.path.exists(os.path.join("trans_data", locale)):
+        os.makedirs(os.path.join("trans_data", locale).format(locale))
+    with open(os.path.join("trans_data", locale, filename), "w+") as out:
         out.write(
             repo.get_contents(
                 full_path, ref=commit_ref
@@ -226,9 +226,9 @@ def iter_pr(pr, locale_check: str, main_lang_progress=None):
 
 
 def apply_pr_map() -> None:
-    if not os.path.exists("trans_data/pr_map.json"):
+    if not os.path.exists(os.path.join("trans_data", "pr_map.json")):
         return
-    with open("trans_data/pr_map.json", "r") as config, trans_db_lock:
+    with open(os.path.join("trans_data", "pr_map.json"), "r") as config, trans_db_lock:
         filestr = config.read()
         if not len(filestr):
             return
@@ -248,7 +248,7 @@ def gen_mainlang_progress_map(
 ) -> dict[str, transfile_progress]:
     with trans_db["en"].mutex if lock else nullcontext():
         target_files: list[str] = []
-        for _, _, subfiles in os.walk("trans_data/en"):
+        for _, _, subfiles in os.walk(os.path.join("trans_data", "en")):
             for item in subfiles:
                 if not item.endswith("_progress.json"):
                     target_files.append(item)
@@ -264,7 +264,7 @@ def write_transfile_progress(
     locale: str, filename: str, main_lang_progress: transfile_progress = None
 ) -> transfile_progress:
     target = transfile_progress()
-    with open(f"trans_data/{locale}/{filename}", "r") as target_file:
+    with open(os.path.join("trans_data", locale, filename), "r") as target_file:
         if locale == main_lang_progress:
             target.load_file(filename, json.loads(target_file.read()))
         else:
@@ -373,7 +373,7 @@ def get_file_stat(lang: str) -> dict[str, bool]:
 
 def write_pr_map() -> None:
     out: dict[str, str] = {}
-    with open("trans_data/pr_map.json", "w+") as config:
+    with open(os.path.join("trans_data", "pr_map.json"), "w+") as config:
         with trans_db_lock:
             for key, value in trans_db.items():
                 with value.mutex:
@@ -384,5 +384,9 @@ def write_pr_map() -> None:
 
 def initialize_github(token: str) -> None:
     global g, repo
-    g = Github(token)
+    if not token:
+        g = Github()
+    else:
+        g = Github(token)
+    
     repo = g.get_repo("placeTW/website")
