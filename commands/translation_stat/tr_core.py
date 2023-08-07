@@ -20,7 +20,7 @@ commands_initialize_condition = Event()
 lang_require_update: bool = False
 
 def float_to_percentage(target: float) -> int:
-    return int(target * 100 + 1)
+    return int(target * 100)
 
 def check_file_include_rule(path: str) -> bool:
     return re.search(
