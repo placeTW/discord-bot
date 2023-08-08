@@ -171,7 +171,7 @@ def register_commands(tree, this_guild: discord.Object):
         ref = core.trans_db[lang.value]
         embed: discord.Embed = None
         with ref.mutex:
-            main_lang_progresses = core.gen_mainlang_progress_map(lang.value is not core.main_lang)
+            main_lang_progresses = core.gen_mainlang_progress_map(lang.value != core.main_lang)
             all_progresses = get_file_progresses(lang.value, ref.all_files())
             all_progresses_str = progresses_to_str(all_progresses)
         files_not_found: list[str] = []

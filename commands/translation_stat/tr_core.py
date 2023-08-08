@@ -128,13 +128,13 @@ class transfile_progress:
                 )
             )
         with open(
-            os.path.join("trans_data", locale, f"{filename}_progress.json"), "w+"
+            os.path.join("trans_data", locale, f"{filename}_progress.json"), "w+", encoding='UTF-8'
         ) as target:
             target.write(json.dumps(out))
 
     def read_json(self, locale, filename) -> None:
         with open(
-            os.path.join("trans_data", locale, f"{filename}_progress.json"), "r"
+            os.path.join("trans_data", locale, f"{filename}_progress.json"), "r", encoding='UTF-8'
         ) as target:
             parsed = json.loads(target.read())
             self.total_indexes = parsed["total_indexes"]
@@ -156,7 +156,7 @@ def write_data(
 ) -> None:
     if not os.path.exists(os.path.join("trans_data", locale)):
         os.makedirs(os.path.join("trans_data", locale).format(locale))
-    with open(os.path.join("trans_data", locale, filename), "w+") as out:
+    with open(os.path.join("trans_data", locale, filename), "w+", encoding='UTF-8') as out:
         out.write(
             repo.get_contents(
                 full_path, ref=commit_ref
@@ -226,7 +226,7 @@ def iter_pr(pr, locale_check: str, main_lang_progress=None):
 def apply_pr_map() -> None:
     if not os.path.exists(os.path.join("trans_data", "pr_map.json")):
         return
-    with open(os.path.join("trans_data", "pr_map.json"), "r") as config, trans_db_lock:
+    with open(os.path.join("trans_data", "pr_map.json"), "r", encoding='UTF-8') as config, trans_db_lock:
         filestr = config.read()
         if not len(filestr):
             return
@@ -262,7 +262,7 @@ def write_transfile_progress(
     locale: str, filename: str, main_lang_progress: transfile_progress = None
 ) -> transfile_progress:
     target = transfile_progress()
-    with open(os.path.join("trans_data", locale, filename), "r") as target_file:
+    with open(os.path.join("trans_data", locale, filename), "r", encoding='UTF-8') as target_file:
         if locale == main_lang_progress:
             target.load_file(filename, json.loads(target_file.read()))
         else:
@@ -311,14 +311,13 @@ def iter_master(locale_check: str, content, main_lang_progress=None, sectors: in
 
 def update_locale(locale: str, main_lang_progress: transfile_progress = None):
     ref = trans_db[locale]
-    with ref.mutex:
-        if ref.pr_no:
-            iter_pr(repo.get_pull(ref.pr_no), locale, main_lang_progress)
-        try:
-            iter_master(locale, repo.get_contents(f"public/locales/{locale}"), main_lang_progress)
-        except Exception:
-            if not ref.pr_no:
-                raise
+    if ref.pr_no:
+        iter_pr(repo.get_pull(ref.pr_no), locale, main_lang_progress)
+    try:
+        iter_master(locale, repo.get_contents(f"public/locales/{locale}"), main_lang_progress)
+    except Exception:
+        if not ref.pr_no:
+            raise
 
 
 def update_repo() -> None:
@@ -336,9 +335,11 @@ def update_repo() -> None:
     if not commands_initialize_condition.is_set():
         commands_initialize_condition.set()
     main_lang_progress: dict[str, transfile_progress] = {}
-    update_locale(lang_list.pop(lang_list.index("en")), main_lang_progress)
+    with trans_db[main_lang].mutex:
+        update_locale(lang_list.pop(lang_list.index("en")), main_lang_progress)
     for item in lang_list:
-        update_locale(item, main_lang_progress)
+        with trans_db[item].mutex:
+            update_locale(item, main_lang_progress)
 
 
 def shift2master(locale: str) -> None:
@@ -371,7 +372,7 @@ def get_file_stat(lang: str) -> dict[str, bool]:
 
 def write_pr_map() -> None:
     out: dict[str, str] = {}
-    with open(os.path.join("trans_data", "pr_map.json"), "w+") as config:
+    with open(os.path.join("trans_data", "pr_map.json"), "w+", encoding='UTF-8') as config:
         with trans_db_lock:
             for key, value in trans_db.items():
                 with value.mutex:
