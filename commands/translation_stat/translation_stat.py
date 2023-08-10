@@ -213,6 +213,11 @@ def register_commands(tree, this_guild: discord.Object):
                 inline=False
             )
 
+        time_diff = int((core.datetime.now() - ref.last_updated).total_seconds())
+        embed.set_footer(
+            text=f"Last updated: {'Now' if time_diff < 10 else f'{time_diff} seconds ago'}"
+        )
+        embed.footer.text += "\nThis automatically updates every 30 minutes"
         view = discord.ui.View()
         button = discord.ui.Button(style=discord.ButtonStyle.primary, label="More Details")
         await interaction.followup.send(content=None, embed=embed, view=MoreDetailsButtonView(all_progresses, files_not_found))

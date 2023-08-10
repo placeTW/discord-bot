@@ -318,6 +318,7 @@ def update_locale(locale: str, main_lang_progress: dict[str, transfile_progress]
     except Exception:
         if not ref.pr_no:
             raise
+    ref.last_updated = datetime.now()
 
 
 def iter_locales() -> None:
