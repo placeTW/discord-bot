@@ -14,6 +14,7 @@ from commands.edit_entry import edit_entry_modal
 from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
+from commands.reacttw import react_tw
 from commands.shiba import random_shiba
 import sys
 
@@ -27,6 +28,8 @@ deployment_date = datetime.datetime.now()
 
 # setting up the bot
 intents = discord.Intents.default()
+# also turn on messages functionality
+intents.message_content = True
 # if you don't want all intents you can do discord.Intents.default()
 client = discord.Client(intents=intents)
 # CommandTree is where all our defined commands are stored
@@ -86,6 +89,17 @@ async def on_ready():
     await tree.sync(guild=this_guild)
     # print "ready" in the console when the bot is ready to work
     print("Bot is ready.")
+
+
+# when someone sends any message
+@client.event
+async def on_message(message: discord.Message):
+    # don't respond to bot's own posts
+    if message.author == client.user:
+        return
+
+    if "TAIWAN" in message.content.upper():
+        await react_tw.send_react_tw(message)
 
 
 client.run(TOKEN)
