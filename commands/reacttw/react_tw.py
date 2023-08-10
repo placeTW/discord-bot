@@ -23,7 +23,7 @@ def is_TW_message(message: discord.Message):
         or ("FORMOSA" in to_upper)
         or ("台灣" in message.content)
         or ("臺灣" in message.content)
-        or ("FORMOSA" in message.content)
+        or ("FORMOSA" in to_upper)
     )
 
 
