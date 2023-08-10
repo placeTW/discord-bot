@@ -1,9 +1,10 @@
 from github import Github, Repository, GithubObject
 import json
 import os
-from threading import Lock, Event
+from threading import Lock
 from contextlib import nullcontext
 import re
+from datetime import datetime
 
 g: Github = None
 repo: Repository = None
@@ -14,8 +15,6 @@ json_matches: dict[str, list[str]] = {
     "art-pieces.json": [r".*#(title|blurb|desc)"],
     "translation.json": [r".*"],
 }
-
-commands_initialize_condition = Event()
 
 lang_require_update: bool = False
 
@@ -170,6 +169,7 @@ class locale_t:
         self.pr_files: list[str] = []
         self.pr_no: int = None
         self.mutex: Lock = Lock()
+        self.last_updated: datetime = None
 
     def sync_pr_files(self, filenames: list[str] = None):
         if filenames:
@@ -309,7 +309,7 @@ def iter_master(locale_check: str, content, main_lang_progress=None, sectors: in
         write_progress_proxy(locale, file, main_lang_progress)
 
 
-def update_locale(locale: str, main_lang_progress: transfile_progress = None):
+def update_locale(locale: str, main_lang_progress: dict[str, transfile_progress] = None):
     ref = trans_db[locale]
     if ref.pr_no:
         iter_pr(repo.get_pull(ref.pr_no), locale, main_lang_progress)
@@ -320,7 +320,7 @@ def update_locale(locale: str, main_lang_progress: transfile_progress = None):
             raise
 
 
-def update_repo() -> None:
+def iter_locales() -> None:
     locale_contents = repo.get_contents("public/locales")
     lang_list: list[str] = []
     with trans_db_lock:
@@ -332,14 +332,19 @@ def update_repo() -> None:
                     global lang_require_update
                     lang_require_update = True
         lang_list = list(trans_db.keys())
-    if not commands_initialize_condition.is_set():
-        commands_initialize_condition.set()
+
+
+def scheduled_update() -> None:
+    locales_to_update: list[str] = []
+    with trans_db.lock:
+        for key, item in trans_db.items():
+            if not item.last_updated or (item.last_updated - datetime.now()).total_seconds() > 1800:
+                locales_to_update.append(key)
     main_lang_progress: dict[str, transfile_progress] = {}
-    with trans_db[main_lang].mutex:
-        update_locale(lang_list.pop(lang_list.index("en")), main_lang_progress)
-    for item in lang_list:
-        with trans_db[item].mutex:
-            update_locale(item, main_lang_progress)
+
+def require_locale(locale: str, mainlang_progress: dict[str, transfile_progress] = None):
+    if not trans_db[locale].last_updated:
+        update_locale(locale, mainlang_progress)
 
 
 def shift2master(locale: str) -> None:
@@ -348,26 +353,6 @@ def shift2master(locale: str) -> None:
     main_lang_progress = gen_mainlang_progress_map(locale != main_lang)
     iter_master(locale, repo.get_contents(f"public/locales/{locale}"), main_lang_progress)
     print(f"{locale} => master")
-
-
-def get_file_stat(lang: str) -> dict[str, bool]:
-    def inner(base: list[str], target: list[str]) -> dict[str, bool]:
-        ret = dict[str, bool]()
-        for item in base:
-            for nested_item in target:
-                if item == nested_item:
-                    ret[item] = True
-                    break
-            else:
-                ret[item] = False
-        return ret
-
-    with trans_db[main_lang].mutex, trans_db[
-        lang
-    ].mutex if lang != main_lang else nullcontext():
-        return inner(
-            trans_db[main_lang].all_files(), trans_db[lang].all_files()
-        )
 
 
 def write_pr_map() -> None:

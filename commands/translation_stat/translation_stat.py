@@ -36,7 +36,6 @@ class MoreDetailsButtonView(discord.ui.View):
         
 
 def register_commands(tree, this_guild: discord.Object):
-    core.commands_initialize_condition.wait()
 
     track_group = app_commands.Group(
         name="track", description="Set source for language tracking"
@@ -81,6 +80,9 @@ def register_commands(tree, this_guild: discord.Object):
         interaction: discord.Interaction, locale: str, pr_no: int = None
     ):
         await interaction.response.defer()
+        if locale != core.main_lang:
+            core.require_locale(core.main_lang)
+        core.require_locale(locale)
         ref = core.trans_db[locale]
         all_progresses = pr_files = master_files = None
         with ref.mutex:
@@ -172,6 +174,9 @@ def register_commands(tree, this_guild: discord.Object):
         embed: discord.Embed = None
         with ref.mutex:
             main_lang_progresses = core.gen_mainlang_progress_map(lang.value != core.main_lang)
+            if (lang.value != core.main_lang):
+                core.require_locale(core.main_lang)
+            core.require_locale(lang.value, main_lang_progresses)
             all_progresses = get_file_progresses(lang.value, ref.all_files())
             all_progresses_str = progresses_to_str(all_progresses)
         files_not_found: list[str] = []

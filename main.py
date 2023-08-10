@@ -42,15 +42,15 @@ class MyClient(discord.Client):
         super().__init__(*args, **kwargs)
 
     async def setup_hook(self):
-        self.bg_worker.start()
+        client.loop.call_later(30 * 60, self.bg_worker.start)
 
     @tasks.loop(minutes=30)
     async def bg_worker(self):
-        tr_core.update_repo()
+        tr_core.iter_locales()
         if tr_core.lang_require_update:
-            while not all(var in globals() for var in ["tree", "this_guild"]):
-                time.sleep(1)
             translation_stat.register_commands(tree, this_guild)
+            tree.sync(guild=this_guild)
+        tr_core.scheduled_update()
 
     @bg_worker.after_loop
     async def write_pr_file(self):
@@ -104,6 +104,8 @@ one_o_one.register_commands(tree, this_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
 edit_entry_cmd.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
+tr_core.iter_locales()
+translation_stat.register_commands(tree, this_guild)
 
 
 # sync the slash commands to server
