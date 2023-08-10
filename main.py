@@ -1,5 +1,4 @@
 import os
-import time
 
 import discord
 from discord import app_commands
@@ -17,12 +16,14 @@ from commands.edit_entry import edit_entry_modal
 from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
+from commands.reacttw import react_tw
+from commands.shiba import random_shiba
 import sys
 
 # load environment vars (from .env)
 load_dotenv()
-prod = len(sys.argv) > 1 and sys.argv[1] == 'prod'
-TOKEN = os.getenv('DISCORD_TOKEN_DEV' if not prod else 'DISCORD_TOKEN')
+prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
+TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 GH_TOKEN = os.getenv("GITHUB_TOKEN")
 
@@ -31,6 +32,8 @@ deployment_date = datetime.datetime.now()
 
 # setting up the bot
 intents = discord.Intents.default()
+# also turn on messages functionality
+intents.message_content = True
 # if you don't want all intents you can do discord.Intents.default()
 
 tr_core.initialize_github(GH_TOKEN)
@@ -96,6 +99,7 @@ https://github.com/placeTW/discord-bot
     """
     await interaction.response.send_message(msg)
 
+
 # * register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
 fetch_entry_ui.register_commands(tree, this_guild)
@@ -103,6 +107,7 @@ one_o_one.register_commands(tree, this_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
 edit_entry_cmd.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
+random_shiba.register_commands(tree, this_guild)
 tr_core.iter_locales()
 translation_stat.register_commands(tree, this_guild)
 
@@ -113,6 +118,17 @@ async def on_ready():
     await tree.sync(guild=this_guild)
     # print "ready" in the console when the bot is ready to work
     print("Bot is ready.")
+
+
+# when someone sends any message
+@client.event
+async def on_message(message: discord.Message):
+    # don't respond to bot's own posts
+    if message.author == client.user:
+        return
+
+    if react_tw.is_TW_message(message):
+        await react_tw.send_react_tw(message)
 
 
 client.run(TOKEN)
