@@ -39,7 +39,7 @@ def register_commands(
         selected_entry_name = entry.name  # entry always exists
         selected_field = field.value  # field is mandatory here
         initial_value = await _fetch_entry_with_json(
-            interaction, selected_entry_id, selected_lang, selected_field
+            interaction, selected_entry_id, selected_lang, selected_field, fromI18n=True
         )
         form = submit_entry_modal.SubmitEntryModal(
             client,

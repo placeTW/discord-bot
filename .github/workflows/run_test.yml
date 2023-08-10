@@ -4,6 +4,7 @@ on:
     push:
       branches:
         - 'main'
+        - '11-add-more-tests'
     pull_request:
         types: [opened, reopened]
             
@@ -20,6 +21,7 @@ jobs:
         uses: actions/setup-python@v4  
         with:  
           python-version: ${{ matrix.python-version }}  
+          cache: 'pip'
       - name: Install dependencies  
         run: |  
           python -m pip install --upgrade pip  
