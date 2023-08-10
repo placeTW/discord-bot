@@ -52,8 +52,7 @@ class MyClient(discord.Client):
             tree.sync(guild=this_guild)
         tr_core.scheduled_update()
 
-    @bg_worker.after_loop
-    async def write_pr_file(self):
+    async def close(self):
         tr_core.write_pr_map()
 
 

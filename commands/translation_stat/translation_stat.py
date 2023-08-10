@@ -89,14 +89,14 @@ def register_commands(tree, this_guild: discord.Object):
             if pr_no:
                 if ref.pr_no and ref.pr_no == pr_no:
                     await interaction.followup.send(
-                        content=f"{locale} is already tracking PR {pr_no}"
+                        embed=discord.Embed(description=f"❌ **{locale} is already tracking PR {pr_no}**", colour=discord.Colour.red())
                     )
                     return
                 core.shift2pr(locale, pr_no)
             else:
                 if not ref.pr_no:
                     await interaction.followup.send(
-                        content=f"{locale} is already tracking Master"
+                        embed=discord.Embed(description=f"❌ **{locale} is already tracking Master**", colour=discord.Colour.red())
                     )
                     return
                 core.shift2master(locale)
