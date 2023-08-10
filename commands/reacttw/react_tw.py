@@ -11,14 +11,19 @@ POSSIBLE_REACTS = (
     "<:roc_heart:1133045894678319235>",
     "<:tw_heart:1133045893227102299>",
     "<:bubblemilktea:1132632348651966596>",
+    "<:TWHW3:1139172056349548604>",
+    "<:rice_cooker:1139169683824713892>",
 )
 
 
 def is_TW_message(message: discord.Message):
+    to_upper = message.content.upper()
     return (
-        ("TAIWAN" in message.content.upper())
+        ("TAIWAN" in to_upper)
+        or ("FORMOSA" in to_upper)
         or ("台灣" in message.content)
         or ("臺灣" in message.content)
+        or ("FORMOSA" in message.content)
     )
 
 
@@ -36,5 +41,5 @@ def mock_bernoulli(p: float) -> bool:
 
 async def send_react_tw(message: discord.Message):
     for react in POSSIBLE_REACTS:
-        if mock_bernoulli(0.25):
+        if mock_bernoulli(0.20):
             await message.add_reaction(react)
