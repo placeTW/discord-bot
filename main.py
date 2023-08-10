@@ -98,7 +98,7 @@ async def on_message(message: discord.Message):
     if message.author == client.user:
         return
 
-    if "TAIWAN" in message.content.upper():
+    if react_tw.is_TW_message(message):
         await react_tw.send_react_tw(message)
 
 

@@ -14,6 +14,14 @@ POSSIBLE_REACTS = (
 )
 
 
+def is_TW_message(message: discord.Message):
+    return (
+        ("TAIWAN" in message.content.upper())
+        or ("台灣" in message.content)
+        or ("臺灣" in message.content)
+    )
+
+
 def mock_bernoulli(p: float) -> bool:
     """Returns True with probability.
 
