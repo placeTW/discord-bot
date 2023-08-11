@@ -18,8 +18,25 @@ KEYWORDS = (
     "Taivaniečiui",
     "Taivaniečiams",
     "Taivanietiškas",
-    "Taivana"
+    "Taivana",
     # Latvian
+    "Taivāna",
+    "Taivānā",
+    "Taivānas",
+    "Taivānai",
+    "Taivānu",
+    "Taivānietis",
+    "Taivāniete",
+    "Taivānisks",
+    "Taivāniešu",
+    "Taivānietim",
+    "Taivānietei",
+    "Taivāniešiem",
+    "Taivānieti",
+    "Taivāniete",
+    "Taivānieši",
+    "Taivānietes",
+    "Taivānieši",
     # Estonian
 )
 
