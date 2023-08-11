@@ -1,4 +1,4 @@
-import re
+from re import compile
 
 POSSIBLE_REACTS = (
     "<:flag_twi:1133045891780071436>",
@@ -69,4 +69,4 @@ KEYWORDS = (
 )
 
 
-TW_REGEX = re.compile(rf"({'|'.join(KEYWORDS)})")
+TW_REGEX = compile(rf"({'|'.join(KEYWORDS)})")

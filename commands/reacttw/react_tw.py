@@ -1,6 +1,5 @@
 import discord
 import random
-import re
 from .consts import POSSIBLE_REACTS, TW_REGEX
 
 
