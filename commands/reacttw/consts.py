@@ -73,4 +73,4 @@ KEYWORDS = (
 )
 
 
-TW_REGEX = compile(rf"({'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
+TW_REGEX = compile(rf"(?:{'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
