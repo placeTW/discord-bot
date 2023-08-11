@@ -1,4 +1,4 @@
-from re import compile
+from re import compile, IGNORECASE, UNICODE
 
 POSSIBLE_REACTS = (
     "<:flag_twi:1133045891780071436>",
@@ -44,10 +44,13 @@ KEYWORDS = (
     "台灣",
     "臺灣",
     "臺北",
+    "台北",
     "新北",
     "桃園",
     "臺中",
+    "台中",
     "臺南",
+    "台南",
     "高雄",
     "新竹",
     "苗栗",
@@ -59,6 +62,7 @@ KEYWORDS = (
     "宜蘭",
     "花蓮",
     "臺東",
+    "台東",
     "澎湖",
     "金門",
     "連江",
@@ -69,4 +73,4 @@ KEYWORDS = (
 )
 
 
-TW_REGEX = compile(rf"({'|'.join(KEYWORDS)})")
+TW_REGEX = compile(rf"({'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
