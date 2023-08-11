@@ -14,7 +14,7 @@ KEYWORDS = (
     "Taivanietis",
     "Taivanietė",
     "Taivaniečiai",
-    "Taivaniečių",
+    r"Taivanieči(?:ų|u)",
     "Taivaniečiui",
     "Taivaniečiams",
     "Taivanietiškas",
@@ -24,4 +24,6 @@ KEYWORDS = (
 )
 
 
-BALTIC_REGEX = compile(rf"({'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
+BALTIC_REGEX = compile(
+    rf"(?:{'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE
+)
