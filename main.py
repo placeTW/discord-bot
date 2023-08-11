@@ -16,6 +16,7 @@ from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
 from commands.react_baltics import react_baltics
+from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 import sys
@@ -106,6 +107,9 @@ async def on_message(message: discord.Message):
 
     if react_baltics.is_baltic_message(message):
         await react_baltics.send_react_baltic(message)
+
+    if hsinchu_wind.is_hsinchu_message(message):
+        await hsinchu_wind.send_hsinchu_msg(message)
 
 
 client.run(TOKEN)
