@@ -15,6 +15,7 @@ from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
+from commands.react_baltics import react_baltics
 from commands.shiba import random_shiba
 import sys
 
@@ -100,6 +101,9 @@ async def on_message(message: discord.Message):
 
     if react_tw.is_TW_message(message):
         await react_tw.send_react_tw(message)
+
+    if react_baltics.is_baltic_message(message):
+        await react_baltics.send_react_baltic(message)
 
 
 client.run(TOKEN)
