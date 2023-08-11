@@ -13,6 +13,9 @@ POSSIBLE_REACTS = (
     "<:bubblemilktea:1132632348651966596>",
     "<:TWHW3:1139172056349548604>",
     "<:rice_cooker:1139169683824713892>",
+    "<:tw_beer:1139314162615459942>",
+    "<:hilife:1139176380521791519>",
+    "<:tw_hw_3:1139172056349548604>",
 )
 
 
@@ -41,5 +44,5 @@ def mock_bernoulli(p: float) -> bool:
 
 async def send_react_tw(message: discord.Message):
     for react in POSSIBLE_REACTS:
-        if mock_bernoulli(0.20):
+        if mock_bernoulli(0.15):
             await message.add_reaction(react)
