@@ -7,7 +7,7 @@ import os
 def register_commands(tree, this_guild: discord.Object):
   @tree.command(
       name="restart",
-      description="Restarts the bot",
+      description="Restarts the bot (only true admins can successfully execute this command)",
       guild=this_guild,
   )
   @app_commands.checks.has_permissions(administrator=True)
