@@ -168,7 +168,7 @@ pyproject.toml
 # for testing github api
 test-git.ipynb
 
-.vscode
+.vscode/
 
 # chanom misc
 py3-11_for_dc_bot/
