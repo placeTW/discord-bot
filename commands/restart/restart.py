@@ -16,11 +16,11 @@ def register_commands(tree, this_guild: discord.Object):
   ):
     await interaction.response.send_message("Restarting, goodbye world")
 
-    print("Fetching from repo and installing requirements...")
+    print("restart: Fetching from repo and installing requirements...")
 
     subprocess.call(["git", "pull"])
     subprocess.call(["pip", "install", "-r", "requirements.txt"])
 
-    print("Restarting...")
+    print("restart: Restarting...")
 
     os.execv(sys.executable, ['python'] + sys.argv)
