@@ -20,6 +20,7 @@ from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
+from commands.gothefucktosleep import gothefucktosleep
 import sys
 
 # load environment vars (from .env)
@@ -74,16 +75,6 @@ https://github.com/placeTW/discord-bot
     await interaction.response.send_message(msg)
 
 
-@tree.command(
-    name="gothefucktosleep",
-    description="Go the fuck to sleep",
-    guild=this_guild,
-)
-@app_commands.rename(user_to_ping='member')
-async def test_slash_command(interaction: discord.Interaction, user_to_ping: discord.Member):
-    await interaction.response.send_message(f"<@{user_to_ping.id}> https://www.youtube.com/watch?v=teIbh8hFQos")
-
-
 # * register commands from other files
 fetch_entry_cmd.register_commands(tree, this_guild)
 fetch_entry_ui.register_commands(tree, this_guild)
@@ -94,6 +85,7 @@ hgs.register_commands(tree, this_guild)
 random_shiba.register_commands(tree, this_guild)
 random_capoo.register_commands(tree, this_guild)
 restart.register_commands(tree, this_guild)
+gothefucktosleep.register_commands(tree, this_guild)
 
 # sync the slash commands to server
 @client.event
