@@ -17,5 +17,6 @@ def register_commands(tree, this_guild: discord.Object):
     await interaction.response.send_message("Restarting, goodbye world")
 
     subprocess.call(["git", "pull"])
+    subprocess.call(["pip", "install", "-r", "requirements.txt"])
 
     os.execv(sys.executable, ['python'] + sys.argv)
