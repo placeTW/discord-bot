@@ -41,8 +41,6 @@ tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)  # basically refers to this server
 
 
-# ! These are basic test commands that should not exist when deployed
-# * simple hi command
 @tree.command(
     name="website",
     description="Responds with the placeTW website link",
@@ -52,7 +50,6 @@ async def test_slash_command(interaction: discord.Interaction):
     await interaction.response.send_message("https://placetw.com/")
 
 
-# * simple echo command with param explanation
 @tree.command(
     name="echo",
     description="Echoes whatever string is fed",
@@ -75,6 +72,16 @@ Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
     """
     await interaction.response.send_message(msg)
+
+
+@tree.command(
+    name="gothefucktosleep",
+    description="Go the fuck to sleep",
+    guild=this_guild,
+)
+@app_commands.rename(user_to_ping='member')
+async def test_slash_command(interaction: discord.Interaction, user_to_ping: discord.Member):
+    await interaction.response.send_message(f"<@{user_to_ping.id}> https://www.youtube.com/watch?v=teIbh8hFQos")
 
 
 # * register commands from other files
