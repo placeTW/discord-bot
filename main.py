@@ -19,6 +19,7 @@ from commands.react_baltics import react_baltics
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
+from commands.restart import restart
 import sys
 
 # load environment vars (from .env)
@@ -85,7 +86,7 @@ edit_entry_cmd.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
 random_shiba.register_commands(tree, this_guild)
 random_capoo.register_commands(tree, this_guild)
-
+restart.register_commands(tree, this_guild)
 
 # sync the slash commands to server
 @client.event
