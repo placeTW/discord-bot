@@ -1,4 +1,4 @@
-from commands.reacttw.consts import TW_REGEX
+from commands.react_baltics.consts import BALTIC_REGEX
 import pytest
 
 
@@ -40,15 +40,15 @@ import pytest
         # ! Estonian (STILL MISSING)
     ),
 )
-def test_react_tw_regex_yes_match(test_str: str):
+def test_react_baltics_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
     # * isolated string
-    assert TW_REGEX.search(test_str)
+    assert BALTIC_REGEX.search(test_str)
     # * surrounded by spaces
-    assert TW_REGEX.search(f" {test_str} ")
+    assert BALTIC_REGEX.search(f" {test_str} ")
     # * surrounded by text
-    assert TW_REGEX.search(f"a{test_str}b")
+    assert BALTIC_REGEX.search(f"a{test_str}b")
     # * to lowercase
-    assert TW_REGEX.search(test_str.lower())
+    assert BALTIC_REGEX.search(test_str.lower())
     # * to title case
-    assert TW_REGEX.search(test_str.title())
+    assert BALTIC_REGEX.search(test_str.title())
