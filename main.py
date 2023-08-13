@@ -16,6 +16,7 @@ from commands import hgs
 from commands.reacttw import react_tw
 from commands.react_baltics import react_baltics
 from commands.react_czech import react_czech
+from commands.react_ph import react_ph
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
@@ -110,6 +111,8 @@ async def on_message(message: discord.Message):
         await react_baltics.send_react_baltic(message)
     if react_czech.is_czech_message(message):
         await react_czech.send_react_czech(message)
+    if react_ph.is_ph_message(message):
+        await react_ph.send_react_ph(message)
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
