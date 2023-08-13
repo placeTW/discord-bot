@@ -5,7 +5,7 @@ POSSIBLE_REACTS = (
     "<:bubblemilktea:1132632348651966596>",
 )
 
-KEYWORDS = ("Taga-Taiwan", "菲律賓")
+KEYWORDS = ("Taga-Taiwan",)
 
 
 PH_REGEX = compile(

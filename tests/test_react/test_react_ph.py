@@ -1,7 +1,7 @@
 from commands.react_ph.consts import PH_REGEX
 import pytest
 
-POSTITIVE_TEST_CASES = ("Taga-Taiwan", "菲律賓")
+POSTITIVE_TEST_CASES = ("Taga-Taiwan",)
 
 
 @pytest.mark.parametrize(

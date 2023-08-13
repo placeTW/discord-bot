@@ -15,5 +15,5 @@ KEYWORDS = (
 
 
 BALTIC_REGEX = compile(
-    rf"(?:\b{'|'.join(KEYWORDS)})\b", flags=IGNORECASE | UNICODE
+    rf"\b(?:{'|'.join(KEYWORDS)})\b", flags=IGNORECASE | UNICODE
 )
