@@ -9,28 +9,11 @@ KEYWORDS = (
     # Lithuanian
     r"Taivan(?:as|a|e|o|ui|ie(?:tiškas|tis|tė|či(?:ų|u|ai|ui|ams)))",
     # Latvian
-    "Taivāna",
-    "Taivānā",
-    "Taivānas",
-    "Taivānai",
-    "Taivānu",
-    "Taivānietis",
-    "Taivāniete",
-    "Taivānisks",
-    "Taivāniešu",
-    "Taivānietim",
-    "Taivānietei",
-    "Taivāniešiem",
-    "Taivānieti",
-    "Taivāniete",
-    "Taivānieši",
-    "Taivānietes",
-    "Taivānieši",
-    # Estonian
+    r"Taivān(?:a|ā|as|u|isks|ie(?:tis|te|šu|tim|tei|šiem|ti|te|ši|tes|ši))",
+    # ! Estonian (STILL MISSING)
 )
 
 
 BALTIC_REGEX = compile(
     rf"(?:{'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE
 )
-print(BALTIC_REGEX)
