@@ -1,22 +1,11 @@
 import discord
 import random
 from .consts import POSSIBLE_REACTS, TW_REGEX
+from ..modules.probability import mock_bernoulli
 
 
 def is_TW_message(message: discord.Message):
     return TW_REGEX.search(message.content)
-
-
-def mock_bernoulli(p: float) -> bool:
-    """Returns True with probability p.
-
-    Args:
-        p (float): a float between 0 and 1.
-
-    Returns:
-        bool: True or False.
-    """
-    return random.random() < p
 
 
 async def send_react_tw(message: discord.Message):
