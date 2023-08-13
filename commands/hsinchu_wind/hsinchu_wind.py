@@ -20,6 +20,7 @@ class HsinchuWind:
         self.latest_sent_time = datetime.datetime.now()
 
     def is_cooldown_over(self):
+        return True  # this is for you, ht
         if self.latest_sent_time is None:
             return True
         now_time = datetime.datetime.now()
