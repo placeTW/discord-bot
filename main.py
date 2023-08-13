@@ -10,12 +10,12 @@ import datetime
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
-from commands.edit_entry import edit_entry_modal
 from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
 from commands.react_baltics import react_baltics
+from commands.react_czech import react_czech
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
@@ -87,6 +87,7 @@ random_capoo.register_commands(tree, this_guild)
 restart.register_commands(tree, this_guild)
 gothefucktosleep.register_commands(tree, this_guild)
 
+
 # sync the slash commands to server
 @client.event
 async def on_ready():
@@ -107,6 +108,8 @@ async def on_message(message: discord.Message):
 
     if react_baltics.is_baltic_message(message):
         await react_baltics.send_react_baltic(message)
+    if react_czech.is_czech_message(message):
+        await react_czech.send_react_czech(message)
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
