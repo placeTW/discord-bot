@@ -19,7 +19,7 @@ POSSIBLE_REACTS = (
     "<:Capoo:1139357657698938991>",
 )
 
-KEYWORDS = (
+KEYWORDS_EN = (
     "TAIWAN",
     "FORMOSA",
     "TAIPEI",
@@ -41,12 +41,15 @@ KEYWORDS = (
     "KEELUNG",
     "HSINCHU",
     "CHIAYI",
-    r"(台|臺)灣",
-    "(台|臺)北",
+)
+
+KEYWORDS_TW = (
+    r"(?:台|臺)灣",
+    r"(?:台|臺)北",
     "新北",
     "桃園",
-    r"(台|臺)中",
-    r"(台|臺)南",
+    r"(?:台|臺)中",
+    r"(?:台|臺)南",
     "高雄",
     "新竹",
     "苗栗",
@@ -68,4 +71,7 @@ KEYWORDS = (
 )
 
 
-TW_REGEX = compile(rf"(?:{'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
+TW_REGEX = compile(
+    rf"\b(?:{'|'.join(KEYWORDS_EN)})\b|{'|'.join(KEYWORDS_TW)}",
+    flags=IGNORECASE | UNICODE,
+)

@@ -1,0 +1,13 @@
+from re import compile, IGNORECASE, UNICODE
+
+POSSIBLE_REACTS = (
+    "❤",
+    "<:bubblemilktea:1132632348651966596>",
+)
+
+KEYWORDS = (r"T(?:ch)?aj-?[wv]an(?:y|u|ů|ům|e|ě|ech|em|ský|sky|ec|ka)?",)
+
+
+CZECH_REGEX = compile(
+    rf"\b(?:{'|'.join(KEYWORDS)})\b", flags=IGNORECASE | UNICODE
+)
