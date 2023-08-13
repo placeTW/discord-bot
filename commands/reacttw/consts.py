@@ -42,7 +42,7 @@ KEYWORDS = (
     "HSINCHU",
     "CHIAYI",
     r"(台|臺)灣",
-    "(台|臺)北",
+    r"(台|臺)北",
     "新北",
     "桃園",
     r"(台|臺)中",
@@ -68,4 +68,6 @@ KEYWORDS = (
 )
 
 
-TW_REGEX = compile(rf"(?:{'|'.join(KEYWORDS)})", flags=IGNORECASE | UNICODE)
+TW_REGEX = compile(
+    rf"(?:\b{'|'.join(KEYWORDS)})\b", flags=IGNORECASE | UNICODE
+)
