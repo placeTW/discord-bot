@@ -22,6 +22,7 @@ from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
+from presence.watching import get_random_movie_as_activity
 import sys
 
 # load environment vars (from .env)
@@ -37,7 +38,10 @@ intents = discord.Intents.default()
 # also turn on messages functionality
 intents.message_content = True
 # if you don't want all intents you can do discord.Intents.default()
-client = discord.Client(intents=intents)
+
+# * set bot activity (watching/playing...)
+movie_activity = get_random_movie_as_activity()
+client = discord.Client(intents=intents, activity=movie_activity)
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)  # basically refers to this server
