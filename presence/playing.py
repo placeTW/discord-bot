@@ -24,7 +24,7 @@ def register_commands(
     tree, this_guild: discord.Object, client: discord.Client
 ):
     @tree.command(
-        name="set_watching",
+        name="set_playing",
         description="Sets the bot's status to 'Playing' (movie)...",
         guild=this_guild,
     )
