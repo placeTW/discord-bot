@@ -22,7 +22,7 @@ from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
-from presence.watching import get_random_movie_as_activity
+from presence import watching
 import sys
 
 # load environment vars (from .env)
@@ -40,7 +40,7 @@ intents.message_content = True
 # if you don't want all intents you can do discord.Intents.default()
 
 # * set bot activity (watching/playing...)
-movie_activity = get_random_movie_as_activity()
+movie_activity = watching.get_random_movie_as_activity()
 client = discord.Client(intents=intents, activity=movie_activity)
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
@@ -91,6 +91,7 @@ random_shiba.register_commands(tree, this_guild)
 random_capoo.register_commands(tree, this_guild)
 restart.register_commands(tree, this_guild)
 gothefucktosleep.register_commands(tree, this_guild)
+watching.register_commands(tree, this_guild, client)
 
 
 # sync the slash commands to server
