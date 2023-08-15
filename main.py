@@ -22,6 +22,7 @@ from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
+from commands.boba import boba
 from presence import watching
 import bot
 import sys
@@ -84,6 +85,7 @@ random_capoo.register_commands(tree, this_guild)
 restart.register_commands(tree, this_guild)
 gothefucktosleep.register_commands(tree, this_guild)
 watching.register_commands(tree, this_guild, client)
+boba.register_commands(tree, this_guild)
 
 
 # sync the slash commands to server
