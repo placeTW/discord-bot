@@ -3,7 +3,11 @@ import discord
 from presence import watching
 from discord.ext import tasks
 
+<<<<<<< HEAD
 CHANGE_STATUS_INTERVAL_HOURS = 1
+=======
+CHANGE_STATUS_INTERVAL_HOURS = 2
+>>>>>>> 659d968344c6f774d296612fdf309135de1be9b3
 
 
 class TWPlaceClient(discord.Client):
@@ -16,7 +20,11 @@ class TWPlaceClient(discord.Client):
             intents=intents, activity=movie_activity, *args, **kwargs
         )
 
+<<<<<<< HEAD
     @tasks.loop(hours=CHANGE_STATUS_INTERVAL_HOURS)
+=======
+    @tasks.loop(seconds=CHANGE_STATUS_INTERVAL_HOURS)
+>>>>>>> 659d968344c6f774d296612fdf309135de1be9b3
     async def set_watching_status(self):
         movie_activity = watching.get_random_movie_as_activity()
         await self.change_presence(
