@@ -172,3 +172,6 @@ test-git.ipynb
 
 # chanom misc
 py3-11_for_dc_bot/
+
+# the model
+*.pth

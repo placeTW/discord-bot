@@ -15,13 +15,35 @@ from pathlib import Path
 BOBA_DIR = Path(__file__).parent  # this file's dir
 
 
+def download_model(model_path):
+    # ! need to wait until a suitable link exists, not this one
+    return
+    import requests
+
+    # import shutil
+
+    model_link = "https://mega.nz/file/Y0ZRnDgb#gLnKv0uYP-5y1LKJIFod-KuZ7hXw1XMUTlbz0GCNFuc"
+    model_path = BOBA_DIR / "models/boba.pth"
+    with requests.get(model_link) as response:
+        with open(model_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+
+
 def register_commands(tree, this_guild: discord.Object):
     # Load the model from the file
     classes: list[str] = ["boba"]
     model_path = BOBA_DIR / "models/boba.pth"
     if not model_path.is_file():
-        print("Model not found, this command will not be registered.")
-        return
+        print("Model not found, attempting download.")
+        download_model(model_path)
+        if not model_path.is_file():
+            print(
+                "Model still doesn't exist for some reason,"
+                " not registering this command."
+            )
+            return
     model = Model.load(str(model_path), classes)
 
     image_files = (
