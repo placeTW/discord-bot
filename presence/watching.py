@@ -25,6 +25,7 @@ def register_commands(
         guild=this_guild,
     )
     @app_commands.choices(movie_name=MOVIE_CHOICES)
+    @app_commands.checks.has_any_role("admin", "dev")
     async def set_watching_status(
         interaction: discord.Interaction, movie_name: Choice[str]
     ):
