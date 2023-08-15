@@ -10,17 +10,24 @@ from discord import app_commands
 from PIL import Image, ImageDraw
 
 from commands.modules.probability import mock_bernoulli
+from pathlib import Path
+
+BOBA_DIR = Path(__file__).parent  # this file's dir
 
 
 def register_commands(tree, this_guild: discord.Object):
     # Load the model from the file
     classes: list[str] = ["boba"]
-    model = Model.load("commands/boba/models/boba.pth", classes)
+    model_path = BOBA_DIR / "models/boba.pth"
+    if not model_path.is_file():
+        print("Model not found, this command will not be registered.")
+        return
+    model = Model.load(str(model_path), classes)
 
     image_files = (
-        load_images_under_directory(Path("commands/boba/random_images"))
-        + load_images_under_directory(Path("commands/boba/training_images"))
-        + load_images_under_directory(Path("commands/boba/validation_data"))
+        load_images_under_directory(BOBA_DIR / "random_images")
+        + load_images_under_directory(BOBA_DIR / "training_images")
+        + load_images_under_directory(BOBA_DIR / "validation_data")
     )
     if not image_files:
         raise RuntimeError(f"Should have at least one image")
@@ -66,7 +73,7 @@ def register_commands(tree, this_guild: discord.Object):
             )
 
             # Save the composite image
-            composite_path = "commands/boba/boba_with_pfp.png"
+            composite_path = str(BOBA_DIR / "boba_with_pfp.png")
             composite_image.save(composite_path)
 
             # Send the message
