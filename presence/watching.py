@@ -31,9 +31,7 @@ def register_commands(
         movie_activity = discord.Activity(
             name=movie_name.value, type=discord.ActivityType.watching
         )
-        await client.change_presence(
-            status=discord.Status.online, activity=movie_activity
-        )
+        await client.change_presence(activity=movie_activity)
         await interaction.response.send_message(
             f"Set bot status to 'Watching: {movie_name.value}'", ephemeral=True
         )

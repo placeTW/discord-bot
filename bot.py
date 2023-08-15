@@ -5,6 +5,7 @@ from discord.ext import tasks
 
 CHANGE_STATUS_INTERVAL_HOURS = 1
 
+
 class TWPlaceClient(discord.Client):
     def __init__(self, *args, **kwargs) -> None:
         intents = discord.Intents.default()
@@ -18,9 +19,7 @@ class TWPlaceClient(discord.Client):
     @tasks.loop(hours=CHANGE_STATUS_INTERVAL_HOURS)
     async def set_watching_status(self):
         movie_activity = watching.get_random_movie_as_activity()
-        await self.change_presence(
-            status=discord.Status.idle, activity=movie_activity
-        )
+        await self.change_presence(activity=movie_activity)
 
     @set_watching_status.before_loop
     async def before_my_task(self):
