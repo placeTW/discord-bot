@@ -23,6 +23,7 @@ from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from presence import watching
+import bot
 import sys
 
 # load environment vars (from .env)
@@ -32,16 +33,7 @@ TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 
 deployment_date = datetime.datetime.now()
-
-# setting up the bot
-intents = discord.Intents.default()
-# also turn on messages functionality
-intents.message_content = True
-# if you don't want all intents you can do discord.Intents.default()
-
-# * set bot activity (watching/playing...)
-movie_activity = watching.get_random_movie_as_activity()
-client = discord.Client(intents=intents, activity=movie_activity)
+client = bot.get_bot()
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)  # basically refers to this server
