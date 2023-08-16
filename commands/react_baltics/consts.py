@@ -14,13 +14,17 @@ LV_REGEX_STR = (
 )
 LV_REGEX_STR_TW = "拉脫維亞"
 
+ET_REGEX_STR = r"Taiwan(?:l(?:ane|as(?:e|t|te(?:sse|s|st|le|l|lt|ks|ni|na|ta|ga)?|i|se(?:l)|se|e(?:s|l|st|le|lt|ks|ni|na|ta|d)))|i(?:d|sse|s|st|le|l|lt|ks|ni|na|ta|ga||sid|(?:de(?:sse|s|st|le|lt|l|ni|na|ks|e|ta|ga)?))?)"
+ET_REGEX_STR_TW = "愛沙尼亞"
+
 
 KEYWORDS = (
     # Lithuanian
     LT_REGEX_STR,
     # Latvian
     LV_REGEX_STR,
-    # ! Estonian (STILL MISSING)
+    # Estonian
+    ET_REGEX_STR,
 )
 
 LT_REGEX = compile(
@@ -31,6 +35,6 @@ LV_REGEX = compile(
 )
 
 BALTIC_REGEX = compile(
-    rf"\b(?:{'|'.join(KEYWORDS)})\b|{LV_REGEX_STR_TW}|{LT_REGEX_STR_TW}",
+    rf"\b(?:{'|'.join(KEYWORDS)})\b|{LV_REGEX_STR_TW}|{LT_REGEX_STR_TW}|{ET_REGEX_STR_TW}",
     flags=IGNORECASE | UNICODE,
 )
