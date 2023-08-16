@@ -3,7 +3,7 @@ from re import compile, IGNORECASE, UNICODE
 POSSIBLE_REACTS = (
     "<:tw_baltics_heart:1132524940587962388>",
     "<:bubblemilktea:1132632348651966596>",
-    "<:chaos:1140296704516706315>",
+    # "<:chaos:1140296704516706315>",
 )
 
 LT_REGEX_STR = r"Taivan(?:as|a|e|o|ui|ie(?:tiškas|tis|tė|či(?:ų|u|ai|ui|ams)))"
@@ -32,6 +32,9 @@ LT_REGEX = compile(
 )
 LV_REGEX = compile(
     rf"\b(?:{LV_REGEX_STR})\b|{LV_REGEX_STR_TW}", flags=IGNORECASE | UNICODE
+)
+ET_REGEX = compile(
+    rf"\b(?:{ET_REGEX_STR})\b|{ET_REGEX_STR_TW}", flags=IGNORECASE | UNICODE
 )
 
 BALTIC_REGEX = compile(
