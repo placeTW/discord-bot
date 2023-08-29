@@ -12,12 +12,21 @@ import datetime
 from commands.fetch_entry import fetch_entry_cmd
 from commands.translation_stat import translation_stat, tr_core
 from commands.fetch_entry import fetch_entry_ui
-from commands.edit_entry import edit_entry_modal
 from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
+from commands.react_baltics import react_baltics
+from commands.react_czech import react_czech
+from commands.react_ph import react_ph
+from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
+from commands.capoo import random_capoo
+from commands.restart import restart
+from commands.gothefucktosleep import gothefucktosleep
+from commands.boba import boba
+from presence import watching
+import bot
 import sys
 
 # load environment vars (from .env)
@@ -64,8 +73,6 @@ tree = discord.app_commands.CommandTree(client)
 this_guild = discord.Object(id=GUILD)
 
 
-# ! These are basic test commands that should not exist when deployed
-# * simple hi command
 @tree.command(
     name="website",
     description="Responds with the placeTW website link",
@@ -75,7 +82,6 @@ async def test_slash_command(interaction: discord.Interaction):
     await interaction.response.send_message("https://placetw.com/")
 
 
-# * simple echo command with param explanation
 @tree.command(
     name="echo",
     description="Echoes whatever string is fed",
@@ -108,6 +114,11 @@ one_o_one.register_commands(tree, this_guild)
 edit_entry_cmd.register_commands(tree, this_guild, client)
 hgs.register_commands(tree, this_guild)
 random_shiba.register_commands(tree, this_guild)
+random_capoo.register_commands(tree, this_guild)
+restart.register_commands(tree, this_guild)
+gothefucktosleep.register_commands(tree, this_guild)
+watching.register_commands(tree, this_guild, client)
+boba.register_commands(tree, this_guild)
 tr_core.iter_locales()
 translation_stat.register_commands(tree, this_guild)
 
@@ -129,6 +140,16 @@ async def on_message(message: discord.Message):
 
     if react_tw.is_TW_message(message):
         await react_tw.send_react_tw(message)
+
+    if react_baltics.is_baltic_message(message):
+        await react_baltics.send_react_baltic(message)
+    if react_czech.is_czech_message(message):
+        await react_czech.send_react_czech(message)
+    if react_ph.is_ph_message(message):
+        await react_ph.send_react_ph(message)
+
+    if hsinchu_wind.is_hsinchu_message(message):
+        await hsinchu_wind.send_hsinchu_msg(message)
 
 
 client.run(TOKEN)

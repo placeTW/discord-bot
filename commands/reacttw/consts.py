@@ -1,0 +1,77 @@
+from re import compile, IGNORECASE, UNICODE
+
+POSSIBLE_REACTS = (
+    "<:flag_twi:1133045891780071436>",
+    "<:Black_Bear:1132603463126237244>",
+    "<:Urocissacaerulea:1132839946303062086>",
+    "<:101_Floor:1132608196515725332>",
+    "<:tw_amogus:1133361653908516885>",
+    "<:roc_troll:1133368648967405610>",
+    "<:roc_heart:1133045894678319235>",
+    "<:tw_heart:1133045893227102299>",
+    "<:bubblemilktea:1132632348651966596>",
+    "<:TWHW3:1139172056349548604>",
+    "<:rice_cooker:1139169683824713892>",
+    "<:tw_beer:1139314162615459942>",
+    "<:hilife:1139176380521791519>",
+    "<:tw_hw_3:1139172056349548604>",
+    "<:AppleSidra:1139357659733172234>",
+    "<:Capoo:1139357657698938991>",
+)
+
+KEYWORDS_EN = (
+    "TAIWAN",
+    "FORMOSA",
+    "TAIPEI",
+    "TAOYUAN",
+    "TAICHUNG",
+    "TAINAN",
+    "KAOHSIUNG",
+    "MIAOLI",
+    "CHANGHUA",
+    "NANTOU",
+    "YUNLIN",
+    "PINGTUNG",
+    "YILAN",
+    "HUALIEN",
+    "TAITUNG",
+    "PENGHU",
+    "KINMEN",
+    "LIENCHIANG",
+    "KEELUNG",
+    "HSINCHU",
+    "CHIAYI",
+)
+
+KEYWORDS_TW = (
+    r"(?:台|臺)灣",
+    r"(?:台|臺)北",
+    "新北",
+    "桃園",
+    r"(?:台|臺)中",
+    r"(?:台|臺)南",
+    "高雄",
+    "新竹",
+    "苗栗",
+    "彰化",
+    "南投",
+    "雲林",
+    "嘉義",
+    "屏東",
+    "宜蘭",
+    "花蓮",
+    r"(台|臺)東",
+    "澎湖",
+    "金門",
+    "連江",
+    "基隆",
+    "新竹",
+    "嘉義",
+    "美麗島",
+)
+
+
+TW_REGEX = compile(
+    rf"\b(?:{'|'.join(KEYWORDS_EN)})\b|{'|'.join(KEYWORDS_TW)}",
+    flags=IGNORECASE | UNICODE,
+)
