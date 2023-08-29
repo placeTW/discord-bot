@@ -50,7 +50,7 @@ def generate_progress_str(percentage: int, size: int) -> str:
     return "[{}]".format(
         str().join(
             [
-                f"{'⬜' if slice * (it + 1) < percentage else '⬛'}"
+                f"{'⬜' if slice * (it) < percentage else '⬛'}"
                 for it in range(size)
             ]
         )
