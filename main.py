@@ -74,8 +74,6 @@ https://github.com/placeTW/discord-bot
 
 
 # * register commands from other files to the placetw server
-fetch_entry_cmd.register_commands(tree, placetw_guild)
-fetch_entry_ui.register_commands(tree, placetw_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
@@ -85,6 +83,8 @@ watching.register_commands(tree, placetw_guild, client)
 for guild_id in GUILDS:
     guild = discord.Object(id=guild_id)
 
+    fetch_entry_cmd.register_commands(tree, guild)
+    fetch_entry_ui.register_commands(tree, guild)
     one_o_one.register_commands(tree, guild)
     hgs.register_commands(tree, guild)
     random_shiba.register_commands(tree, guild)
