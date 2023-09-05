@@ -31,19 +31,19 @@ import sys
 load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILD = os.getenv("DISCORD_GUILD")
+GUILDS = os.getenv("DISCORD_GUILD").split(',')
 
 deployment_date = datetime.datetime.now()
 client = bot.get_bot()
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
-this_guild = discord.Object(id=GUILD)  # basically refers to this server
+placetw_guild = discord.Object(id=GUILDS[0])  # basically refers to this server
 
 
 @tree.command(
     name="website",
     description="Responds with the placeTW website link",
-    guild=this_guild,
+    guild=placetw_guild,
 )
 async def test_slash_command(interaction: discord.Interaction):
     await interaction.response.send_message("https://placetw.com/")
@@ -52,7 +52,7 @@ async def test_slash_command(interaction: discord.Interaction):
 @tree.command(
     name="echo",
     description="Echoes whatever string is fed",
-    guild=this_guild,
+    guild=placetw_guild,
 )
 @app_commands.describe(given_str="The string you want echoed backed")
 async def test_slash_command(interaction: discord.Interaction, given_str: str):
@@ -62,7 +62,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 @tree.command(
     name="deployment-info",
     description="Returns information about the bot deployment",
-    guild=this_guild,
+    guild=placetw_guild,
 )
 async def test_slash_command(interaction: discord.Interaction):
     msg = f"""
@@ -73,25 +73,32 @@ https://github.com/placeTW/discord-bot
     await interaction.response.send_message(msg)
 
 
-# * register commands from other files
-fetch_entry_cmd.register_commands(tree, this_guild)
-fetch_entry_ui.register_commands(tree, this_guild)
-one_o_one.register_commands(tree, this_guild)
+# * register commands from other files to the placetw server
+fetch_entry_cmd.register_commands(tree, placetw_guild)
+fetch_entry_ui.register_commands(tree, placetw_guild)
 # edit_entry_modal.register_commands(tree, this_guild, client)
-edit_entry_cmd.register_commands(tree, this_guild, client)
-hgs.register_commands(tree, this_guild)
-random_shiba.register_commands(tree, this_guild)
-random_capoo.register_commands(tree, this_guild)
-restart.register_commands(tree, this_guild)
-gothefucktosleep.register_commands(tree, this_guild)
-watching.register_commands(tree, this_guild, client)
-boba.register_commands(tree, this_guild)
+edit_entry_cmd.register_commands(tree, placetw_guild, client)
+restart.register_commands(tree, placetw_guild)
+watching.register_commands(tree, placetw_guild, client)
+
+# * register commands to the other servers
+for guild_id in GUILDS:
+    guild = discord.Object(id=guild_id)
+
+    one_o_one.register_commands(tree, guild)
+    hgs.register_commands(tree, guild)
+    random_shiba.register_commands(tree, guild)
+    random_capoo.register_commands(tree, guild)
+    gothefucktosleep.register_commands(tree, guild)
+    boba.register_commands(tree, guild)
 
 
-# sync the slash commands to server
+# sync the slash commands servers
 @client.event
 async def on_ready():
-    await tree.sync(guild=this_guild)
+    for guild_id in GUILDS:
+        guild = discord.Object(id=guild_id)
+        await tree.sync(guild=guild)
     # print "ready" in the console when the bot is ready to work
     print("Bot is ready.")
 
