@@ -8,6 +8,10 @@ POSSIBLE_REACTS = (
 
 LT_REGEX_STR = r"Taivan(?:as|a|e|o|ui|ie(?:tiškas|tis|tė|či(?:ų|u|ai|ui|ams)))"
 LT_REGEX_STR_TW = "立陶宛"
+LT_REACTS = (
+    "<:lv_tw_hgs:1139660598574055514>",
+    "<:LTAmong:1089490466409549844>",
+)
 
 LV_REGEX_STR = (
     r"Taivān(?:a|ā|ai|as|u|isks|ie(?:tis|te|šu|tim|tei|šiem|ti|te|ši|tes|ši))"
