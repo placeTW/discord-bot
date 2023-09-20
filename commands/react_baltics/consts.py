@@ -25,7 +25,7 @@ LV_REACTS = (
 ET_REGEX_STR = r"Taiwan(?:l(?:ane|as(?:e|t|te(?:sse|s|st|le|l|lt|ks|ni|na|ta|ga)?|i|se(?:l)|se|e(?:s|l|st|le|lt|ks|ni|na|ta|d)))|i(?:d|sse|s|st|le|l|lt|ks|ni|na|ta|ga||sid|(?:de(?:sse|s|st|le|lt|l|ni|na|ks|e|ta|ga)?))?)"
 ET_REGEX_STR_TW = "愛沙尼亞"
 ET_REACTS = (
-    "<:lv_tw_hgs:1139660598574055514>",
+    "<:et_tw_hgs:1139660507167608882>",
     "<:EEAmong:1089490464102682664>",
 )
 
