@@ -7,6 +7,8 @@ from .consts import (
     LV_REGEX,
     ET_REGEX,
     LT_REACTS,
+    LV_REACTS,
+    ET_REACTS,
 )
 from ..modules.probability import mock_bernoulli
 
@@ -26,8 +28,8 @@ async def random_react(
 async def send_react_baltic(message: discord.Message):
     await random_react(message, POSSIBLE_REACTS, 0.40)
     if LV_REGEX.search(message.content):
+        await random_react(message, LV_REACTS, 0.69)
+    elif LT_REGEX.search(message.content):
         await random_react(message, LT_REACTS, 0.69)
-    elif LT_REGEX.search(message.content) and mock_bernoulli(0.69):
-        await message.add_reaction("<:lt_tw_hgs:1139647918442283038>")
-    elif ET_REGEX.search(message.content) and mock_bernoulli(0.69):
-        await message.add_reaction("<:et_tw_hgs:1139660507167608882>")
+    elif ET_REGEX.search(message.content):
+        await random_react(message, ET_REACTS, 0.69)
