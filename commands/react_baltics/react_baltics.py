@@ -29,7 +29,7 @@ async def send_react_baltic(message: discord.Message):
     await random_react(message, POSSIBLE_REACTS, 0.40)
     if LV_REGEX.search(message.content):
         await random_react(message, LV_REACTS, 0.69)
-    elif LT_REGEX.search(message.content):
+    if LT_REGEX.search(message.content):
         await random_react(message, LT_REACTS, 0.69)
-    elif ET_REGEX.search(message.content):
+    if ET_REGEX.search(message.content):
         await random_react(message, ET_REACTS, 0.69)
