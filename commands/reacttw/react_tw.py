@@ -10,5 +10,5 @@ def is_TW_message(message: discord.Message):
 
 async def send_react_tw(message: discord.Message):
     for react in POSSIBLE_REACTS:
-        if mock_bernoulli(0.15):
+        if mock_bernoulli(0.10625):
             await message.add_reaction(react)
