@@ -17,6 +17,7 @@ from commands.reacttw import react_tw
 from commands.react_baltics import react_baltics
 from commands.react_czech import react_czech
 from commands.react_ph import react_ph
+from commands.react_hgs import react_hgs
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
@@ -31,7 +32,7 @@ import sys
 load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILDS = os.getenv("DISCORD_GUILD").split(',')
+GUILDS = os.getenv("DISCORD_GUILD").split(",")
 
 deployment_date = datetime.datetime.now()
 client = bot.get_bot()
@@ -113,6 +114,8 @@ async def on_message(message: discord.Message):
     if react_tw.is_TW_message(message):
         await react_tw.send_react_tw(message)
 
+    if react_hgs.is_hgs_message(message):
+        await react_hgs.send_react_hgs(message)
     if react_baltics.is_baltic_message(message):
         await react_baltics.send_react_baltic(message)
     if react_czech.is_czech_message(message):
