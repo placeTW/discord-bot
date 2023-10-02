@@ -15,3 +15,5 @@ async def send_react_hgs(message: discord.Message):
             await message.add_reaction(react)
     if mock_bernoulli(0.87):
         await message.add_reaction(choice(POSSIBLE_REACTS_TROLLS))
+    if mock_bernoulli(0.169):
+        await message.reply("hot gay sex")
