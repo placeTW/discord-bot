@@ -21,6 +21,6 @@ POSSIBLE_MEOW_MESSAGES = [
 
 
 MEOW_REGEX = compile(
-    rf"\b(?:{'|'.join(KEYWORDS_MEOW)})",
+    rf"\b(?:{'|'.join(POSSIBLE_MEOW_MESSAGES)})",
     flags=IGNORECASE | UNICODE,
 )
