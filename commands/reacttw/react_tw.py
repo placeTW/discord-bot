@@ -1,5 +1,4 @@
 import discord
-import random
 from .consts import POSSIBLE_REACTS, TW_REGEX
 from ..modules.probability import mock_bernoulli
 

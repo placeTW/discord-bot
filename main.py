@@ -14,6 +14,7 @@ from commands.edit_entry import edit_entry_cmd
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
+from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
 from commands.react_czech import react_czech
 from commands.react_ph import react_ph
@@ -122,6 +123,8 @@ async def on_message(message: discord.Message):
         await react_czech.send_react_czech(message)
     if react_ph.is_ph_message(message):
         await react_ph.send_react_ph(message)
+    if react_ua.is_UA_message(message):
+        await react_ua.send_react_ua(message)
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
