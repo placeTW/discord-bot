@@ -18,9 +18,10 @@ def from_meow_channel(message: discord.Message):
 
 
 async def do_meow(message: discord.Message, mention_author=False, multiplier=1):
-    await message.reply(MEOW * multiplier, mention_author=mention_author)
     if not mention_author and mock_bernoulli(0.25):
         await message.channel.send(choice(POSSIBLE_MEOW_MESSAGES))
+    else:
+        await message.reply(MEOW * multiplier, mention_author=mention_author)
 
 
 async def react_meow(message: discord.Message):
