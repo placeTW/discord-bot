@@ -16,7 +16,6 @@ POSSIBLE_MEOW_MESSAGES = [
     MEOW,
     TRADITIONAL_CAT,
     '瞄',
-    '貓子孩女'
     '錨'
 ] + POSSIBLE_MEOW_REACTS
 
