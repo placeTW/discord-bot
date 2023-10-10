@@ -11,6 +11,7 @@ import datetime
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
+from commands.meow.meow import meow_meow
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
@@ -129,5 +130,6 @@ async def on_message(message: discord.Message):
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
 
+    await meow_meow(message)
 
 client.run(TOKEN)
