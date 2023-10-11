@@ -34,7 +34,7 @@ async def react_meow(message: discord.Message):
 async def shibelol(message: discord.Message):
     await message.add_reaction(CHISOBCAT)
     if mock_bernoulli(0.25):
-        message.reply(SHIBELOL)
+        await message.reply(SHIBELOL)
 
 
 async def meow_meow(message: discord.Message):
