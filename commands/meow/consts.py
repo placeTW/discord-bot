@@ -15,6 +15,7 @@ POSSIBLE_MEOW_MESSAGES = [
     '錨'
 ] + POSSIBLE_MEOW_REACTS
 
+SHIBELOL = '<:shibelol:906714392857559050>'
 
 MEOW_REGEX = compile(
     rf"\b(?:{'|'.join(POSSIBLE_MEOW_MESSAGES)})",
