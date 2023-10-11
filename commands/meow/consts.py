@@ -1,10 +1,5 @@
 from re import compile, IGNORECASE, UNICODE
 
-KEYWORDS_MEOW = (
-    'meow',
-    '喵'
-)
-
 MEOW = '喵'
 TRADITIONAL_CAT = '貓'
 
@@ -15,6 +10,7 @@ POSSIBLE_MEOW_REACTS = [
 POSSIBLE_MEOW_MESSAGES = [
     MEOW,
     TRADITIONAL_CAT,
+    'meow',
     '瞄',
     '錨'
 ] + POSSIBLE_MEOW_REACTS
