@@ -27,13 +27,14 @@ async def do_meow(message: discord.Message, mention_author=False, multiplier=1):
 async def react_meow(message: discord.Message):
     shuffle(POSSIBLE_MEOW_REACTS)
     for react in POSSIBLE_MEOW_REACTS:
-        if mock_bernoulli(0.15):
+        if mock_bernoulli(0.25):
             await message.add_reaction(react)
 
 
 async def shibelol(message: discord.Message):
-    await message.add_reaction(CHISOBCAT)
-    if mock_bernoulli(0.25):
+    if mock_bernoulli(0.5):
+        await message.add_reaction(CHISOBCAT)
+    if mock_bernoulli(0.1):
         await message.reply(SHIBELOL)
 
 
@@ -44,11 +45,8 @@ async def meow_meow(message: discord.Message):
     if is_traditional_cat(message):
         await do_meow(message, multiplier=randint(2, 101))
     elif is_meow_message(message) and mock_bernoulli(0.169):
-        await do_meow(message)
-    elif from_meow_channel(message):
-        if not is_meow_message(message):
-            await shibelol(message)
-        elif mock_bernoulli(0.1):
-            await do_meow(message, multiplier=randint(1, 5))
+        await do_meow(message, multiplier=randint(1, 5))
+    elif from_meow_channel(message) and not is_meow_message(message):
+        await shibelol(message)
     elif mock_bernoulli(0.001):
         await do_meow(message)
