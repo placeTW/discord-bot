@@ -26,6 +26,7 @@ from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
+from commands.confessions import confession
 from presence import watching
 import bot
 import sys
@@ -95,6 +96,11 @@ for guild_id in GUILDS:
     gothefucktosleep.register_commands(tree, guild)
     boba.register_commands(tree, guild)
 
+# * register commands to the specific servers onlu
+# at this point, the first two servers are specifically TW and Baltics server
+# TODO: make GUILDS a dict probably
+confession.register_commands(tree, client, GUILDS[:2])
+
 
 # sync the slash commands servers
 @client.event
@@ -131,5 +137,6 @@ async def on_message(message: discord.Message):
         await hsinchu_wind.send_hsinchu_msg(message)
 
     await meow_meow(message)
+
 
 client.run(TOKEN)
