@@ -1,7 +1,5 @@
 import discord
-import datetime
 import logging
-import sys
 
 
 TW_SERVER_CONFESSIONS_CHANNEL_ID = 1161839912509775902
@@ -12,12 +10,6 @@ TW_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
 BALTICS_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
     id=BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
 )
-
-
-filename = f"{str(datetime.datetime.now()).split('.')[0].replace(':', '-')}.log"
-path = f"{sys.path[0]}/logs/{filename}"
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.INFO, filename=path, filemode='a')
-logging.getLogger().addHandler(logging.StreamHandler())
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
