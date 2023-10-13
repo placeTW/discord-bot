@@ -5,21 +5,20 @@ import discord
 from dotenv import load_dotenv
 load_dotenv()
 
-FILENAME = f"{str(datetime.datetime.now()).split('.')[0].replace(':', '-')}.log"
-path = f"{sys.path[0]}/logs/{FILENAME}"
-
 
 class Logging:
     def __init__(self):
         self.log_channel = None
+        self.log_file_path = None
 
-    def set_log_channel(self, channel):
+    def set_log_params(self, channel, log_file):
         self.log_channel = channel
+        self.log_file_path = log_file
 
     async def log(self, event, log_data: dict):
         print(event)
         try:
-            file_object = open(path, 'a')
+            file_object = open(self.log_file_path, 'a')
             file_object.write(f"{datetime.datetime.now()}: {event}\n")
             file_object.close()
         except:
@@ -34,9 +33,11 @@ class Logging:
 logging = Logging()
 
 
-def init(client: discord.Client):
+def init(client: discord.Client, deployment_date: datetime):
     log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL')))
-    logging.set_log_channel(log_channel)
+    filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
+    path = f"{sys.path[0]}/logs/{filename}"
+    logging.set_log_channel(log_channel, path)
 
 
 async def log(message, data: dict = {}):

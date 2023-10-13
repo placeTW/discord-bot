@@ -110,7 +110,7 @@ async def on_ready():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
     # print "ready" in the console when the bot is ready to work
-    logging.init(client)
+    logging.init(client, deployment_date)
     print("Bot is ready.")
 
 
