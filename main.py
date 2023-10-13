@@ -12,6 +12,7 @@ from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
 from commands.meow.meow import meow_meow
+from commands.modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.reacttw import react_tw
@@ -109,6 +110,7 @@ async def on_ready():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
     # print "ready" in the console when the bot is ready to work
+    logging.init(client)
     print("Bot is ready.")
 
 

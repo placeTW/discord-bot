@@ -1,9 +1,12 @@
+import os
+from dotenv import load_dotenv
 import discord
 from ..modules import logging
 
+load_dotenv()
 
-TW_SERVER_CONFESSIONS_CHANNEL_ID = 1161839912509775902
-BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = 1161419086987800737
+TW_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv("TW_SERVER_CONFESSIONS_CHANNEL_ID")
+BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv("BALTICS_SERVER_CONFESSIONS_CHANNEL_ID")
 TW_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
     id=TW_SERVER_CONFESSIONS_CHANNEL_ID
 )
@@ -34,7 +37,7 @@ def register_commands(
         server = (
             "TW" if (interaction.guild_id == int(guilds[0])) else "BALTICS"
         )
-        confession_channel_id = (
+        confession_channel_id = int(
             TW_SERVER_CONFESSIONS_CHANNEL_ID
             if server == "TW"
             else BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
@@ -42,7 +45,7 @@ def register_commands(
         confession_channel = client.get_channel(confession_channel_id)
         embed = discord.Embed()
         embed.add_field(name="Confession", value=confession, inline=False)
-        logging.log(f"{server} - {interaction.user.name} ({interaction.user.id}): {confession}")
+        await logging.log(f"{server} - {interaction.user.name} ({interaction.user.id}): {confession}")
         await confession_channel.send(embed=embed)
         await interaction.response.send_message(
             f"Your confession has been sent to <#{confession_channel_id}>.",
