@@ -1,5 +1,5 @@
 import discord
-import logging
+from ..modules import logging
 
 
 TW_SERVER_CONFESSIONS_CHANNEL_ID = 1161839912509775902
@@ -42,7 +42,7 @@ def register_commands(
         confession_channel = client.get_channel(confession_channel_id)
         embed = discord.Embed()
         embed.add_field(name="Confession", value=confession, inline=False)
-        logging.info(f"{server} - {interaction.user.name} ({interaction.user.id}): {confession}")
+        logging.log(f"{server} - {interaction.user.name} ({interaction.user.id}): {confession}")
         await confession_channel.send(embed=embed)
         await interaction.response.send_message(
             f"Your confession has been sent to <#{confession_channel_id}>.",

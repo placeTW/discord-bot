@@ -6,7 +6,6 @@ from discord import app_commands
 # from discord.ext import commands
 from dotenv import load_dotenv
 import datetime
-import logging
 import sys
 
 # user commands
@@ -44,12 +43,6 @@ client = bot.get_bot()
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 placetw_guild = discord.Object(id=GUILDS[0])  # basically refers to this server
-
-
-filename = f"{str(datetime.datetime.now()).split('.')[0].replace(':', '-')}.log"
-path = f"{sys.path[0]}/logs/{filename}"
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.INFO, filename=path, filemode='a')
-logging.getLogger().addHandler(logging.StreamHandler())
 
 
 @tree.command(
