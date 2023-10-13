@@ -16,17 +16,20 @@ class Logging:
     def set_log_channel(self, channel):
         self.log_channel = channel
 
-    async def log(self, message):
-        print(message)
+    async def log(self, event, log_data: dict):
+        print(event)
         try:
             file_object = open(path, 'a')
-            file_object.write(f"{datetime.datetime.now()}: {message}\n")
+            file_object.write(f"{datetime.datetime.now()}: {event}\n")
             file_object.close()
         except:
-            pass
+            print('!!! failed to write log entry to file')
         if not self.log_channel is None:
-            await self.log_channel.send(message)
-    
+            embed = discord.Embed()
+            for param in log_data.items():
+                embed.add_field(name=param[0], value=param[1], inline=False)
+            await self.log_channel.send(embed=embed)
+
 
 logging = Logging()
 
@@ -35,5 +38,6 @@ def init(client: discord.Client):
     log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL')))
     logging.set_log_channel(log_channel)
 
-async def log(message):
-    await logging.log(message)
+
+async def log(message, data: dict = {}):
+    await logging.log(message, data)
