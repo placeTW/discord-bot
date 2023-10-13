@@ -53,17 +53,18 @@ def register_commands(
         embed = discord.Embed(title="Confession", description=confession)
         embed.set_footer(text=f"confession id: {confession_id}")
         confession_message = await confession_channel.send(embed=embed)
+        confession_url = confession_message.jump_url
 
         log_event = {
             "event": "Confession",
             "user_id": f"<@{interaction.user.id}>",
             "server": server,
-            "url": confession_message.jump_url,
+            "url": confession_url,
             "id": confession_id,
         }
 
         await logging.log(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", log_event)
         await interaction.response.send_message(
-            f"Your confession has been sent to <#{confession_channel_id}>.",
+            f"Your confession has been sent to <#{confession_channel_id}>. See it here: {confession_url}",
             ephemeral=True,
         )

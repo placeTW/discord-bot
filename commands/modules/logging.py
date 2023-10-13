@@ -37,7 +37,7 @@ def init(client: discord.Client, deployment_date: datetime):
     log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL')))
     filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
     path = f"{sys.path[0]}/logs/{filename}"
-    logging.set_log_channel(log_channel, path)
+    logging.set_log_params(log_channel, path)
 
 
 async def log(message, data: dict = {}):
