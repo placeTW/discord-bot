@@ -6,7 +6,6 @@ from discord import app_commands
 # from discord.ext import commands
 from dotenv import load_dotenv
 import datetime
-import sys
 
 # user commands
 from commands.fetch_entry import fetch_entry_cmd
