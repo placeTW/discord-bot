@@ -1,8 +1,15 @@
+import os
+import shortuuid
+from dotenv import load_dotenv
 import discord
+from ..modules import logging
 
+load_dotenv()
 
-TW_SERVER_CONFESSIONS_CHANNEL_ID = 1161839912509775902
-BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = 1161419086987800737
+TW_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
+    "TW_SERVER_CONFESSIONS_CHANNEL_ID")
+BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
+    "BALTICS_SERVER_CONFESSIONS_CHANNEL_ID")
 TW_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
     id=TW_SERVER_CONFESSIONS_CHANNEL_ID
 )
@@ -34,16 +41,30 @@ def register_commands(
         server = (
             "TW" if (interaction.guild_id == int(guilds[0])) else "BALTICS"
         )
-        confession_channel_id = (
+        confession_channel_id = int(
             TW_SERVER_CONFESSIONS_CHANNEL_ID
             if server == "TW"
             else BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
         )
         confession_channel = client.get_channel(confession_channel_id)
-        embed = discord.Embed()
-        embed.add_field(name="Confession", value=confession, inline=False)
-        await confession_channel.send(embed=embed)
+
+        # Building the confession
+        confession_id = shortuuid.uuid()
+        embed = discord.Embed(title="Confession", description=confession)
+        embed.set_footer(text=f"confession id: {confession_id}")
+        confession_message = await confession_channel.send(embed=embed)
+        confession_url = confession_message.jump_url
+
+        log_event = {
+            "event": "Confession",
+            "user_id": f"<@{interaction.user.id}>",
+            "server": server,
+            "url": confession_url,
+            "id": confession_id,
+        }
+
+        await logging.log(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", log_event)
         await interaction.response.send_message(
-            f"Your confession has been sent to <#{confession_channel_id}>.",
+            f"Your confession has been sent to <#{confession_channel_id}>. See it here: {confession_url}",
             ephemeral=True,
         )
