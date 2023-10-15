@@ -12,7 +12,8 @@ POSSIBLE_MEOW_MESSAGES = [
     TRADITIONAL_CAT,
     'meow',
     '瞄',
-    '錨'
+    '錨',
+    'ㄇㄧㄠ'
 ] + POSSIBLE_MEOW_REACTS
 
 CHISOBCAT = '<:ChisobCat:1157361078452375582>'
