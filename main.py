@@ -149,7 +149,7 @@ async def on_message(message: discord.Message):
         event = "meow"
 
     if len(event) > 0:
-        await logging.log_event(message, event)
+        await logging.log_message_event(message, event)
 
 
 client.run(TOKEN)

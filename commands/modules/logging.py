@@ -5,6 +5,12 @@ import discord
 from dotenv import load_dotenv
 load_dotenv()
 
+from supabase import create_client, Client
+
+url: str = os.getenv("SUPABASE_URL")
+private_key: str = os.getenv("SUPABASE_SECRET_KEY")
+supabase: Client = create_client(url, private_key)
+
 
 class Logging:
     def __init__(self):
@@ -43,6 +49,14 @@ def init(client: discord.Client, deployment_date: datetime):
 async def log_to_channel(message, data: dict = {}):
     await logging.log_to_channel(message, data)
 
-async def log_event(message: discord.Message, event: str):
-    print(event)
+async def log_message_event(message: discord.Message, event: str):
+    data = supabase.table('message_logs').insert({
+        "message_id": message.id,
+        "author_id": message.author.id,
+        "event": event,
+        "created_at": str(message.created_at),
+        "channel_id": message.channel.id,
+        "guild_id": message.guild.id if not message.guild is None else None,
+    }).execute()
+    print(data)
     pass
