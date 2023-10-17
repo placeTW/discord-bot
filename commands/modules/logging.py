@@ -15,7 +15,7 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log(self, event, log_data: dict):
+    async def log_to_channel(self, event, log_data: dict):
         print(event)
         try:
             file_object = open(self.log_file_path, 'a')
@@ -40,5 +40,9 @@ def init(client: discord.Client, deployment_date: datetime):
     logging.set_log_params(log_channel, path)
 
 
-async def log(message, data: dict = {}):
-    await logging.log(message, data)
+async def log_to_channel(message, data: dict = {}):
+    await logging.log_to_channel(message, data)
+
+async def log_event(message: discord.Message, event: str):
+    print(event)
+    pass

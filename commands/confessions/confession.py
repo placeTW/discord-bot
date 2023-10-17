@@ -63,7 +63,7 @@ def register_commands(
             "id": confession_id,
         }
 
-        await logging.log(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", log_event)
+        await logging.log_to_channel(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", log_event)
         await interaction.response.send_message(
             f"Your confession has been sent to <#{confession_channel_id}>. See it here: {confession_url}",
             ephemeral=True,

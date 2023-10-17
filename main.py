@@ -120,25 +120,36 @@ async def on_message(message: discord.Message):
     # don't respond to bot's own posts
     if message.author == client.user:
         return
+    
+    event = ""
 
     if react_tw.is_TW_message(message):
         await react_tw.send_react_tw(message)
-
+        event = "tw"
     if react_hgs.is_hgs_message(message):
         await react_hgs.send_react_hgs(message)
+        event = "hgs"
     if react_baltics.is_baltic_message(message):
         await react_baltics.send_react_baltic(message)
+        event = "baltics"
     if react_czech.is_czech_message(message):
         await react_czech.send_react_czech(message)
+        event = "czech"
     if react_ph.is_ph_message(message):
         await react_ph.send_react_ph(message)
+        event = "ph"
     if react_ua.is_UA_message(message):
         await react_ua.send_react_ua(message)
-
+        event = "ua"
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
+        event = "hsinchu"
 
-    await meow_meow(message)
+    if await meow_meow(message):
+        event = "meow"
+
+    if len(event) > 0:
+        await logging.log_event(message, event)
 
 
 client.run(TOKEN)
