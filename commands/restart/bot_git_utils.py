@@ -15,4 +15,4 @@ REPO_NAME = 'placeTW/discord-bot'
 BOT_REPO = GITHUB_OBJECT.get_repo(REPO_NAME)
 
 def list_of_branches():
-    return [branch.name for branch in BOT_REPO.get_branches()]
+    return ['main'] + [branch.name for branch in BOT_REPO.get_branches()].remove('main')
