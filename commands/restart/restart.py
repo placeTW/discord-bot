@@ -15,11 +15,12 @@ def register_commands(tree, this_guild: discord.Object):
 
     @tree.command(
         name="restart",
-        description="Restarts the bot (only true admins can successfully execute this command). Main by default.",
+        description="Restarts the bot (only true admins can successfully execute this command).",
         guild=this_guild,
     )
     @app_commands.checks.has_permissions(administrator=True)
     @app_commands.choices(branch=BRANCHES)
+    @app_commands.describe(branch="The branch to deploy from (deploys from the current branch if not specified)")
     async def restart(
         interaction: discord.Interaction,
         branch: Choice[str] = None,
