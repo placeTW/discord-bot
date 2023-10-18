@@ -31,6 +31,8 @@ from commands.confessions import confession
 from presence import watching
 import bot
 import sys
+from git import Repo
+
 
 # load environment vars (from .env)
 load_dotenv()
@@ -72,6 +74,7 @@ async def test_slash_command(interaction: discord.Interaction, given_str: str):
 async def test_slash_command(interaction: discord.Interaction):
     msg = f"""
 PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
+Branch deployed: `{Repo().active_branch.name}`
 Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
     """
