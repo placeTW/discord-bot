@@ -3,24 +3,37 @@ import sys
 import discord
 from discord import app_commands
 import os
+from discord.app_commands import Choice
+
+from commands.restart.bot_git_utils import list_of_branches
+
 
 def register_commands(tree, this_guild: discord.Object):
-  @tree.command(
-      name="restart",
-      description="Restarts the bot (only true admins can successfully execute this command)",
-      guild=this_guild,
-  )
-  @app_commands.checks.has_permissions(administrator=True)
-  async def restart(
-      interaction: discord.Interaction,
-  ):
-    await interaction.response.send_message("Restarting, goodbye world")
+    BRANCHES = [
+        Choice(name=branch, value=branch) for branch in list_of_branches()
+    ]
 
-    print("restart: Fetching from repo and installing requirements...")
+    @tree.command(
+        name="restart",
+        description="Restarts the bot (only true admins can successfully execute this command). Main by default.",
+        guild=this_guild,
+    )
+    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.choices(branch=BRANCHES)
+    async def restart(
+        interaction: discord.Interaction,
+        branch: Choice[str] = None,
+    ):
+        await interaction.response.send_message("Restarting, goodbye world")
 
-    subprocess.call(["git", "pull"])
-    subprocess.call(["pip", "install", "-r", "requirements.txt"])
+        print("restart: Fetching from repo and installing requirements...")
 
-    print("restart: Restarting...")
+        if branch is not None:
+            print(branch.value)
+            subprocess.call(["git", "checkout", branch.value])
+        subprocess.call(["git", "pull"])
+        subprocess.call(["pip", "install", "-r", "requirements.txt"])
 
-    os.execv(sys.executable, ['python'] + sys.argv)
+        print("restart: Restarting...")
+
+        os.execv(sys.executable, ['python'] + sys.argv)
