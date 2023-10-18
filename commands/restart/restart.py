@@ -25,7 +25,7 @@ def register_commands(tree, this_guild: discord.Object):
         interaction: discord.Interaction,
         branch: Choice[str] = None,
     ):
-        await interaction.response.send_message("Restarting, goodbye world")
+        await interaction.response.send_message(f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}, goodbye world")
 
         print("restart: Fetching from repo and installing requirements...")
 
