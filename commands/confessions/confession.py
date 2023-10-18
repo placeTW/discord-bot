@@ -1,34 +1,20 @@
 import os
 import shortuuid
-from dotenv import load_dotenv
 import discord
 from ..modules import logging
-
-load_dotenv()
-
-TW_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
-    "TW_SERVER_CONFESSIONS_CHANNEL_ID")
-BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
-    "BALTICS_SERVER_CONFESSIONS_CHANNEL_ID")
-TW_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
-    id=TW_SERVER_CONFESSIONS_CHANNEL_ID
-)
-BALTICS_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
-    id=BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
-)
 
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
     client: discord.Client,
-    guilds: list,
+    guilds_dict: dict,
 ):
     @tree.command(
         name="confess",
         description="Make an anonymous confession",
         guilds=[  # TW and Baltics server
-            discord.Object(id=guilds[0]),
-            discord.Object(id=guilds[1]),
+            discord.Object(id=guilds_dict["guilds"]["TW_SERVER_ID"]),
+            discord.Object(id=guilds_dict["guilds"]["BALTICS_SERVER_ID"]),
         ],
     )
     async def confess(interaction: discord.Interaction, confession: str):
@@ -38,15 +24,26 @@ def register_commands(
             interaction (discord.Interaction): required by discord.py
             confession (str): The confession to make.
         """
-        server = (
-            "TW" if (interaction.guild_id == int(guilds[0])) else "BALTICS"
-        )
-        confession_channel_id = int(
-            TW_SERVER_CONFESSIONS_CHANNEL_ID
-            if server == "TW"
-            else BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
-        )
-        confession_channel = client.get_channel(confession_channel_id)
+
+        # Getting the confession channel
+        if interaction.guild_id == guilds_dict["guilds"]["TW_SERVER_ID"]:
+            confession_channel = guilds_dict["confession_channels"][
+                "TW_SERVER_CONFESSIONS_CHANNEL_ID"
+            ]
+        elif (
+            interaction.guild_id == guilds_dict["guilds"]["BALTICS_SERVER_ID"]
+        ):
+            confession_channel = guilds_dict["confession_channels"][
+                "BALTICS_SERVER_CONFESSIONS_CHANNEL_ID"
+            ]
+        else:
+            await interaction.response.send_message(
+                "This command is only available in the TW and Baltics server.",
+                ephemeral=True,
+            )
+            return
+
+        confession_channel = client.get_channel(confession_channel)
 
         # Building the confession
         confession_id = shortuuid.uuid()
@@ -58,13 +55,16 @@ def register_commands(
         log_event = {
             "event": "Confession",
             "user_id": f"<@{interaction.user.id}>",
-            "server": server,
+            "server": interaction.guild.name,
             "url": confession_url,
             "id": confession_id,
         }
 
-        await logging.log(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", log_event)
+        await logging.log(
+            f"[{confession_id}] {interaction.guild.name} - {interaction.user.name} ({interaction.user.id}): {confession}",
+            log_event,
+        )
         await interaction.response.send_message(
-            f"Your confession has been sent to <#{confession_channel_id}>. See it here: {confession_url}",
+            f"Your confession has been sent. See it here: {confession_url}",
             ephemeral=True,
         )
