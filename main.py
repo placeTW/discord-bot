@@ -92,6 +92,9 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
+
+# ^ for future use
+all_guild_ids = [int(guild_id) for guild_id in GUILDS_DICT.keys()]
 for guild_id in GUILDS_DICT.keys():
     guild = discord.Object(id=int(guild_id))
 
@@ -104,8 +107,7 @@ for guild_id in GUILDS_DICT.keys():
     gothefucktosleep.register_commands(tree, guild)
     boba.register_commands(tree, guild)
 
-# * register commands to the specific servers onlu
-
+# * register commands to the specific servers only
 confession.register_commands(tree, client, GUILDS_DICT)
 
 
