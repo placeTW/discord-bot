@@ -13,8 +13,9 @@ def register_commands(
         name="confess",
         description="Make an anonymous confession",
         guilds=[  # TW and Baltics server
-            discord.Object(id=guilds_dict["guilds"]["TW_SERVER_ID"]),
-            discord.Object(id=guilds_dict["guilds"]["BALTICS_SERVER_ID"]),
+            discord.Object(id=int(server_id))
+            for server_id, server_info in guilds_dict.items()
+            if "CONFESSIONS_CHANNEL_ID" in server_info
         ],
     )
     async def confess(interaction: discord.Interaction, confession: str):
@@ -26,24 +27,10 @@ def register_commands(
         """
 
         # Getting the confession channel
-        if interaction.guild_id == guilds_dict["guilds"]["TW_SERVER_ID"]:
-            confession_channel = guilds_dict["confession_channels"][
-                "TW_SERVER_CONFESSIONS_CHANNEL_ID"
-            ]
-        elif (
-            interaction.guild_id == guilds_dict["guilds"]["BALTICS_SERVER_ID"]
-        ):
-            confession_channel = guilds_dict["confession_channels"][
-                "BALTICS_SERVER_CONFESSIONS_CHANNEL_ID"
-            ]
-        else:
-            await interaction.response.send_message(
-                "This command is only available in the TW and Baltics server.",
-                ephemeral=True,
-            )
-            return
-
-        confession_channel = client.get_channel(confession_channel)
+        confession_channel_id = guilds_dict[str(interaction.guild.id)][
+            "CONFESSIONS_CHANNEL_ID"
+        ]
+        confession_channel = client.get_channel(confession_channel_id)
 
         # Building the confession
         confession_id = shortuuid.uuid()

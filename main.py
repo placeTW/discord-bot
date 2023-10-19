@@ -47,7 +47,7 @@ client = bot.get_bot()
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 placetw_guild = discord.Object(
-    id=GUILDS_DICT["guilds"]["TW_SERVER_ID"]
+    id=os.getenv("PLACETW_SERVER_ID")
 )  # basically refers to this server
 
 
@@ -92,8 +92,8 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
-for guild_id in GUILDS_DICT["guilds"].values():
-    guild = discord.Object(id=guild_id)
+for guild_id in GUILDS_DICT.keys():
+    guild = discord.Object(id=int(guild_id))
 
     fetch_entry_cmd.register_commands(tree, guild)
     fetch_entry_ui.register_commands(tree, guild)
@@ -105,15 +105,14 @@ for guild_id in GUILDS_DICT["guilds"].values():
     boba.register_commands(tree, guild)
 
 # * register commands to the specific servers onlu
-# at this point, the first two servers are specifically TW and Baltics server
-# TODO: make GUILDS a dict probably
+
 confession.register_commands(tree, client, GUILDS_DICT)
 
 
 # sync the slash commands servers
 @client.event
 async def on_ready():
-    for guild_id in GUILDS_DICT["guilds"].values():
+    for guild_id in GUILDS_DICT.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
     # print "ready" in the console when the bot is ready to work
