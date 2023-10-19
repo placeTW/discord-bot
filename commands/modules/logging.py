@@ -1,3 +1,4 @@
+from supabase import create_client, Client
 import datetime
 import os
 import sys
@@ -5,7 +6,6 @@ import discord
 from dotenv import load_dotenv
 load_dotenv()
 
-from supabase import create_client, Client
 
 url: str = os.getenv("SUPABASE_URL")
 private_key: str = os.getenv("SUPABASE_SECRET_KEY")
@@ -21,11 +21,11 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log_to_channel(self, event, log_data: dict):
-        print(event)
+    async def log_to_channel(self, log_text, log_data: dict):
+        print(log_text)
         try:
             file_object = open(self.log_file_path, 'a')
-            file_object.write(f"{datetime.datetime.now()}: {event}\n")
+            file_object.write(f"{datetime.datetime.now()}: {log_text}\n")
             file_object.close()
         except:
             print('!!! failed to write log entry to file')
@@ -46,17 +46,19 @@ def init(client: discord.Client, deployment_date: datetime):
     logging.set_log_params(log_channel, path)
 
 
-async def log_to_channel(message, data: dict = {}):
-    await logging.log_to_channel(message, data)
+async def log_to_channel(log_text: str, message: discord.Message, data: dict = {}):
+    await logging.log_to_channel(log_text, data)
 
-async def log_message_event(message: discord.Message, event: str):
-    data = supabase.table('message_logs').insert({
-        "message_id": message.id,
-        "author_id": message.author.id,
-        "event": event,
-        "created_at": str(message.created_at),
-        "channel_id": message.channel.id,
-        "guild_id": message.guild.id if not message.guild is None else None,
-    }).execute()
+
+async def log_message_event(message: discord.Message, events: list[str]):
+    data = supabase.table('message_logs').insert([
+        {
+            "message_id": message.id,
+            "author_id": message.author.id,
+            "event": event,
+            "created_at": str(message.created_at),
+            "channel_id": message.channel.id,
+            "guild_id": message.guild.id if not message.guild is None else None,
+        }
+        for event in events]).execute()
     print(data)
-    pass

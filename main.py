@@ -123,36 +123,55 @@ async def on_message(message: discord.Message):
     # don't respond to bot's own posts
     if message.author == client.user:
         return
-    
-    event = ""
+
+    events = []
 
     if react_tw.is_TW_message(message):
-        await react_tw.send_react_tw(message)
-        event = "tw"
+        try:
+            await react_tw.send_react_tw(message)
+        except:
+            pass
+        events.append("tw")
     if react_hgs.is_hgs_message(message):
-        await react_hgs.send_react_hgs(message)
-        event = "hgs"
+        try:
+            await react_hgs.send_react_hgs(message)
+        except:
+            pass
+        events.append("hgs")
     if react_baltics.is_baltic_message(message):
-        await react_baltics.send_react_baltic(message)
-        event = "baltics"
+        try:
+            await react_baltics.send_react_baltics(message)
+        except:
+            pass
+        events.append("baltics")
     if react_czech.is_czech_message(message):
-        await react_czech.send_react_czech(message)
-        event = "czech"
+        try:
+            await react_czech.send_react_czech(message)
+        except:
+            pass
+        events.append("czech")
     if react_ph.is_ph_message(message):
-        await react_ph.send_react_ph(message)
-        event = "ph"
+        try:
+            await react_ph.send_react_ph(message)
+        except:
+            pass
+        events.append("ph")
     if react_ua.is_UA_message(message):
-        await react_ua.send_react_ua(message)
-        event = "ua"
+        try:
+            await react_ua.send_react_ua(message)
+        except:
+            pass
+        events.append("ua")
+
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
-        event = "hsinchu"
-
+        events.append("hsinchu")
+        
     if await meow_meow(message):
-        event = "meow"
+        events.append("meow")
 
-    if len(event) > 0:
-        await logging.log_message_event(message, event)
+    if len(events) > 0:
+        await logging.log_message_event(message, events)
 
 
 client.run(TOKEN)
