@@ -27,10 +27,12 @@ from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
+
 from commands.confessions import confession
 from presence import watching
 import bot
 import sys
+import utils
 from git import Repo
 
 
@@ -38,13 +40,15 @@ from git import Repo
 load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILDS = os.getenv("DISCORD_GUILD").split(",")
+GUILDS_DICT = utils.read_json_file("guilds.env.json")
 
 deployment_date = datetime.datetime.now()
 client = bot.get_bot()
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
-placetw_guild = discord.Object(id=GUILDS[0])  # basically refers to this server
+placetw_guild = discord.Object(
+    id=os.getenv("PLACETW_SERVER_ID")
+)  # basically refers to this server
 
 
 @tree.command(
@@ -88,8 +92,11 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
-for guild_id in GUILDS:
-    guild = discord.Object(id=guild_id)
+
+# ^ for future use
+all_guild_ids = [int(guild_id) for guild_id in GUILDS_DICT.keys()]
+for guild_id in GUILDS_DICT.keys():
+    guild = discord.Object(id=int(guild_id))
 
     fetch_entry_cmd.register_commands(tree, guild)
     fetch_entry_ui.register_commands(tree, guild)
@@ -100,16 +107,14 @@ for guild_id in GUILDS:
     gothefucktosleep.register_commands(tree, guild)
     boba.register_commands(tree, guild)
 
-# * register commands to the specific servers onlu
-# at this point, the first two servers are specifically TW and Baltics server
-# TODO: make GUILDS a dict probably
-confession.register_commands(tree, client, GUILDS[:2])
+# * register commands to the specific servers only
+confession.register_commands(tree, client, GUILDS_DICT)
 
 
 # sync the slash commands servers
 @client.event
 async def on_ready():
-    for guild_id in GUILDS:
+    for guild_id in GUILDS_DICT.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
     # print "ready" in the console when the bot is ready to work

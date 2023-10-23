@@ -1,34 +1,21 @@
 import os
 import shortuuid
-from dotenv import load_dotenv
 import discord
 from ..modules import logging
-
-load_dotenv()
-
-TW_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
-    "TW_SERVER_CONFESSIONS_CHANNEL_ID")
-BALTICS_SERVER_CONFESSIONS_CHANNEL_ID = os.getenv(
-    "BALTICS_SERVER_CONFESSIONS_CHANNEL_ID")
-TW_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
-    id=TW_SERVER_CONFESSIONS_CHANNEL_ID
-)
-BALTICS_SERVER_CONFESSIONS_CHANNEL_OBJ = discord.Object(
-    id=BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
-)
 
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
     client: discord.Client,
-    guilds: list,
+    guilds_dict: dict,
 ):
     @tree.command(
         name="confess",
         description="Make an anonymous confession",
         guilds=[  # TW and Baltics server
-            discord.Object(id=guilds[0]),
-            discord.Object(id=guilds[1]),
+            discord.Object(id=int(server_id))
+            for server_id, server_info in guilds_dict.items()
+            if "CONFESSIONS_CHANNEL_ID" in server_info
         ],
     )
     async def confess(interaction: discord.Interaction, confession: str):
@@ -38,14 +25,11 @@ def register_commands(
             interaction (discord.Interaction): required by discord.py
             confession (str): The confession to make.
         """
-        server = (
-            "TW" if (interaction.guild_id == int(guilds[0])) else "BALTICS"
-        )
-        confession_channel_id = int(
-            TW_SERVER_CONFESSIONS_CHANNEL_ID
-            if server == "TW"
-            else BALTICS_SERVER_CONFESSIONS_CHANNEL_ID
-        )
+
+        # Getting the confession channel
+        confession_channel_id = guilds_dict[str(interaction.guild.id)][
+            "CONFESSIONS_CHANNEL_ID"
+        ]
         confession_channel = client.get_channel(confession_channel_id)
 
         # Building the confession
@@ -55,16 +39,19 @@ def register_commands(
         confession_message = await confession_channel.send(embed=embed)
         confession_url = confession_message.jump_url
 
+        user_id = interaction.user.id
+        server = interaction.guild.name
+
         log_event = {
             "event": "Confession",
-            "user_id": f"<@{interaction.user.id}>",
+            "user_id": f"<@{user_id}>",
             "server": server,
             "url": confession_url,
             "id": confession_id,
         }
 
-        await logging.log_to_channel(f"[{confession_id}] {server} - {interaction.user.name} ({interaction.user.id}): {confession}", confession_message, log_event)
+        await logging.log_to_channel(f"[{confession_id}] {server} - {interaction.user.name} ({user_id}): {confession}", confession_message, log_event)
         await interaction.response.send_message(
-            f"Your confession has been sent to <#{confession_channel_id}>. See it here: {confession_url}",
+            f"Your confession has been sent. See it here: {confession_url}",
             ephemeral=True,
         )
