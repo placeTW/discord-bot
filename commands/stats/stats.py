@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from ..modules.supabase import supabaseClient
 
 
 def register_commands(tree, guilds_dict: dict,):
