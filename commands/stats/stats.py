@@ -14,7 +14,6 @@ def register_commands(tree, guilds_dict: dict,):
     )
     @app_commands.describe(event="(Optional) The event to get stats for", user="(Optional) The user to get stats for", days="(Optional) The number of days to get stats for (default 7)")
     async def server_stats(interaction: discord.Interaction, event: str = None, user: discord.Member = None, days: int = 7):
-        user_id = user.id if user is not None else interaction.user.id
         try:
             pass
         except:
@@ -31,7 +30,6 @@ def register_commands(tree, guilds_dict: dict,):
     )
     @app_commands.describe(event="(Optional) The event to get stats for", user="(Optional) The user to get stats for", days="(Optional) The number of days to get stats for (default 7)")
     async def global_stats(interaction: discord.Interaction, event: str = None, user: discord.Member = None, days: int = 7):
-        user_id = user.id if user is not None else interaction.user.id
         try:
             pass
         except:
