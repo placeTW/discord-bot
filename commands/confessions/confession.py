@@ -44,13 +44,14 @@ def register_commands(
 
         log_event = {
             "event": "Confession",
-            "user_id": f"<@{user_id}>",
+            "author_id": user_id,
+            "user": f"<@{user_id}>",
             "server": server,
             "url": confession_url,
-            "id": confession_id,
+            "generated_id": confession_id,
         }
 
-        await logging.log_to_channel(f"[{confession_id}] {server} - {interaction.user.name} ({user_id}): {confession}", confession_message, log_event)
+        await logging.log_to_channel(confession_message, log_event, confession)
         await interaction.response.send_message(
             f"Your confession has been sent. See it here: {confession_url}",
             ephemeral=True,
