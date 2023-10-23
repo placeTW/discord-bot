@@ -41,12 +41,18 @@ async def shibelol(message: discord.Message):
 async def meow_meow(message: discord.Message):
     if is_meow_message(message):
         await react_meow(message)
+        return True
 
     if is_traditional_cat(message):
         await do_meow(message, multiplier=randint(2, 101))
+        return True
     elif is_meow_message(message) and mock_bernoulli(0.169):
         await do_meow(message, multiplier=randint(1, 5))
+        return True
     elif from_meow_channel(message) and not is_meow_message(message):
         await shibelol(message)
     elif mock_bernoulli(0.001):
         await do_meow(message)
+        return True
+    
+    return False

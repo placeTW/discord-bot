@@ -1,9 +1,15 @@
+from supabase import create_client, Client
 import datetime
 import os
 import sys
 import discord
 from dotenv import load_dotenv
 load_dotenv()
+
+
+url: str = os.getenv("SUPABASE_URL")
+private_key: str = os.getenv("SUPABASE_SECRET_KEY")
+supabase: Client = create_client(url, private_key)
 
 
 class Logging:
@@ -15,14 +21,7 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log(self, event, log_data: dict):
-        print(event)
-        try:
-            file_object = open(self.log_file_path, 'a')
-            file_object.write(f"{datetime.datetime.now()}: {event}\n")
-            file_object.close()
-        except:
-            print('!!! failed to write log entry to file')
+    async def log_to_channel(self, log_data: dict):
         if not self.log_channel is None:
             embed = discord.Embed()
             for param in log_data.items():
@@ -39,6 +38,33 @@ def init(client: discord.Client, deployment_date: datetime):
     path = f"{sys.path[0]}/logs/{filename}"
     logging.set_log_params(log_channel, path)
 
+"""
 
-async def log(message, data: dict = {}):
-    await logging.log(message, data)
+"""
+async def log_to_channel(message: discord.Message, data: dict = {}, content: str = None):
+    supabase.table('event_logs').insert(
+    {
+        "message_id": message.id,
+        "event": data['event'] if 'event' in data else None,
+        "created_at": str(message.created_at),
+        "content": content if content else message.content,
+        "author_id": data['author_id'] if 'author_id' in data else message.author.id,
+        "channel_id": message.channel.id if message.channel else None,
+        "guild_id": message.guild.id if message.guild else None,
+        "generated_id": data['generated_id'] if 'generated_id' in data else None,
+    }).execute()
+    await logging.log_to_channel(data)
+
+
+async def log_message_event(message: discord.Message, events: list[str]):
+    data = supabase.table('message_logs').insert([
+        {
+            "message_id": message.id,
+            "author_id": message.author.id,
+            "event": event,
+            "created_at": str(message.created_at),
+            "channel_id": message.channel.id if message.channel else None,
+            "guild_id": message.guild.id if message.guild else None,
+        }
+        for event in events]).execute()
+    print(data)
