@@ -44,13 +44,14 @@ def init(client: discord.Client, deployment_date: datetime):
 async def log_to_channel(message: discord.Message, data: dict = {}, content: str = None):
     supabase.table('event_logs').insert(
     {
+        "message_id": message.id,
         "event": data['event'] if 'event' in data else None,
-        "generated_id": data['generated_id'] if 'generated_id' in data else None,
         "created_at": str(message.created_at),
-        "author_id": data['author_id'] if 'author_id' in data else message.author.id,
-        "channel_id": message.channel.id,
-        "guild_id": message.guild.id if message.guild else None,
         "content": content if content else message.content,
+        "author_id": data['author_id'] if 'author_id' in data else message.author.id,
+        "channel_id": message.channel.id if message.channel else None,
+        "guild_id": message.guild.id if message.guild else None,
+        "generated_id": data['generated_id'] if 'generated_id' in data else None,
     }).execute()
     await logging.log_to_channel(data)
 
@@ -62,7 +63,7 @@ async def log_message_event(message: discord.Message, events: list[str]):
             "author_id": message.author.id,
             "event": event,
             "created_at": str(message.created_at),
-            "channel_id": message.channel.id,
+            "channel_id": message.channel.id if message.channel else None,
             "guild_id": message.guild.id if message.guild else None,
         }
         for event in events]).execute()
