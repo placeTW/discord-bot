@@ -40,7 +40,7 @@ from git import Repo
 load_dotenv()
 prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILDS_DICT = utils.read_json_file("guilds.env.json")
+GUILDS_DICT = utils.read_hjson_file("guilds.env.hjson")
 
 deployment_date = datetime.datetime.now()
 client = bot.get_bot()
@@ -171,7 +171,7 @@ async def on_message(message: discord.Message):
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
         events.append("hsinchu")
-        
+
     if await meow_meow(message):
         events.append("meow")
 
