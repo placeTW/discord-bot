@@ -135,37 +135,37 @@ async def on_message(message: discord.Message):
         try:
             await react_tw.send_react_tw(message)
         except:
-            pass
+            print('failed to react Taiwan')
         events.append("tw")
     if react_hgs.is_hgs_message(message):
         try:
             await react_hgs.send_react_hgs(message)
         except:
-            pass
+            print('failed to react HGS')
         events.append("hgs")
     if react_baltics.is_baltic_message(message):
         try:
-            await react_baltics.send_react_baltics(message)
+            await react_baltics.send_react_baltic(message)
         except:
-            pass
+            print('failed to react Baltics')
         events.append("baltics")
     if react_czech.is_czech_message(message):
         try:
             await react_czech.send_react_czech(message)
         except:
-            pass
+            print('failed to react Czech')
         events.append("czech")
     if react_ph.is_ph_message(message):
         try:
             await react_ph.send_react_ph(message)
         except:
-            pass
+            print('failed to react PH')
         events.append("ph")
     if react_ua.is_UA_message(message):
         try:
             await react_ua.send_react_ua(message)
         except:
-            pass
+            print('failed to react UA')
         events.append("ua")
 
     if hsinchu_wind.is_hsinchu_message(message):
