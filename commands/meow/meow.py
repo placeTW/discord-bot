@@ -2,7 +2,15 @@ from random import choice, randint, shuffle
 import discord
 
 from commands.modules.probability import mock_bernoulli
-from .consts import CHISOBCAT, MEOW, MEOW_REGEX, POSSIBLE_MEOW_MESSAGES, POSSIBLE_MEOW_REACTS, SHIBELOL, TRADITIONAL_CAT
+from .consts import (
+    CHISOBCAT,
+    MEOW,
+    MEOW_REGEX,
+    POSSIBLE_MEOW_MESSAGES,
+    POSSIBLE_MEOW_REACTS,
+    SHIBELOL,
+    TRADITIONAL_CAT,
+)
 
 
 def is_meow_message(message: discord.Message):
@@ -17,7 +25,9 @@ def from_meow_channel(message: discord.Message):
     return MEOW in message.channel.name
 
 
-async def do_meow(message: discord.Message, mention_author=False, multiplier=1):
+async def do_meow(
+    message: discord.Message, mention_author=False, multiplier=1
+):
     if not mention_author and mock_bernoulli(0.75):
         await message.channel.send(choice(POSSIBLE_MEOW_MESSAGES))
     else:
@@ -54,5 +64,5 @@ async def meow_meow(message: discord.Message):
     elif mock_bernoulli(0.001):
         await do_meow(message)
         return True
-    
+
     return False

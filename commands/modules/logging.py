@@ -4,6 +4,7 @@ import os
 import sys
 import discord
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -33,38 +34,57 @@ logging = Logging()
 
 
 def init(client: discord.Client, deployment_date: datetime):
-    log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL')))
+    log_channel = client.get_channel(int(os.getenv("LOG_CHANNEL")))
     filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
     path = f"{sys.path[0]}/logs/{filename}"
     logging.set_log_params(log_channel, path)
 
+
 """
 
 """
-async def log_to_channel(message: discord.Message, data: dict = {}, content: str = None):
-    supabase.table('event_logs').insert(
-    {
-        "message_id": message.id,
-        "event": data['event'] if 'event' in data else None,
-        "created_at": str(message.created_at),
-        "content": content if content else message.content,
-        "author_id": data['author_id'] if 'author_id' in data else message.author.id,
-        "channel_id": message.channel.id if message.channel else None,
-        "guild_id": message.guild.id if message.guild else None,
-        "generated_id": data['generated_id'] if 'generated_id' in data else None,
-    }).execute()
+
+
+async def log_to_channel(
+    message: discord.Message, data: dict = {}, content: str = None
+):
+    supabase.table("event_logs").insert(
+        {
+            "message_id": message.id,
+            "event": data["event"] if "event" in data else None,
+            "created_at": str(message.created_at),
+            "content": content if content else message.content,
+            "author_id": data["author_id"]
+            if "author_id" in data
+            else message.author.id,
+            "channel_id": message.channel.id if message.channel else None,
+            "guild_id": message.guild.id if message.guild else None,
+            "generated_id": data["generated_id"]
+            if "generated_id" in data
+            else None,
+        }
+    ).execute()
     await logging.log_to_channel(data)
 
 
 async def log_message_event(message: discord.Message, events: list[str]):
-    data = supabase.table('message_logs').insert([
-        {
-            "message_id": message.id,
-            "author_id": message.author.id,
-            "event": event,
-            "created_at": str(message.created_at),
-            "channel_id": message.channel.id if message.channel else None,
-            "guild_id": message.guild.id if message.guild else None,
-        }
-        for event in events]).execute()
+    data = (
+        supabase.table("message_logs")
+        .insert(
+            [
+                {
+                    "message_id": message.id,
+                    "author_id": message.author.id,
+                    "event": event,
+                    "created_at": str(message.created_at),
+                    "channel_id": message.channel.id
+                    if message.channel
+                    else None,
+                    "guild_id": message.guild.id if message.guild else None,
+                }
+                for event in events
+            ]
+        )
+        .execute()
+    )
     print(data)
