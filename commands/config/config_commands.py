@@ -14,17 +14,18 @@ def register_commands(
     guilds: list[discord.Object],
     is_prod: bool,
 ):
-    
     config_group = app_commands.Group(name="config", description="Config functions")
-
 
     @config_group.command(
         name="channel",
-        description="Sets a config value",
+        description="Sets a config value for a channel",
     )
     @app_commands.default_permissions(manage_guild=True)
     @app_commands.choices(channel_config=POSSIBLE_CHANNEL_CONFIG_FIELDS)
+    @app_commands.describe(channel="The channel to set the config value for (defaults to current channel)")
     async def set_channel(interaction: discord.Interaction, channel_config: Choice[str], channel: discord.TextChannel = None):
-        set_server_config(interaction.guild_id, channel_config.value, str(channel.id) if channel else interaction.channel_id, is_prod)
+        config_value = str(channel.id) if channel else interaction.channel_id
+        set_server_config(interaction.guild_id, channel_config.value, config_value, is_prod)
+        await interaction.response.send_message(f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not is_prod else ''}")
 
     tree.add_command(config_group, guilds=guilds)
