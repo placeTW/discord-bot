@@ -9,6 +9,7 @@ import datetime
 
 # user commands
 from commands.basic import basic_commands
+from commands.config import config_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
@@ -91,6 +92,7 @@ random_capoo.register_commands(tree, guilds)
 gothefucktosleep.register_commands(tree, guilds)
 boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
+config_commands.register_commands(tree, guilds, is_prod)
 
 # confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client, GUILDS_DICT)
@@ -102,8 +104,9 @@ async def on_ready():
     for guild_id in GUILDS_DICT.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
-    # print "ready" in the console when the bot is ready to work
-    logging.init(client, deployment_date)
+    # Enable logging if prod bot
+    if is_prod:
+        logging.init(client, deployment_date)
     print("Bot is ready.")
 
 
