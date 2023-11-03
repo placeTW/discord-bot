@@ -31,6 +31,8 @@ from commands.boba import boba
 
 from commands.confessions import confession
 from presence import watching
+from commands.modules.supabase import supabaseClient
+from commands.modules import config
 import bot
 import sys
 import utils
@@ -39,9 +41,9 @@ from git import Repo
 
 # load environment vars (from .env)
 load_dotenv()
-prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
-TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILDS_DICT = utils.read_hjson_file("guilds.env.hjson")
+is_prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
+TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not is_prod else "DISCORD_TOKEN")
+GUILDS_DICT = config.fetch_config(is_prod)
 
 deployment_date = datetime.datetime.now()
 client = bot.get_bot()
@@ -59,7 +61,7 @@ placetw_guild = discord.Object(
 )
 async def deployment_info(interaction: discord.Interaction):
     msg = f"""
-PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
+PlaceTW discord bot ({'prod' if is_prod else 'dev'} deployment)
 Branch deployed: `{Repo().active_branch.name}`
 Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
@@ -161,5 +163,14 @@ async def on_message(message: discord.Message):
     if len(events) > 0:
         await logging.log_message_event(message, events)
 
+@client.event
+async def on_guild_join(guild):
+    await tree.sync(guild=guild)
+    supabaseClient.table("server_config").insert(
+        {
+            "guild_id": str(guild.id),
+            "server_name": guild.name,
+        }
+    ).execute()
 
 client.run(TOKEN)
