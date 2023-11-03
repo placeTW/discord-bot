@@ -3,14 +3,10 @@ import datetime
 import os
 import sys
 import discord
+from ..modules.supabase import supabaseClient
+
 from dotenv import load_dotenv
-
 load_dotenv()
-
-
-url: str = os.getenv("SUPABASE_URL")
-private_key: str = os.getenv("SUPABASE_SECRET_KEY")
-supabase: Client = create_client(url, private_key)
 
 
 class Logging:
@@ -48,7 +44,7 @@ def init(client: discord.Client, deployment_date: datetime):
 async def log_to_channel(
     message: discord.Message, data: dict = {}, content: str = None
 ):
-    supabase.table("event_logs").insert(
+    supabaseClient.table("event_logs").insert(
         {
             "message_id": message.id,
             "event": data["event"] if "event" in data else None,
@@ -69,7 +65,7 @@ async def log_to_channel(
 
 async def log_message_event(message: discord.Message, events: list[str]):
     data = (
-        supabase.table("message_logs")
+        supabaseClient.table("message_logs")
         .insert(
             [
                 {
