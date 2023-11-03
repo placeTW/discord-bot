@@ -5,12 +5,8 @@ import discord
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
-    guilds_dict: dict,
+    guilds: list[discord.Object],
 ):
-    guilds = [  # TW and Baltics server
-        discord.Object(id=int(server_id))
-        for server_id in guilds_dict.keys()
-    ]
     @tree.command(
         name="website",
         description="Responds with the placeTW website link",

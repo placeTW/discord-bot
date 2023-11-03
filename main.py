@@ -74,25 +74,25 @@ https://github.com/placeTW/discord-bot
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
-basic_commands.register_commands(tree, GUILDS_DICT)
 
 # * register commands to the other servers
+guilds = [
+    discord.Object(id=int(server_id))
+    for server_id in GUILDS_DICT.keys()
+]
 
-# ^ for future use
-all_guild_ids = [int(guild_id) for guild_id in GUILDS_DICT.keys()]
-for guild_id in GUILDS_DICT.keys():
-    guild = discord.Object(id=int(guild_id))
+# * Register commands to all servers that the bot is in
+fetch_entry_cmd.register_commands(tree, guilds)
+fetch_entry_ui.register_commands(tree, guilds)
+one_o_one.register_commands(tree, guilds)
+hgs.register_commands(tree, guilds)
+random_shiba.register_commands(tree, guilds)
+random_capoo.register_commands(tree, guilds)
+gothefucktosleep.register_commands(tree, guilds)
+boba.register_commands(tree, guilds)
+basic_commands.register_commands(tree, guilds)
 
-    fetch_entry_cmd.register_commands(tree, guild)
-    fetch_entry_ui.register_commands(tree, guild)
-    one_o_one.register_commands(tree, guild)
-    hgs.register_commands(tree, guild)
-    random_shiba.register_commands(tree, guild)
-    random_capoo.register_commands(tree, guild)
-    gothefucktosleep.register_commands(tree, guild)
-    boba.register_commands(tree, guild)
-
-# * register commands to the specific servers only
+# confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client, GUILDS_DICT)
 
 
