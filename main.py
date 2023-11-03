@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import datetime
 
 # user commands
+from commands.basic import basic_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
@@ -52,30 +53,11 @@ placetw_guild = discord.Object(
 
 
 @tree.command(
-    name="website",
-    description="Responds with the placeTW website link",
-    guild=placetw_guild,
-)
-async def test_slash_command(interaction: discord.Interaction):
-    await interaction.response.send_message("https://placetw.com/")
-
-
-@tree.command(
-    name="echo",
-    description="Echoes whatever string is fed",
-    guild=placetw_guild,
-)
-@app_commands.describe(given_str="The string you want echoed backed")
-async def test_slash_command(interaction: discord.Interaction, given_str: str):
-    await interaction.response.send_message(f"You sent this: `{given_str}`")
-
-
-@tree.command(
     name="deployment-info",
     description="Returns information about the bot deployment",
     guild=placetw_guild,
 )
-async def test_slash_command(interaction: discord.Interaction):
+async def deployment_info(interaction: discord.Interaction):
     msg = f"""
 PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
 Branch deployed: `{Repo().active_branch.name}`
@@ -90,6 +72,7 @@ https://github.com/placeTW/discord-bot
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
+basic_commands.register_commands(tree, GUILDS_DICT)
 
 # * register commands to the other servers
 
