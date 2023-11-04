@@ -103,6 +103,8 @@ def register_commands(
     )
     async def report_confession(interaction: discord.Interaction, confession_id: str, reason: str):
         confession_channel, report_channel = await get_confession_channels(interaction, client, report=True)
+        if not report_channel:
+            return
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
 
         if not event_log_data:
