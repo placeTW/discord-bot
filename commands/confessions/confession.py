@@ -157,7 +157,6 @@ def register_commands(
         description="Restores a confession",
     )
     @app_commands.default_permissions(manage_guild=True)
-    @app_commands.has_permissions(manage_guild=True)
     async def restore_confession(interaction: discord.Interaction, confession_id: str):
         confession_channel, _ = await get_confession_channels(interaction, client)
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
