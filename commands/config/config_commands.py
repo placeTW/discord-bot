@@ -34,3 +34,5 @@ def register_commands(
         await interaction.response.send_message(f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}", ephemeral=True)
 
     tree.add_command(config_group, guilds=guilds)
+
+    

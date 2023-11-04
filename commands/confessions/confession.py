@@ -129,7 +129,7 @@ def register_commands(
         report_embed.add_field(name="confession content", value=confession_content, inline=False)
         report_embed.set_footer(text=f"confession id: {confession_id}")
 
-        confession_embed = discord.Embed(title="Confession", description=f"[This confession was reported]\nReason: {reason}", color=discord.Color.red())
+        confession_embed = discord.Embed(title="Confession", description=f"[This confession was reported]", color=discord.Color.red())
         confession_embed.set_footer(text=f"confession id: {confession_id}")
         confession_message = await confession_channel.fetch_message(confession["message_id"])
         await confession_message.edit(embed=confession_embed)
