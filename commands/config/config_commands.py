@@ -21,8 +21,13 @@ def register_commands(
     )
     @app_commands.default_permissions(manage_guild=True)
     @app_commands.choices(channel_config=POSSIBLE_CHANNEL_CONFIG_FIELDS)
-    @app_commands.describe(channel="The channel to set the config value for (defaults to current channel)")
+    @app_commands.describe(channel="The channel to set the config value for (defaults to current channel) (requires manage server permissions)")
     async def set_channel(interaction: discord.Interaction, channel_config: Choice[str], channel: discord.TextChannel = None):
+        if not interaction.permissions.manage_guild:
+            await interaction.response.send_message(
+                "You do not have the required permissions to use this command.", ephemeral=True
+            )
+            return
         config_value = str(channel.id) if channel else interaction.channel_id
         set_config(interaction.guild_id, channel_config.value, config_value, client.is_prod)
         client.fetch_config()
