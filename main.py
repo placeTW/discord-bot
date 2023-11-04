@@ -44,10 +44,9 @@ from git import Repo
 load_dotenv()
 is_prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not is_prod else "DISCORD_TOKEN")
-GUILDS_DICT = config.fetch_config(is_prod)
 
 deployment_date = datetime.datetime.now()
-client = bot.get_bot()
+client = bot.get_bot(is_prod)
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 placetw_guild = discord.Object(
@@ -79,7 +78,7 @@ watching.register_commands(tree, placetw_guild, client)
 # * register commands to the other servers
 guilds = [
     discord.Object(id=int(server_id))
-    for server_id in GUILDS_DICT.keys()
+    for server_id in client.guilds_dict.keys()
 ]
 
 # * Register commands to all servers that the bot is in
@@ -92,21 +91,20 @@ random_capoo.register_commands(tree, guilds)
 gothefucktosleep.register_commands(tree, guilds)
 boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
-config_commands.register_commands(tree, guilds, is_prod)
+config_commands.register_commands(tree, client, guilds)
 
 # confessions needs the dictionary for the confession channel id
-confession.register_commands(tree, client, GUILDS_DICT)
+confession.register_commands(tree, client)
 
 
 # sync the slash commands servers
 @client.event
 async def on_ready():
-    for guild_id in GUILDS_DICT.keys():
+    for guild_id in client.guilds_dict.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
     # Enable logging if prod bot
-    if is_prod:
-        logging.init(client, deployment_date)
+    logging.init(client, deployment_date)
     print("Bot is ready.")
 
 

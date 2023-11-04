@@ -18,9 +18,9 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log_to_channel(self, log_data: dict):
+    async def log_to_channel(self, log_data: dict, color: discord.Color = None):
         if not self.log_channel is None:
-            embed = discord.Embed()
+            embed = discord.Embed(color=color if color else discord.Color.default())
             for param in log_data.items():
                 embed.add_field(name=param[0], value=param[1], inline=False)
             await self.log_channel.send(embed=embed)
@@ -42,7 +42,7 @@ def init(client: discord.Client, deployment_date: datetime):
 
 
 async def log_to_channel(
-    message: discord.Message, data: dict = {}, content: str = None
+    message: discord.Message, data: dict = {}, content: str = None, color: discord.Color = None
 ):
     supabaseClient.table("event_logs").insert(
         {
@@ -60,7 +60,7 @@ async def log_to_channel(
             else None,
         }
     ).execute()
-    await logging.log_to_channel(data)
+    await logging.log_to_channel(data, color)
 
 
 async def log_message_event(message: discord.Message, events: list[str]):
@@ -84,3 +84,8 @@ async def log_message_event(message: discord.Message, events: list[str]):
         .execute()
     )
     print(data)
+
+async def fetch_event_log(
+    guild_id: int, generated_id: str, event: str
+):
+    return supabaseClient.table("event_logs").select("*").eq("guild_id", guild_id).eq("generated_id", generated_id).eq('event', event).execute().data
