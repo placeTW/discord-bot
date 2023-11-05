@@ -1,11 +1,11 @@
 
 from discord import app_commands
 from discord.app_commands import Choice
+from commands.modules import logging
 
 import discord
 from bot import TWPlaceClient
 from commands.config.consts import POSSIBLE_CHANNEL_CONFIG_FIELDS
-from commands.modules.logging import Logging
 from commands.modules.supabase import supabaseClient
 from commands.modules.config import set_config
 
@@ -36,7 +36,7 @@ def register_commands(
             "event_type": "config channel",
             "author_id": interaction.user.id,
         }
-        await Logging.log_to_channel(
+        await logging.log_to_channel(
             interaction.message,
             log_event,
             f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}",
