@@ -120,7 +120,7 @@ def register_commands(
         confession_created_at = confession["created_at"]
         confession_content = confession["content"]
         
-        report_embed = discord.Embed(title=f"Confession reported", description=f"Confession {confession_id} reported by <@{interaction.user.id}", color=discord.Color.red())
+        report_embed = discord.Embed(title=f"Confession reported", description=f"Confession {confession_id} reported by <@{interaction.user.id}>", color=discord.Color.red())
         report_embed.add_field(name="reporter", value=f"<@{interaction.user.id}>", inline=False)
         report_embed.add_field(name="reason", value=reason, inline=False)
         report_embed.add_field(name="confession author", value=f"<@{confession_author}>", inline=False)
