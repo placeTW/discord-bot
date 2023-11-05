@@ -42,11 +42,11 @@ def init(client: discord.Client, deployment_date: datetime):
 
 
 async def log_to_channel(
-    message: discord.Message, data: dict = {}, content: str = None, color: discord.Color = None
+    message: discord.Message | discord.Interaction, data: dict = {}, content: str = None, color: discord.Color = None
 ):
     supabaseClient.table("event_logs").insert(
         {
-            "message_id": message.id,
+            "message_id": message.id if message.id else None,
             "event": data["event"] if "event" in data else None,
             "created_at": str(message.created_at),
             "content": content if content else message.content,

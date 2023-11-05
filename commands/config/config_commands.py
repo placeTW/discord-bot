@@ -37,7 +37,7 @@ def register_commands(
             "author_id": interaction.user.id,
         }
         await logging.log_to_channel(
-            interaction.message,
+            interaction,
             log_event,
             f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}",
         )
