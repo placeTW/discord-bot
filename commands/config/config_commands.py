@@ -5,6 +5,7 @@ from discord.app_commands import Choice
 import discord
 from bot import TWPlaceClient
 from commands.config.consts import POSSIBLE_CHANNEL_CONFIG_FIELDS
+from commands.modules.logging import Logging
 from commands.modules.supabase import supabaseClient
 from commands.modules.config import set_config
 
@@ -31,6 +32,15 @@ def register_commands(
         config_value = str(channel.id) if channel else interaction.channel_id
         set_config(interaction.guild_id, channel_config.value, config_value, client.is_prod)
         client.fetch_config()
+        log_event = {
+            "event_type": "config channel",
+            "author_id": interaction.user.id,
+        }
+        await Logging.log_to_channel(
+            interaction.message,
+            log_event,
+            f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}",
+        )
         await interaction.response.send_message(f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}", ephemeral=True)
 
     tree.add_command(config_group, guilds=guilds)
