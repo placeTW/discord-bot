@@ -33,7 +33,7 @@ def register_commands(
         set_config(interaction.guild_id, channel_config.value, config_value, client.is_prod)
         client.fetch_config()
         log_event = {
-            "event_type": "config channel",
+            "event": "config channel",
             "author_id": interaction.user.id,
         }
         await logging.log_to_channel(
