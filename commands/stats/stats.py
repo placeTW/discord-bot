@@ -3,7 +3,10 @@ from discord import app_commands
 from ..modules.supabase import supabaseClient
 
 
-def register_commands(tree, guilds_dict: dict,):
+def register_commands(
+    tree,
+    guilds_dict: dict,
+):
     @tree.command(
         name="server_stats",
         description="Statistics on message events in this server",
@@ -12,12 +15,21 @@ def register_commands(tree, guilds_dict: dict,):
             for server_id in guilds_dict.keys()
         ],
     )
-    @app_commands.describe(event="(Optional) The event to get stats for", user="(Optional) The user to get stats for", days="(Optional) The number of days to get stats for (default 7)")
-    async def server_stats(interaction: discord.Interaction, event: str = None, user: discord.Member = None, days: int = 7):
+    @app_commands.describe(
+        event="(Optional) The event to get stats for",
+        user="(Optional) The user to get stats for",
+        days="(Optional) The number of days to get stats for (default 7)",
+    )
+    async def server_stats(
+        interaction: discord.Interaction,
+        event: str = None,
+        user: discord.Member = None,
+        days: int = 7,
+    ):
         try:
             pass
         except:
-            print(f'Could not get message stats for {event} and/or {user}')
+            print(f"Could not get message stats for {event} and/or {user}")
         pass
 
     @tree.command(
@@ -28,12 +40,21 @@ def register_commands(tree, guilds_dict: dict,):
             for server_id in guilds_dict.keys()
         ],
     )
-    @app_commands.describe(event="(Optional) The event to get stats for", user="(Optional) The user to get stats for", days="(Optional) The number of days to get stats for (default 7)")
-    async def global_stats(interaction: discord.Interaction, event: str = None, user: discord.Member = None, days: int = 7):
+    @app_commands.describe(
+        event="(Optional) The event to get stats for",
+        user="(Optional) The user to get stats for",
+        days="(Optional) The number of days to get stats for (default 7)",
+    )
+    async def global_stats(
+        interaction: discord.Interaction,
+        event: str = None,
+        user: discord.Member = None,
+        days: int = 7,
+    ):
         try:
             pass
         except:
-            print(f'Could not get message stats for {event} and/or {user}')
+            print(f"Could not get message stats for {event} and/or {user}")
         pass
 
     @tree.command(
@@ -44,12 +65,21 @@ def register_commands(tree, guilds_dict: dict,):
             for server_id in guilds_dict.keys()
         ],
     )
-    @app_commands.describe(event="(Optional) The event to get stats for", days="(Optional) The number of days to get stats for (default 7)", page="(Optional) The page number to get stats for")
-    async def server_top(interaction: discord.Interaction, event: str = None, days: int = 7, page: int = 1):
+    @app_commands.describe(
+        event="(Optional) The event to get stats for",
+        days="(Optional) The number of days to get stats for (default 7)",
+        page="(Optional) The page number to get stats for",
+    )
+    async def server_top(
+        interaction: discord.Interaction,
+        event: str = None,
+        days: int = 7,
+        page: int = 1,
+    ):
         try:
             pass
         except:
-            print(f'Could not get top stats for {event}')
+            print(f"Could not get top stats for {event}")
         pass
 
     @tree.command(
@@ -60,10 +90,20 @@ def register_commands(tree, guilds_dict: dict,):
             for server_id in guilds_dict.keys()
         ],
     )
-    @app_commands.describe(event="(Optional) The event to get stats for", days="(Optional) The number of days to get stats for (default 7)", page="(Optional) The page number to get stats for")
-    async def global_top(interaction: discord.Interaction, event: str = None, days: int = 7, page: int = 1):
+    @app_commands.describe(
+        event="(Optional) The event to get stats for",
+        days="(Optional) The number of days to get stats for (default 7)",
+        page="(Optional) The page number to get stats for",
+    )
+    async def global_top(
+        interaction: discord.Interaction,
+        event: str = None,
+        days: int = 7,
+        page: int = 1,
+    ):
         try:
             pass
+
         except:
-            print(f'Could not get top stats for {event}')
+            print(f"Could not get top stats for {event}")
         pass
