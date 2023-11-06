@@ -31,7 +31,7 @@ def download_model(model_path):
                     f.write(chunk)
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
     # Load the model from the file
     classes: list[str] = ["boba"]
     model_path = BOBA_DIR / "models/boba.pth"
@@ -57,7 +57,7 @@ def register_commands(tree, this_guild: discord.Object):
     @tree.command(
         name="boba",
         description="Give boba someone to drink",
-        guild=this_guild,
+        guilds=guilds,
     )
     @app_commands.rename(user="member")
     async def boba(interaction: discord.Interaction, user: discord.Member):

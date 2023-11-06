@@ -7,13 +7,13 @@ GO_THE_FUCK_TO_SLEEP_URL = "https://www.youtube.com/watch?v=teIbh8hFQos"
 COOLDOWN_DURATION = 60
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
     user_timestamps: dict[int, float] = {}
 
     @tree.command(
         name="gothefucktosleep",
         description="Go the fuck to sleep",
-        guild=this_guild,
+        guilds=guilds,
     )
     @app_commands.rename(user_to_ping='member')
     async def go_the_fuck_to_sleep(interaction: discord.Interaction, user_to_ping: discord.Member):

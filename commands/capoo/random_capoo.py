@@ -8,11 +8,11 @@ BASE_VIDEO_URL = 'https://www.youtube.com/watch?v='
 BASE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search?'
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
   @tree.command(
       name="capoo",
       description="Get a random video from Capoo's YouTube channel",
-      guild=this_guild,
+      guilds=guilds,
   )
   async def random_capoo(
       interaction: discord.Interaction,

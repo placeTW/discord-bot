@@ -124,11 +124,11 @@ class FetchEntryView(discord.ui.View):
         )
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
         name="ui-fetch",
         description="Eady-to-use entry selector",
-        guild=this_guild,
+        guilds=guilds,
     )
     async def ui_fetch(interaction: discord.Interaction):
         button = FetchEntryView()

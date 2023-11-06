@@ -27,11 +27,11 @@ class HGSButtonView(discord.ui.View):
         await self.msg.delete()
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
         name="hgs",
         description="The ultimate question",
-        guild=this_guild,
+        guilds=guilds,
     )
     async def hgs(interaction: discord.Interaction):
         button = HGSButtonView()

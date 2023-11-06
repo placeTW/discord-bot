@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import datetime
 
 # user commands
+from commands.basic import basic_commands
+from commands.config import config_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
@@ -30,6 +32,8 @@ from commands.boba import boba
 
 from commands.confessions import confession
 from presence import watching
+from commands.modules.supabase import supabaseClient
+from commands.modules import config
 import bot
 import sys
 import utils
@@ -38,12 +42,11 @@ from git import Repo
 
 # load environment vars (from .env)
 load_dotenv()
-prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
-TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not prod else "DISCORD_TOKEN")
-GUILDS_DICT = utils.read_json_file("guilds.env.json")
+is_prod = len(sys.argv) > 1 and sys.argv[1] == "prod"
+TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not is_prod else "DISCORD_TOKEN")
 
 deployment_date = datetime.datetime.now()
-client = bot.get_bot()
+client = bot.get_bot(is_prod)
 # CommandTree is where all our defined commands are stored
 tree = discord.app_commands.CommandTree(client)
 placetw_guild = discord.Object(
@@ -52,32 +55,13 @@ placetw_guild = discord.Object(
 
 
 @tree.command(
-    name="website",
-    description="Responds with the placeTW website link",
-    guild=placetw_guild,
-)
-async def test_slash_command(interaction: discord.Interaction):
-    await interaction.response.send_message("https://placetw.com/")
-
-
-@tree.command(
-    name="echo",
-    description="Echoes whatever string is fed",
-    guild=placetw_guild,
-)
-@app_commands.describe(given_str="The string you want echoed backed")
-async def test_slash_command(interaction: discord.Interaction, given_str: str):
-    await interaction.response.send_message(f"You sent this: `{given_str}`")
-
-
-@tree.command(
     name="deployment-info",
     description="Returns information about the bot deployment",
     guild=placetw_guild,
 )
-async def test_slash_command(interaction: discord.Interaction):
+async def deployment_info(interaction: discord.Interaction):
     msg = f"""
-PlaceTW discord bot ({'prod' if prod else 'dev'} deployment)
+PlaceTW discord bot ({'prod' if is_prod else 'dev'} deployment)
 Branch deployed: `{Repo().active_branch.name}`
 Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
@@ -92,32 +76,34 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
+guilds = [
+    discord.Object(id=int(server_id))
+    for server_id in client.guilds_dict.keys()
+]
 
-# ^ for future use
-all_guild_ids = [int(guild_id) for guild_id in GUILDS_DICT.keys()]
-for guild_id in GUILDS_DICT.keys():
-    guild = discord.Object(id=int(guild_id))
+# * Register commands to all servers that the bot is in
+fetch_entry_cmd.register_commands(tree, guilds)
+fetch_entry_ui.register_commands(tree, guilds)
+one_o_one.register_commands(tree, guilds)
+hgs.register_commands(tree, guilds)
+random_shiba.register_commands(tree, guilds)
+random_capoo.register_commands(tree, guilds)
+gothefucktosleep.register_commands(tree, guilds)
+boba.register_commands(tree, guilds)
+basic_commands.register_commands(tree, guilds)
+config_commands.register_commands(tree, client, guilds)
 
-    fetch_entry_cmd.register_commands(tree, guild)
-    fetch_entry_ui.register_commands(tree, guild)
-    one_o_one.register_commands(tree, guild)
-    hgs.register_commands(tree, guild)
-    random_shiba.register_commands(tree, guild)
-    random_capoo.register_commands(tree, guild)
-    gothefucktosleep.register_commands(tree, guild)
-    boba.register_commands(tree, guild)
-
-# * register commands to the specific servers only
-confession.register_commands(tree, client, GUILDS_DICT)
+# confessions needs the dictionary for the confession channel id
+confession.register_commands(tree, client)
 
 
 # sync the slash commands servers
 @client.event
 async def on_ready():
-    for guild_id in GUILDS_DICT.keys():
+    for guild_id in client.guilds_dict.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
-    # print "ready" in the console when the bot is ready to work
+    # Enable logging
     logging.init(client, deployment_date)
     print("Bot is ready.")
 
@@ -134,49 +120,58 @@ async def on_message(message: discord.Message):
     if react_tw.is_TW_message(message):
         try:
             await react_tw.send_react_tw(message)
-        except:
-            pass
+        except Exception as e:
+            print('failed to react Taiwan: ', e)
         events.append("tw")
     if react_hgs.is_hgs_message(message):
         try:
             await react_hgs.send_react_hgs(message)
-        except:
-            pass
+        except Exception as e:
+            print('failed to react HGS: ', e)
         events.append("hgs")
     if react_baltics.is_baltic_message(message):
         try:
-            await react_baltics.send_react_baltics(message)
-        except:
-            pass
+            await react_baltics.send_react_baltic(message)
+        except Exception as e:
+            print('failed to react Baltics: ', e)
         events.append("baltics")
     if react_czech.is_czech_message(message):
         try:
             await react_czech.send_react_czech(message)
-        except:
-            pass
+        except Exception as e:
+            print('failed to react Czech: ', e)
         events.append("czech")
     if react_ph.is_ph_message(message):
         try:
             await react_ph.send_react_ph(message)
-        except:
-            pass
+        except Exception as e:
+            print('failed to react PH: ', e)
         events.append("ph")
     if react_ua.is_UA_message(message):
         try:
             await react_ua.send_react_ua(message)
-        except:
-            pass
+        except Exception as e:
+            print('failed to react UA: ', e)
         events.append("ua")
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
         events.append("hsinchu")
-        
+
     if await meow_meow(message):
         events.append("meow")
 
     if len(events) > 0:
         await logging.log_message_event(message, events)
 
+@client.event
+async def on_guild_join(guild):
+    await tree.sync(guild=guild)
+    supabaseClient.table("server_config").insert(
+        {
+            "guild_id": str(guild.id),
+            "server_name": guild.name,
+        }
+    ).execute()
 
 client.run(TOKEN)

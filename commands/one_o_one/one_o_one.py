@@ -128,13 +128,13 @@ class OneOOne:
         self._user_to_timestamps[user].append(current_time)
 
 
-def register_commands(tree, this_guild: discord.Object) -> None:
+def register_commands(tree, guilds: list[discord.Object]) -> None:
     one_o_one = OneOOne()
 
     @tree.command(
         name="101",
         description="Wanna build your own Taipei 101?",
-        guild=this_guild,
+        guilds=guilds,
     )
     async def command(interaction: discord.Interaction):
         message = one_o_one.get_message(interaction.user.id)

@@ -176,5 +176,6 @@ py3-11_for_dc_bot/
 # the model
 *.pth
 
-# json env 
+# json/hjson env 
 guilds.env.json
+guilds.env.hjson

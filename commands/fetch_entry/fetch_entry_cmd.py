@@ -13,11 +13,11 @@ from ..entry_consts.consts import (
 )
 
 
-def register_commands(tree, this_guild: discord.Object):
+def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
         name="fetch",
         description="Fetches r/place Taiwan art entries.",
-        guild=this_guild,
+        guilds=guilds,
     )
     @app_commands.choices(entry=POSSIBLE_ART2023_IDS)
     @app_commands.choices(lang=POSSIBLE_LANGUAGE_CODES)
