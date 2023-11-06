@@ -52,7 +52,6 @@ tree = discord.app_commands.CommandTree(client)
 placetw_guild = discord.Object(
     id=os.getenv("PLACETW_SERVER_ID")
 )  # basically refers to this server
-logging.init(client, deployment_date)
 
 
 @tree.command(
@@ -104,7 +103,8 @@ async def on_ready():
     for guild_id in client.guilds_dict.keys():
         guild = discord.Object(id=guild_id)
         await tree.sync(guild=guild)
-    # Enable logging if prod bot
+    # Enable logging
+    logging.init(client, deployment_date)
     print("Bot is ready.")
 
 

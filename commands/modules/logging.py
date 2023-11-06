@@ -11,7 +11,7 @@ load_dotenv()
 
 class Logging:
     def __init__(self):
-        self.log_channel = None
+        self.log_channel: discord.TextChannel = None
         self.log_file_path = None
 
     def set_log_params(self, channel, log_file):
