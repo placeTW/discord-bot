@@ -118,9 +118,11 @@ async def on_message(message: discord.Message):
     if message.author == client.user:
         return
 
-    if client.user.mentioned_in(message):
-        await mention_responses.reply_with_random_response(message)
     events = []
+
+    if client.user.mentioned_in(message):  # if bot is pinged in message
+        await mention_responses.reply_with_random_response(message)
+        events.append("pinged")
 
     if react_tw.is_TW_message(message):
         try:
