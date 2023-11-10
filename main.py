@@ -29,9 +29,12 @@ from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
-
 from commands.confessions import confession
+
 from presence import watching
+
+from mentioned import mention_responses
+
 from commands.modules.supabase import supabaseClient
 from commands.modules import config
 import bot
@@ -117,41 +120,45 @@ async def on_message(message: discord.Message):
 
     events = []
 
+    if client.user.mentioned_in(message):  # if bot is pinged in message
+        await mention_responses.reply_with_random_response(message)
+        events.append("pinged")
+
     if react_tw.is_TW_message(message):
         try:
             await react_tw.send_react_tw(message)
         except Exception as e:
-            print('failed to react Taiwan: ', e)
+            print("failed to react Taiwan: ", e)
         events.append("tw")
     if react_hgs.is_hgs_message(message):
         try:
             await react_hgs.send_react_hgs(message)
         except Exception as e:
-            print('failed to react HGS: ', e)
+            print("failed to react HGS: ", e)
         events.append("hgs")
     if react_baltics.is_baltic_message(message):
         try:
             await react_baltics.send_react_baltic(message)
         except Exception as e:
-            print('failed to react Baltics: ', e)
+            print("failed to react Baltics: ", e)
         events.append("baltics")
     if react_czech.is_czech_message(message):
         try:
             await react_czech.send_react_czech(message)
         except Exception as e:
-            print('failed to react Czech: ', e)
+            print("failed to react Czech: ", e)
         events.append("czech")
     if react_ph.is_ph_message(message):
         try:
             await react_ph.send_react_ph(message)
         except Exception as e:
-            print('failed to react PH: ', e)
+            print("failed to react PH: ", e)
         events.append("ph")
     if react_ua.is_UA_message(message):
         try:
             await react_ua.send_react_ua(message)
         except Exception as e:
-            print('failed to react UA: ', e)
+            print("failed to react UA: ", e)
         events.append("ua")
 
     if hsinchu_wind.is_hsinchu_message(message):
@@ -164,6 +171,7 @@ async def on_message(message: discord.Message):
     if len(events) > 0:
         await logging.log_message_event(message, events)
 
+
 @client.event
 async def on_guild_join(guild):
     await tree.sync(guild=guild)
@@ -173,5 +181,6 @@ async def on_guild_join(guild):
             "server_name": guild.name,
         }
     ).execute()
+
 
 client.run(TOKEN)
