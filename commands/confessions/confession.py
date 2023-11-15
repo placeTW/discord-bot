@@ -74,7 +74,7 @@ def register_commands(
             # Building the confession
             confession_id = shortuuid.uuid()
             embed = discord.Embed(title="Confession", description=confession)
-            embed.set_footer(text=f"confession id: {confession_id}")
+            embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report)' if confession_logging_enabled else ''}")
             confession_message = await confession_channel.send(embed=embed)
             confession_url = confession_message.jump_url
 
