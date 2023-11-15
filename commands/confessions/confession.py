@@ -11,6 +11,9 @@ async def get_confession_channels(interaction: discord.Interaction, client: TWPl
     confessions_enabled = client.guilds_dict[interaction.guild.id][
             "confessions_enabled"
     ]
+    confession_logging_enabled = client.guilds_dict[interaction.guild.id][
+            "confession_logging_enabled"
+    ]
     if not confessions_enabled:
         await interaction.response.send_message(
             "Confessions are not enabled for this server.", ephemeral=True
@@ -44,7 +47,7 @@ async def get_confession_channels(interaction: discord.Interaction, client: TWPl
         
         report_channel = client.get_channel(report_channel_id)
 
-    return confession_channel, report_channel
+    return confession_channel, report_channel, confession_logging_enabled
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -65,7 +68,7 @@ def register_commands(
         """
 
         # Getting the confession channel
-        confession_channel, _ = await get_confession_channels(interaction, client)
+        confession_channel, _, confession_logging_enabled = await get_confession_channels(interaction, client)
 
         try:
             # Building the confession
@@ -87,7 +90,8 @@ def register_commands(
                 "generated_id": confession_id,
             }
 
-            await logging.log_to_channel(confession_message, log_event, confession)
+            if confession_logging_enabled:
+                await logging.log_to_channel(confession_message, log_event, confession)
             await interaction.response.send_message(
                 f"Your confession has been sent. See it here: {confession_url}",
                 ephemeral=True,
@@ -102,7 +106,7 @@ def register_commands(
         description="Report a confession",
     )
     async def report_confession(interaction: discord.Interaction, confession_id: str, reason: str):
-        confession_channel, report_channel = await get_confession_channels(interaction, client, report=True)
+        confession_channel, report_channel, confession_logging_enabled = await get_confession_channels(interaction, client, report=True)
         if not report_channel:
             return
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
@@ -148,7 +152,8 @@ def register_commands(
             "confession_content": confession_content,
             "generated_id": confession_id,
         }
-        await logging.log_to_channel(report_message, log_event, reason, color=discord.Color.red())
+        if confession_logging_enabled:
+            await logging.log_to_channel(report_message, log_event, reason, color=discord.Color.red())
 
         await interaction.response.send_message(
             "Your report has been sent. Thank you.", ephemeral=True
@@ -165,7 +170,7 @@ def register_commands(
             )
             return
 
-        confession_channel, _ = await get_confession_channels(interaction, client)
+        confession_channel, _, confession_logging_enabled = await get_confession_channels(interaction, client)
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
 
         if not event_log_data:
@@ -191,7 +196,8 @@ def register_commands(
             "generated_id": confession_id,
         }
 
-        await logging.log_to_channel(confession_message, log_event, color=discord.Color.green())
+        if confession_logging_enabled:
+            await logging.log_to_channel(confession_message, log_event, color=discord.Color.green())
 
         await interaction.response.send_message(
             "The confession has been restored.", ephemeral=True
