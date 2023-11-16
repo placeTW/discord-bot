@@ -91,7 +91,7 @@ def register_commands(
             }
 
             if confession_logging_enabled:
-                await logging.log_to_channel(confession_message, log_event, confession)
+                await logging.log_event(confession_message, log_event, confession)
             await interaction.response.send_message(
                 f"Your confession has been sent. See it here: {confession_url}",
                 ephemeral=True,
@@ -153,7 +153,7 @@ def register_commands(
             "generated_id": confession_id,
         }
         if confession_logging_enabled:
-            await logging.log_to_channel(report_message, log_event, reason, color=discord.Color.red())
+            await logging.log_event(report_message, log_event, reason, color=discord.Color.red())
 
         await interaction.response.send_message(
             "Your report has been sent. Thank you.", ephemeral=True
@@ -197,7 +197,7 @@ def register_commands(
         }
 
         if confession_logging_enabled:
-            await logging.log_to_channel(confession_message, log_event, color=discord.Color.green())
+            await logging.log_event(confession_message, log_event, color=discord.Color.green())
 
         await interaction.response.send_message(
             "The confession has been restored.", ephemeral=True
