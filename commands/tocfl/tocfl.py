@@ -61,13 +61,24 @@ def _create_word_embed(
     embed = discord.Embed(
         title=word
     )  # ^ add description="desc" for translation
-    embed.add_field(name="Pronunciation", value=pinyin, inline=True)
-    embed.add_field(name="Level", value=level, inline=True)
+    embed.add_field(name="Pronunciation", value=pinyin, inline=False)
     embed.add_field(
-        name="Reference", value=f"https://cdict.net/?q={word}", inline=False
+        name="Reference",
+        value=f"https://cdict.net/?q={word}",
+        inline=False,
     )
+    embed.add_field(name="Level", value=level, inline=False)
     if part_of_speech:
-        embed.add_field(name="Category", value=part_of_speech, inline=True)
+        embed.add_field(name="Category", value=part_of_speech, inline=False)
+    # stroke order
+    embed.add_field(name="Stroke Order", value="", inline=False)
+    for character in word:
+        embed.add_field(
+            name="",
+            value=f"[Stroke order for {character}](https://stroke-order.learningweb.moe.edu.tw/charactersQueryResult.do?words={character}&lang=zh_TW&csrfPreventionSalt=null)",
+            inline=False,
+        )
+
     # embed.set_footer(
     #     text="Source: https://tocfl.edu.tw/index.php/exam/download"
     # )
