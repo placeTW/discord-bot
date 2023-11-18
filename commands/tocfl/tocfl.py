@@ -20,18 +20,18 @@ def register_commands(
         name="random",
         description="Get a random TOCFL word",
     )
-    @app_commands.choices(level=TOCFL_LEVELS_CHOICES)
-    @app_commands.describe(level="The level of the word to get")
+    # @app_commands.choices(level=TOCFL_LEVELS_CHOICES)
+    # @app_commands.describe(level="The level of the word to get")
     async def tocfl_rand(
         interaction: discord.Interaction,
-        level: discord.app_commands.Choice[int] = None,
+        # level: discord.app_commands.Choice[int] = None,
     ):
         MAX_ID = 7563  # fixed for now until we can get the max id from the db
         random_id = randint(1, MAX_ID)
         tocfl_table = supabaseClient.table("tocfl")
         query = tocfl_table.select("*").eq("id", random_id)
-        if level:
-            query = query.eq("level", level.value)
+        # if level:
+        #     query = query.eq("level", int(level.value))
         data, count = query.execute()
         if count == 0:
             await interaction.response.send_message(
@@ -39,6 +39,8 @@ def register_commands(
                 emphemeral=True,
             )
             return
+        print(data)
+        print(count)
         data = data[1]  # the first element is just the string "data"
         data = data[0]  # rand only has one element
         # example data: {'id': 112, 'vocab': '找', 'zhuyin': None, 'pinyin': 'zhăo ', 'english': None, 'level': 1, 'part_of_speech': 'V', 'context': '與他人的關係'}
