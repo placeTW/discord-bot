@@ -61,13 +61,13 @@ def _create_word_embed(
     )  # ^ add description="desc" for translation
     embed.add_field(name="Pronunciation", value=pinyin, inline=False)
     embed.add_field(
-        name="Reference",
+        name="Dictionary Reference",
         value=f"https://cdict.net/?q={word}",
         inline=False,
     )
     embed.add_field(name="Level", value=level, inline=False)
     if part_of_speech:
-        embed.add_field(name="Category", value=part_of_speech, inline=False)
+        embed.add_field(name="Grammar Category", value=part_of_speech, inline=False)
     # stroke order
     embed.add_field(name="Stroke Order", value="", inline=False)
     for character in word.translate(str.maketrans('', '', string.punctuation)):
