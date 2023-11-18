@@ -1,3 +1,4 @@
+import string
 import discord
 from discord import app_commands
 
@@ -69,7 +70,7 @@ def _create_word_embed(
         embed.add_field(name="Category", value=part_of_speech, inline=False)
     # stroke order
     embed.add_field(name="Stroke Order", value="", inline=False)
-    for character in word:
+    for character in word.translate(str.maketrans('', '', string.punctuation)):
         embed.add_field(
             name="",
             value=f"[Stroke order for {character}](https://stroke-order.learningweb.moe.edu.tw/charactersQueryResult.do?words={character}&lang=zh_TW&csrfPreventionSalt=null)",
