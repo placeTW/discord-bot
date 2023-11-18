@@ -30,6 +30,7 @@ from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
 from commands.confessions import confession
+from commands.tocfl import tocfl
 
 from presence import watching
 
@@ -72,11 +73,11 @@ https://github.com/placeTW/discord-bot
     await interaction.response.send_message(msg)
 
 
-# * register commands from other files to the placetw server
-# edit_entry_modal.register_commands(tree, this_guild, client)
+# * register commands the just the placetw server
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
+tocfl.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
 guilds = [

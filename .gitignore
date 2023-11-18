@@ -179,3 +179,8 @@ py3-11_for_dc_bot/
 # json/hjson env 
 guilds.env.json
 guilds.env.hjson
+
+# for tocfl
+*.ipynb
+*.xlsx
+tocfl_8000.csv
