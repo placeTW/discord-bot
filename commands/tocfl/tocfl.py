@@ -29,13 +29,10 @@ def register_commands(
         MAX_ID = 7563  # fixed for now until we can get the max id from the db
         random_id = randint(1, MAX_ID)
         tocfl_table = supabaseClient.table("tocfl")
-        query = tocfl_table.select("*").eq("id", random_id)
-        if level:
-            query = query.eq("level", level.value)
-        data, count = query.execute()
+        data, count = supabaseClient.rpc('get_random_tocfl', { 'level': level.value }).execute() if level else tocfl_table.select("*").eq("id", random_id).execute()
         if count == 0:
             await interaction.response.send_message(
-                "There was an error getting the random word. Please try again.",
+                f"There was an error getting the random word. Please try again",
                 emphemeral=True,
             )
             return
