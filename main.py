@@ -17,6 +17,7 @@ from commands.meow.meow import meow_meow
 from commands.modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
+from commands.pat import pat
 from commands.reacttw import react_tw
 from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
@@ -96,6 +97,7 @@ gothefucktosleep.register_commands(tree, guilds)
 boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
+pat.register_commands(tree, guilds)
 
 # confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client)
