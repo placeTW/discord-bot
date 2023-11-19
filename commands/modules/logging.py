@@ -59,6 +59,7 @@ async def log_event(
             "generated_id": data["generated_id"]
             if "generated_id" in data
             else None,
+            "metadata": data["metadata"] if "metadata" in data else None,
         }
     ).execute()
     if log_to_channel:

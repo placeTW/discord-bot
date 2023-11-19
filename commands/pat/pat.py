@@ -22,14 +22,6 @@ def register_commands(tree, guilds: list[discord.Object]):
         # random file from the directory
         random_gif = choice(list(PAT_DIR.iterdir()))
 
-        log_event = {
-            "event": "pat",
-            "author_id": current_user_id,
-            "mentioned_id": user_to_pat.id,
-        }
-        
-        # await logging.log_event(interaction, log_event, log_to_channel=False)
-
         embed = discord.Embed()
 
         # set the title of the embed
@@ -39,5 +31,18 @@ def register_commands(tree, guilds: list[discord.Object]):
         # add the file to the embed
         file = discord.File(random_gif)
         embed.set_image(url=f"attachment://{file.filename}")
+
+
+        log_event = {
+            "event": "pat",
+            "author_id": current_user_id,
+            "mentioned_id": user_to_pat.id,
+            "content": text,
+            "metadata": {
+                'filename': file.filename
+            },
+        }
+        
+        await logging.log_event(interaction, log_event, log_to_channel=False)
 
         await interaction.response.send_message(embed=embed, file=file)
