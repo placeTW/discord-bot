@@ -1,5 +1,6 @@
 import time
 import discord
+from ..modules import logging
 from discord import app_commands
 
 
@@ -27,4 +28,12 @@ def register_commands(tree, guilds: list[discord.Object]):
             return
 
         await interaction.response.send_message(f"<@{user_to_ping.id}> https://www.youtube.com/watch?v=teIbh8hFQos")
+
+        log_event = {
+            "event": "gothefucktosleep",
+            "author_id": current_user_id,
+            "mentioned_id": user_to_ping.id,
+        }
+        
+        await logging.log_event(interaction, log_event, log_to_channel=False)
         user_timestamps[current_user_id] = current_time

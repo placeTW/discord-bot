@@ -1,0 +1,48 @@
+import time
+import discord
+from ..modules import logging
+from discord import app_commands
+from pathlib import Path
+from random import choice
+import os
+
+PAT_DIR = Path(Path(__file__).parent, 'gifs')
+
+
+def register_commands(tree, guilds: list[discord.Object]):
+    @tree.command(
+        name="pat",
+        description="Pat",
+        guilds=guilds,
+    )
+    @app_commands.rename(user_to_pat='member')
+    async def pat(interaction: discord.Interaction, user_to_pat: discord.Member, text: str = None):
+        current_user_id = interaction.user.id
+
+        # random file from the directory
+        random_gif = choice(list(PAT_DIR.iterdir()))
+
+        embed = discord.Embed()
+
+        # set the title of the embed
+        embed.title = f"{interaction.user.display_name} pats {user_to_pat.display_name}"
+        embed.description = text if text else None
+        embed.color = discord.Color.random()
+
+        # add the file to the embed
+        file = discord.File(random_gif)
+        embed.set_image(url=f"attachment://{file.filename}")
+
+
+        log_event = {
+            "event": "pat",
+            "author_id": current_user_id,
+            "mentioned_id": user_to_pat.id,
+            "metadata": {
+                'filename': file.filename
+            },
+        }
+        
+        await logging.log_event(interaction, log_event, content=text, log_to_channel=False)
+
+        await interaction.response.send_message(content=f'<@{user_to_pat.id}> get pat by <@{current_user_id}>',embed=embed, file=file)

@@ -17,6 +17,7 @@ from commands.meow.meow import meow_meow
 from commands.modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
+from commands.pat import pat
 from commands.reacttw import react_tw
 from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
@@ -29,9 +30,13 @@ from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
-
 from commands.confessions import confession
+from commands.tocfl import tocfl
+
 from presence import watching
+
+from mentioned import mention_responses
+
 from commands.modules.supabase import supabaseClient
 from commands.modules import config
 import bot
@@ -69,11 +74,11 @@ https://github.com/placeTW/discord-bot
     await interaction.response.send_message(msg)
 
 
-# * register commands from other files to the placetw server
-# edit_entry_modal.register_commands(tree, this_guild, client)
+# * register commands the just the placetw server
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
+tocfl.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
 guilds = [
@@ -92,6 +97,7 @@ gothefucktosleep.register_commands(tree, guilds)
 boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
+pat.register_commands(tree, guilds)
 
 # confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client)
@@ -111,47 +117,55 @@ async def on_ready():
 # when someone sends any message
 @client.event
 async def on_message(message: discord.Message):
-    # don't respond to bot's own posts
-    if message.author == client.user:
+    message_reacts_enabled = client.guilds_dict[message.guild.id][
+        "message_reacts_enabled"
+    ]
+
+    # don't respond to bot's own posts or if message reacts are disabled
+    if message.author == client.user or not message_reacts_enabled:
         return
 
     events = []
+
+    if client.user.mentioned_in(message):  # if bot is pinged in message
+        await mention_responses.reply_with_random_response(message)
+        events.append("pinged")
 
     if react_tw.is_TW_message(message):
         try:
             await react_tw.send_react_tw(message)
         except Exception as e:
-            print('failed to react Taiwan: ', e)
+            print("failed to react Taiwan: ", e)
         events.append("tw")
     if react_hgs.is_hgs_message(message):
         try:
             await react_hgs.send_react_hgs(message)
         except Exception as e:
-            print('failed to react HGS: ', e)
+            print("failed to react HGS: ", e)
         events.append("hgs")
     if react_baltics.is_baltic_message(message):
         try:
             await react_baltics.send_react_baltic(message)
         except Exception as e:
-            print('failed to react Baltics: ', e)
+            print("failed to react Baltics: ", e)
         events.append("baltics")
     if react_czech.is_czech_message(message):
         try:
             await react_czech.send_react_czech(message)
         except Exception as e:
-            print('failed to react Czech: ', e)
+            print("failed to react Czech: ", e)
         events.append("czech")
     if react_ph.is_ph_message(message):
         try:
             await react_ph.send_react_ph(message)
         except Exception as e:
-            print('failed to react PH: ', e)
+            print("failed to react PH: ", e)
         events.append("ph")
     if react_ua.is_UA_message(message):
         try:
             await react_ua.send_react_ua(message)
         except Exception as e:
-            print('failed to react UA: ', e)
+            print("failed to react UA: ", e)
         events.append("ua")
 
     if hsinchu_wind.is_hsinchu_message(message):
@@ -164,6 +178,7 @@ async def on_message(message: discord.Message):
     if len(events) > 0:
         await logging.log_message_event(message, events)
 
+
 @client.event
 async def on_guild_join(guild):
     await tree.sync(guild=guild)
@@ -173,5 +188,6 @@ async def on_guild_join(guild):
             "server_name": guild.name,
         }
     ).execute()
+
 
 client.run(TOKEN)

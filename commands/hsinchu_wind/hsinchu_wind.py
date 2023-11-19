@@ -1,6 +1,7 @@
 import datetime
 import discord
 from re import compile, IGNORECASE, UNICODE
+from ..react_baltics.react_baltics import mock_bernoulli
 
 KEYWORDS = ("HSINCHU", "新竹")
 
@@ -45,5 +46,5 @@ def is_hsinchu_message(message: discord.Message):
 
 async def send_hsinchu_msg(message: discord.Message):
     text = hsinchu_wind.get_response_or_ignore()
-    if text is not None:
+    if text is not None and mock_bernoulli(0.15):
         await message.reply(text)
