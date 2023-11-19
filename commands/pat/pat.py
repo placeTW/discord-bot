@@ -38,12 +38,11 @@ def register_commands(tree, guilds: list[discord.Object]):
             "event": "pat",
             "author_id": current_user_id,
             "mentioned_id": user_to_pat.id,
-            "content": text,
             "metadata": {
                 'filename': file.filename
             },
         }
         
-        await logging.log_event(interaction, log_event, log_to_channel=False)
+        await logging.log_event(interaction, log_event, content=text, log_to_channel=False)
 
         await interaction.response.send_message(content=f'<@{user_to_pat.id}> get pat by <@{current_user_id}>',embed=embed, file=file)
