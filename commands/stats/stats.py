@@ -1,109 +1,44 @@
 import discord
 from discord import app_commands
+
+from bot import TWPlaceClient
+from commands.stats.stats_functions import get_pat_stats
 from ..modules.supabase import supabaseClient
 
 
 def register_commands(
-    tree,
-    guilds_dict: dict,
+    tree: discord.app_commands.CommandTree,
+    client: TWPlaceClient,
+    guilds: list[discord.Object],
 ):
-    @tree.command(
-        name="server_stats",
-        description="Statistics on message events in this server",
-        guilds=[
-            discord.Object(id=int(server_id))
-            for server_id in guilds_dict.keys()
-        ],
-    )
-    @app_commands.describe(
-        event="(Optional) The event to get stats for",
-        user="(Optional) The user to get stats for",
-        days="(Optional) The number of days to get stats for (default 7)",
-    )
-    async def server_stats(
-        interaction: discord.Interaction,
-        event: str = None,
-        user: discord.Member = None,
-        days: int = 7,
-    ):
-        try:
-            pass
-        except:
-            print(f"Could not get message stats for {event} and/or {user}")
-        pass
+    stats = app_commands.Group(name="stats", description="Stats functions")
 
-    @tree.command(
-        name="global_stats",
-        description="Statistics on message events in all the servers that this bot is in",
-        guilds=[
-            discord.Object(id=int(server_id))
-            for server_id in guilds_dict.keys()
-        ],
-    )
-    @app_commands.describe(
-        event="(Optional) The event to get stats for",
-        user="(Optional) The user to get stats for",
-        days="(Optional) The number of days to get stats for (default 7)",
-    )
-    async def global_stats(
-        interaction: discord.Interaction,
-        event: str = None,
-        user: discord.Member = None,
-        days: int = 7,
-    ):
-        try:
-            pass
-        except:
-            print(f"Could not get message stats for {event} and/or {user}")
-        pass
+    pat_stats = app_commands.Group(name="pat",description="Pat stats")
 
-    @tree.command(
-        name="server_top",
-        description="Top users in this server",
-        guilds=[
-            discord.Object(id=int(server_id))
-            for server_id in guilds_dict.keys()
-        ],
-    )
-    @app_commands.describe(
-        event="(Optional) The event to get stats for",
-        days="(Optional) The number of days to get stats for (default 7)",
-        page="(Optional) The page number to get stats for",
-    )
-    async def server_top(
-        interaction: discord.Interaction,
-        event: str = None,
-        days: int = 7,
-        page: int = 1,
-    ):
-        try:
-            pass
-        except:
-            print(f"Could not get top stats for {event}")
-        pass
+    @pat_stats.command(name='patted', description="Total patted stats")
+    async def patted_stats(interaction: discord.Interaction):
+        embed = get_pat_stats('patted')
+        if embed is None:
+            await interaction.response.send_message(
+                f"There was an error getting the patted stats. Please try again",
+                ephemeral=True,
+            )
+            return
 
-    @tree.command(
-        name="global_top",
-        description="Top users in all the servers that this bot is in",
-        guilds=[
-            discord.Object(id=int(server_id))
-            for server_id in guilds_dict.keys()
-        ],
-    )
-    @app_commands.describe(
-        event="(Optional) The event to get stats for",
-        days="(Optional) The number of days to get stats for (default 7)",
-        page="(Optional) The page number to get stats for",
-    )
-    async def global_top(
-        interaction: discord.Interaction,
-        event: str = None,
-        days: int = 7,
-        page: int = 1,
-    ):
-        try:
-            pass
+        await interaction.response.send_message(embed=embed)
+        
 
-        except:
-            print(f"Could not get top stats for {event}")
-        pass
+    @pat_stats.command(name='patter', description="Total patter stats")
+    async def patted_stats(interaction: discord.Interaction):
+        embed = get_pat_stats('patter')
+        if embed is None:
+            await interaction.response.send_message(
+                f"There was an error getting the patter stats. Please try again",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.send_message(embed=embed)
+
+    stats.add_command(pat_stats)
+    tree.add_command(stats, guilds=guilds)

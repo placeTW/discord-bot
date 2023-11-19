@@ -34,7 +34,7 @@ def register_commands(
         if count == 0:
             await interaction.response.send_message(
                 f"There was an error getting the random word. Please try again",
-                emphemeral=True,
+                ephemeral=True,
             )
             return
         data = data[1]  # the first element is just the string "data"
