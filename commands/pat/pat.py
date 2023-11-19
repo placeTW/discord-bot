@@ -25,7 +25,8 @@ def register_commands(tree, guilds: list[discord.Object]):
         embed = discord.Embed()
 
         # set the title of the embed
-        embed.title = f"{interaction.user.display_name} pats {user_to_pat.display_name} {text if text else ''}"
+        embed.title = f"{interaction.user.display_name} pats {user_to_pat.display_name}"
+        embed.description = text if text else None
         embed.color = discord.Color.random()
 
         # add the file to the embed
@@ -45,4 +46,4 @@ def register_commands(tree, guilds: list[discord.Object]):
         
         await logging.log_event(interaction, log_event, log_to_channel=False)
 
-        await interaction.response.send_message(embed=embed, file=file)
+        await interaction.response.send_message(content=f'<@{user_to_pat.id}> get pat by <@{current_user_id}>',embed=embed, file=file)
