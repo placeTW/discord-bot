@@ -106,6 +106,7 @@ def register_commands(
                 "server": server,
                 "url": confession_url,
                 "generated_id": confession_id,
+                "mentioned_id": reply_to_message.id if reply_to_message else None,
             }
 
             if confession_logging_enabled:
