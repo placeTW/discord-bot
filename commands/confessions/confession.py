@@ -75,7 +75,7 @@ def register_commands(
             # Building the confession
             confession_id = shortuuid.uuid()
             embed = discord.Embed(title="Confession", description=confession)
-            embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report)' if not confession_logging_enabled else ''}")
+            embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report or reply)' if not confession_logging_enabled else ''}")
 
             reply_to_id = None
             reply_to_message = None
@@ -84,7 +84,7 @@ def register_commands(
                 event_log_data = await logging.fetch_event_log(interaction.guild_id, reply_to, 'Confession')
                 if not event_log_data:
                     await interaction.response.send_message(
-                        "That confession does not exist.", ephemeral=True
+                        "That confession does not exist or could not be fetched from the logs.", ephemeral=True
                     )
                     return
                 
@@ -134,7 +134,7 @@ def register_commands(
 
         if not event_log_data:
             await interaction.response.send_message(
-                "That confession does not exist.", ephemeral=True
+                "That confession does not exist or could not be fetched from the logs.", ephemeral=True
             )
             return
         
