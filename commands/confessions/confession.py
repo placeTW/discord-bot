@@ -77,7 +77,7 @@ def register_commands(
             embed = discord.Embed(title="Confession", description=confession)
             embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report)' if not confession_logging_enabled else ''}")
 
-            reply_to_generated_id = None
+            reply_to_id = None
             reply_to_message = None
 
             if reply_to:
@@ -108,7 +108,7 @@ def register_commands(
                 "server": server,
                 "url": confession_url,
                 "generated_id": confession_id,
-                "mentioned_id": reply_to_generated_id,
+                "mentioned_id": reply_to_id,
             }
 
             if confession_logging_enabled:
