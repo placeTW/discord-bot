@@ -59,7 +59,8 @@ def register_commands(
         name="create",
         description="Make an anonymous confession",
     )
-    async def confess(interaction: discord.Interaction, confession: str):
+    @app_commands.describe(reply_to="The confession id to reply to")
+    async def confess(interaction: discord.Interaction, confession: str, reply_to: str = None):
         """Write an anonymous confession.
 
         Args:
@@ -75,7 +76,24 @@ def register_commands(
             confession_id = shortuuid.uuid()
             embed = discord.Embed(title="Confession", description=confession)
             embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report)' if not confession_logging_enabled else ''}")
-            confession_message = await confession_channel.send(embed=embed)
+
+            reply_to_message = None
+
+            if reply_to:
+                event_log_data = await logging.fetch_event_log(interaction.guild_id, reply_to, 'Confession')
+                if not event_log_data:
+                    await interaction.response.send_message(
+                        "That confession does not exist.", ephemeral=True
+                    )
+                    return
+                
+                reply_to_confession = event_log_data[0]
+                reply_to_id = reply_to_confession["message_id"]
+                reply_to_message = await confession_channel.fetch_message(reply_to_id)
+                embed.add_field(name="Replying to", value=f"[Confession {reply_to}](https://discord.com/channels/{interaction.guild_id}/{confession_channel.id}/{reply_to_id})")
+                
+                
+            confession_message = await confession_channel.send(embed=embed, reference=reply_to_message)
             confession_url = confession_message.jump_url
 
             user_id = interaction.user.id

@@ -120,9 +120,14 @@ async def on_ready():
 # when someone sends any message
 @client.event
 async def on_message(message: discord.Message):
-    message_reacts_enabled = client.guilds_dict[message.guild.id][
-        "message_reacts_enabled"
-    ]
+    message_reacts_enabled = True
+    try:
+        message_reacts_enabled = client.guilds_dict[message.guild.id][
+            "message_reacts_enabled"
+        ]
+    except:
+        # default true
+        pass
 
     # don't respond to bot's own posts or if message reacts are disabled
     if message.author == client.user or not message_reacts_enabled:
