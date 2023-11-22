@@ -6,6 +6,8 @@ import discord
 from ..modules.supabase import supabaseClient
 
 from dotenv import load_dotenv
+from .supabase import supabaseClient
+
 load_dotenv()
 
 
@@ -18,9 +20,13 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log_to_channel(self, log_data: dict, color: discord.Color = None):
+    async def log_to_channel(
+        self, log_data: dict, color: discord.Color = None
+    ):
         if not self.log_channel is None:
-            embed = discord.Embed(color=color if color else discord.Color.default())
+            embed = discord.Embed(
+                color=color if color else discord.Color.default()
+            )
             for param in log_data.items():
                 embed.add_field(name=param[0], value=param[1], inline=False)
             await self.log_channel.send(embed=embed)
@@ -88,7 +94,14 @@ async def log_message_event(message: discord.Message, events: list[str]):
     )
     print(data)
 
-async def fetch_event_log(
-    guild_id: int, generated_id: str, event: str
-):
-    return supabaseClient.table("event_logs").select("*").eq("guild_id", guild_id).eq("generated_id", generated_id).eq('event', event).execute().data
+
+async def fetch_event_log(guild_id: int, generated_id: str, event: str):
+    return (
+        supabaseClient.table("event_logs")
+        .select("*")
+        .eq("guild_id", guild_id)
+        .eq("generated_id", generated_id)
+        .eq("event", event)
+        .execute()
+        .data
+    )

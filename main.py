@@ -31,6 +31,7 @@ from commands.restart import restart
 from commands.gothefucktosleep import gothefucktosleep
 from commands.boba import boba
 from commands.confessions import confession
+from commands.stats import stats
 from commands.tocfl import tocfl
 
 from presence import watching
@@ -97,7 +98,9 @@ gothefucktosleep.register_commands(tree, guilds)
 boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
+stats.register_commands(tree, client, guilds)
 pat.register_commands(tree, guilds)
+
 
 # confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client)
