@@ -89,7 +89,6 @@ def register_commands(
                     return
                 
                 reply_to_confession = event_log_data[0]
-                reply_to_generated_id = reply_to_confession["generated_id"]
                 reply_to_id = reply_to_confession["message_id"]
                 reply_to_message = await confession_channel.fetch_message(reply_to_id)
                 embed.add_field(name="Replying to", value=f"[Confession {reply_to}](https://discord.com/channels/{interaction.guild_id}/{confession_channel.id}/{reply_to_id})")
