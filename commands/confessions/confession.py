@@ -2,6 +2,7 @@ import os
 import shortuuid
 import discord
 from discord import app_commands
+import validators
 
 from bot import TWPlaceClient
 from ..modules import logging
@@ -75,21 +76,32 @@ def register_commands(
             # Building the confession
             confession_id = shortuuid.uuid()
             embed = discord.Embed(title="Confession", description=confession)
-            embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report or reply)' if not confession_logging_enabled else ''}")
+            embed.set_footer(text=f"confession id: {confession_id}{' (not logged, unable to report)' if not confession_logging_enabled else ''}")
 
-            reply_to_id = None
+            reply_to_id: int = None
             reply_to_message = None
+            reply_to_type: 'url' | 'generated_id' | 'message_id' | None = None
 
             if reply_to:
-                event_log_data = await logging.fetch_event_log(interaction.guild_id, reply_to, 'Confession')
-                if not event_log_data:
-                    await interaction.response.send_message(
-                        "That confession does not exist or could not be fetched from the logs.", ephemeral=True
-                    )
-                    return
-                
-                reply_to_confession = event_log_data[0]
-                reply_to_id = reply_to_confession["message_id"]
+                if reply_to.isdigit():
+                    reply_to_type = 'message_id'
+                    reply_to_id = int(reply_to)
+                elif validators.url(reply_to):
+                    reply_to_type = 'url'
+                    reply_to_id = int(reply_to.split('/')[-1])
+                    reply_to = reply_to_id
+                else:
+                    reply_to_type = 'generated_id'
+                    event_log_data = await logging.fetch_event_log(interaction.guild_id, reply_to, 'Confession')
+                    if not event_log_data:
+                        await interaction.response.send_message(
+                            "That confession does not exist or could not be fetched from the logs.", ephemeral=True
+                        )
+                        return
+                    
+                    reply_to_confession = event_log_data[0]
+                    reply_to_id = reply_to_confession["message_id"]
+
                 reply_to_message = await confession_channel.fetch_message(reply_to_id)
                 embed.add_field(name="Replying to", value=f"[Confession {reply_to}](https://discord.com/channels/{interaction.guild_id}/{confession_channel.id}/{reply_to_id})")
                 
@@ -107,7 +119,10 @@ def register_commands(
                 "server": server,
                 "url": confession_url,
                 "generated_id": confession_id,
-                "mentioned_id": reply_to_id,
+                "metadata": {
+                    'replied_to': reply_to_id,
+                    'replied_to_type': reply_to_type,
+                },
             }
 
             if confession_logging_enabled:
