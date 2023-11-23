@@ -99,7 +99,7 @@ boba.register_commands(tree, guilds)
 basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
 stats.register_commands(tree, client, guilds)
-pat.register_commands(tree, guilds)
+pat.register_commands(tree, client, guilds)
 
 
 # confessions needs the dictionary for the confession channel id

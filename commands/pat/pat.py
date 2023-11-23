@@ -4,13 +4,17 @@ from ..modules import logging
 from discord import app_commands
 from pathlib import Path
 from random import choice
+from bot import TWPlaceClient
 import os
 
 PAT_DIR = Path(Path(__file__).parent, "gifs")
 SELF_PAT_GIFS = Path(Path(__file__).parent, "self_pat_gifs")
+BOT_PAT_GIFS = Path(Path(__file__).parent, "bot_pat_gifs")
 
 
-def register_commands(tree, guilds: list[discord.Object]):
+def register_commands(
+    tree, client: TWPlaceClient, guilds: list[discord.Object]
+):
     @tree.command(
         name="pat",
         description="Pat",
@@ -26,16 +30,8 @@ def register_commands(tree, guilds: list[discord.Object]):
         current_user_id = interaction.user.id
 
         # * These are the parts that change depending who the user is patting
-        # ** Default: user pats another user
-        if user_to_pat.id != current_user_id:
-            # random file from the directory
-            random_gif = choice(list(PAT_DIR.iterdir()))
-            pat_embed_title = f"{interaction.user.display_name} pats {user_to_pat.display_name}"
-            pat_content = (
-                f"<@{user_to_pat.id}> get pat by <@{current_user_id}>"
-            )
         # ** Case: user pats themselves
-        elif user_to_pat.id == current_user_id:
+        if user_to_pat.id == current_user_id:
             random_gif = choice(list(SELF_PAT_GIFS.iterdir()))
             pat_embed_title = (
                 f"{interaction.user.display_name} pats themselves"
@@ -44,6 +40,21 @@ def register_commands(tree, guilds: list[discord.Object]):
                 f"<@{current_user_id}> pats themselves for some reason"
             )
         # ^ Future case: user pats (this) bot
+        elif user_to_pat.id == client.user.id:
+            random_gif = choice(list(BOT_PAT_GIFS.iterdir()))
+            pat_embed_title = f"{interaction.user.display_name} pats {client.user.display_name}! Good bot!"
+            pat_content = (
+                f"<@{current_user_id}> pats the bot <:uwu:1161126694762061825>"
+            )
+
+        # ** Default: user pats another user
+        else:  # i.e. user_to_pat.id != current_user_id:
+            # random file from the directory
+            random_gif = choice(list(PAT_DIR.iterdir()))
+            pat_embed_title = f"{interaction.user.display_name} pats {user_to_pat.display_name}"
+            pat_content = (
+                f"<@{user_to_pat.id}> get pat by <@{current_user_id}>"
+            )
 
         # create empty embed
         embed = discord.Embed()
