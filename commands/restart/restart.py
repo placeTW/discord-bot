@@ -1,4 +1,5 @@
 from pathlib import Path
+from random import choice
 import subprocess
 import sys
 import discord
@@ -8,7 +9,7 @@ from discord.app_commands import Choice
 
 from commands.restart.bot_git_utils import list_of_branches
 
-RESTART_GIF = Path(Path(__file__).parent, "upload-cat.gif")
+GIFS_DIR = Path(Path(__file__).parent, "gifs")
 
 def register_commands(tree, this_guild: discord.Object):
     BRANCHES = [
@@ -23,16 +24,19 @@ def register_commands(tree, this_guild: discord.Object):
     @app_commands.checks.has_permissions(administrator=True)
     @app_commands.choices(branch=BRANCHES)
     @app_commands.describe(branch="The branch to deploy from (deploys from the current branch if not specified)")
+    @app_commands.describe(reinstall_requirements="Whether to reinstall the requirements (defaults to no)")
     async def restart(
         interaction: discord.Interaction,
         branch: Choice[str] = None,
+        reinstall_requirements: bool = False,
     ):
         embed = discord.Embed(
             title="Restarting...",
             description=f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}, goodbye world",
             color=discord.Color.red(),
         )
-        file = discord.File(RESTART_GIF)
+        random_gif = choice(list(GIFS_DIR.iterdir()))
+        file = discord.File(random_gif)
         embed.set_image(url=f"attachment://{file.filename}")
 
         await interaction.response.send_message(embed=embed, file=file)
@@ -43,7 +47,8 @@ def register_commands(tree, this_guild: discord.Object):
             print(branch.value)
             subprocess.call(["git", "checkout", branch.value])
         subprocess.call(["git", "pull"])
-        subprocess.call(["pip", "install", "-r", "requirements.txt"])
+        if reinstall_requirements:
+            subprocess.call(["pip", "install", "-r", "requirements.txt"])
 
         print("restart: Restarting...")
 
