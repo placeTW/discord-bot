@@ -108,7 +108,7 @@ def register_commands(
                 embed.add_field(name="Replying to", value=f"[{'Confession ' if reply_to_message.author.id == client.user.id else ''} {reply_to}](https://discord.com/channels/{interaction.guild_id}/{confession_channel.id}/{reply_to_id})")
                 
                 
-            confession_message = await confession_channel.send(f"<@{user_to_ping.id}>" if confession_mentioning_enabled else None, embed=embed, reference=reply_to_message)
+            confession_message = await confession_channel.send(f"<@{user_to_ping.id}>" if confession_mentioning_enabled and user_to_ping else None, embed=embed, reference=reply_to_message)
             confession_url = confession_message.jump_url
 
             user_id = interaction.user.id
