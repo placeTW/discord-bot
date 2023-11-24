@@ -1,3 +1,4 @@
+from pathlib import Path
 import subprocess
 import sys
 import discord
@@ -7,6 +8,7 @@ from discord.app_commands import Choice
 
 from commands.restart.bot_git_utils import list_of_branches
 
+RESTART_GIF = Path(Path(__file__).parent, "upload-cat.gif")
 
 def register_commands(tree, this_guild: discord.Object):
     BRANCHES = [
@@ -25,7 +27,15 @@ def register_commands(tree, this_guild: discord.Object):
         interaction: discord.Interaction,
         branch: Choice[str] = None,
     ):
-        await interaction.response.send_message(f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}, goodbye world")
+        embed = discord.Embed(
+            title="Restarting...",
+            description=f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}, goodbye world",
+            color=discord.Color.red(),
+        )
+        file = discord.File(RESTART_GIF)
+        embed.set_image(url=f"attachment://{file.filename}")
+
+        await interaction.response.send_message(embed=embed, file=file)
 
         print("restart: Fetching from repo and installing requirements...")
 
