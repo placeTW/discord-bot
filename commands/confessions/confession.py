@@ -8,12 +8,12 @@ from bot import TWPlaceClient
 from ..modules import logging
 from ..modules.supabase import supabaseClient
 
-async def get_confession_channels(interaction: discord.Interaction, client: TWPlaceClient, report: bool = False):
+async def get_confession_config(interaction: discord.Interaction, client: TWPlaceClient, report: bool = False):
     confessions_enabled = client.guilds_dict[interaction.guild.id][
-            "confessions_enabled"
+        "confessions_enabled"
     ]
-    confession_logging_enabled = client.guilds_dict[interaction.guild.id][
-            "confession_logging_enabled"
+    confession_config = client.guilds_dict[interaction.guild.id][
+        "confession_config"
     ]
     if not confessions_enabled:
         await interaction.response.send_message(
@@ -48,7 +48,7 @@ async def get_confession_channels(interaction: discord.Interaction, client: TWPl
         
         report_channel = client.get_channel(report_channel_id)
 
-    return confession_channel, report_channel, confession_logging_enabled
+    return confession_channel, report_channel, confession_config['confession_logging_enabled'], confession_config['confession_mentioning_enabled']
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -61,7 +61,9 @@ def register_commands(
         description="Make an anonymous confession",
     )
     @app_commands.describe(reply_to="The confession id to reply to")
-    async def confess(interaction: discord.Interaction, confession: str, reply_to: str = None):
+    @app_commands.describe(confession="The confession to make")
+    @app_commands.describe(user_to_ping="The user to ping in the confession (only if the server has it enabled)")
+    async def confess(interaction: discord.Interaction, confession: str, reply_to: str = None, user_to_ping: discord.Member = None):
         """Write an anonymous confession.
 
         Args:
@@ -70,7 +72,7 @@ def register_commands(
         """
 
         # Getting the confession channel
-        confession_channel, _, confession_logging_enabled = await get_confession_channels(interaction, client)
+        confession_channel, _, confession_logging_enabled, confession_mentioning_enabled = await get_confession_config(interaction, client)
 
         try:
             # Building the confession
@@ -106,7 +108,7 @@ def register_commands(
                 embed.add_field(name="Replying to", value=f"[{'Confession ' if reply_to_message.author.id == client.user.id else ''} {reply_to}](https://discord.com/channels/{interaction.guild_id}/{confession_channel.id}/{reply_to_id})")
                 
                 
-            confession_message = await confession_channel.send(embed=embed, reference=reply_to_message)
+            confession_message = await confession_channel.send(f"<@{user_to_ping.id}>" if confession_mentioning_enabled else None, embed=embed, reference=reply_to_message)
             confession_url = confession_message.jump_url
 
             user_id = interaction.user.id
@@ -122,13 +124,14 @@ def register_commands(
                 "metadata": {
                     'replied_to': reply_to_id,
                     'replied_to_type': reply_to_type,
+                    'pinged_user': user_to_ping.id if confession_mentioning_enabled and user_to_ping else None,
                 },
             }
 
             if confession_logging_enabled:
                 await logging.log_event(confession_message, log_event, confession)
             await interaction.response.send_message(
-                f"Your confession has been sent. See it here: {confession_url}",
+                f"{'This server does not have confession mentioning enabled. Please contact an admin to enable it.' if user_to_ping and not confession_mentioning_enabled else ''}\nYour confession has been sent. See it here: {confession_url}.",
                 ephemeral=True,
             )
         except Exception as e:
@@ -141,7 +144,7 @@ def register_commands(
         description="Report a confession",
     )
     async def report_confession(interaction: discord.Interaction, confession_id: str, reason: str):
-        confession_channel, report_channel, confession_logging_enabled = await get_confession_channels(interaction, client, report=True)
+        confession_channel, report_channel, confession_logging_enabled, _ = await get_confession_config(interaction, client, report=True)
         if not report_channel:
             return
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
@@ -205,7 +208,7 @@ def register_commands(
             )
             return
 
-        confession_channel, _, confession_logging_enabled = await get_confession_channels(interaction, client)
+        confession_channel, _, confession_logging_enabled, _ = await get_confession_config(interaction, client)
         event_log_data = await logging.fetch_event_log(interaction.guild_id, confession_id, 'Confession')
 
         if not event_log_data:
