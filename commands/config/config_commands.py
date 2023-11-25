@@ -45,4 +45,16 @@ def register_commands(
 
     tree.add_command(config_group, guilds=guilds)
 
-    
+    @config_group.command(
+        name="update",
+        description="Updates the config from the database",
+    )
+    @app_commands.checks.has_permissions(administrator=True)
+    async def update_config(interaction: discord.Interaction):
+        if not interaction.permissions.administrator:
+            await interaction.response.send_message(
+                "You do not have the required permissions to use this command.", ephemeral=True
+            )
+            return
+        client.fetch_config()
+        await interaction.response.send_message(f"Config updated from database {'(in dev config)' if not client.is_prod else ''}", ephemeral=True)
