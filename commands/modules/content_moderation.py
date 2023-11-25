@@ -15,6 +15,7 @@ async def review_image(file: discord.Attachment) -> bool:
     response = requests.get(url)
     # convert response to json
     data = response.json()
+    print(data)
     # check if image is safe (rating of everyone)
     return data['rating_index'] == 1
   except:
