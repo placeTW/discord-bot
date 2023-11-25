@@ -98,6 +98,7 @@ def register_commands(
                     await interaction.response.send_message(
                         "Image blocked by content moderation. Please only send appropriate images.", ephemeral=True
                     )
+                    print(f'Image sent by {interaction.user.display_name} blocked by content moderation: {image.url}')
                     return
                 
         if user_to_ping and not mentioning_enabled:
