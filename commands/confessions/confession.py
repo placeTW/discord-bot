@@ -60,7 +60,7 @@ def register_commands(
         name="create",
         description="Make an anonymous confession",
     )
-    @app_commands.describe(reply_to="The confession id to reply to")
+    @app_commands.describe(reply_to="The confession or message to reply to (provide either the confession id, message id, or the message link)")
     @app_commands.describe(confession="The confession to make")
     @app_commands.describe(user_to_ping="The user to ping in the confession (only if the server has it enabled)")
     async def confess(interaction: discord.Interaction, confession: str, reply_to: str = None, user_to_ping: discord.Member = None):
