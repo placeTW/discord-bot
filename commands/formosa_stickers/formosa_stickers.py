@@ -10,12 +10,15 @@ from ..modules import logging
 from .consts import SITE_URL, POSSIBLE_URLS, STYLE_TYPE_CHOICES, POSSIBLE_TAGS, TAGS
 FETCHED_TIMEOUT = 21600 # once every 6 hours
 
-def get_url(type: str, style: str | None, query: str | None):
+def get_url(type: str, style: str | None, query: str | list(str) | None):
     query_params = []
     if style:
         query_params.append(f'style={style}')
     if query:
-        query_params.append(f'keywords={query}')
+        if isinstance(query, list):
+            query_params.append(f'keywords={",".join(query)}')
+        else:
+            query_params.append(f'keywords={query}')
     query_str = '&'.join(query_params)
     return f'{POSSIBLE_URLS[type]}?{query_str}'
 
@@ -49,7 +52,9 @@ def fetch_sticker(sticker_url):
 
 def register_commands(tree, guilds: list[discord.Object]):
 
-    async def send_sticker(interaction: discord.Interaction, type: str = 'search', user: discord.User = None, style: str | None = None, query: str | None = None, latest: bool = False):
+    async def send_sticker(interaction: discord.Interaction, user: discord.User = None, 
+                           type: str = 'search', style: str | None = None, query: str | None = None, 
+                           latest: bool = False):
         await interaction.response.defer()
 
         # get the sticker urls
@@ -91,6 +96,6 @@ def register_commands(tree, guilds: list[discord.Object]):
     @app_commands.describe(style='The style of the sticker')
     @app_commands.choices(style=STYLE_TYPE_CHOICES)
     async def good_morning(interaction: discord.Interaction, user: discord.User = None, style: Choice[str] = None, latest: bool = False):
-        await send_sticker(interaction, 'daily', user, style.value if style else None, TAGS['morning'], latest)
+        await send_sticker(interaction, user, 'daily', style.value if style else None, TAGS['morning'], latest)
 
     tree.add_command(sticker_group, guilds=guilds)
