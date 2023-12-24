@@ -8,8 +8,18 @@ POSSIBLE_URLS = {
   'search': f'{SITE_URL}/search.aspx',
   'festival': f'{SITE_URL}/festival_all.aspx',
   'note': f'{SITE_URL}/note.aspx',
-  'search': f'{SITE_URL}/search.aspx',
 }
+
+TYPES = {
+  'daily': 'Daily',
+  'search': 'Search',
+  'festival': 'Festival',
+  'note': 'Note',
+}
+
+TYPE_CHOICES = [
+  Choice(name=desc, value=id) for id, desc in TYPES.items()
+]
 
 STYLE_TYPES = {
   'photo': 'Photo',
