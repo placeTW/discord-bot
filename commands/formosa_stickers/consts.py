@@ -35,6 +35,7 @@ TAGS = {
   'morning': '早安',
   'night': '晚安',
   'happy_holidays': '假日愉快',
+  'new_year': '新年',
 }
 
 POSSIBLE_TAGS = {
@@ -49,5 +50,9 @@ POSSIBLE_TAGS = {
   'happy_holidays': {
     'query': '假日愉快',
     'name': 'Happy Holidays',
+  },
+  'new_year': {
+    'query': '新年',
+    'name': 'New Year',
   },
 }
