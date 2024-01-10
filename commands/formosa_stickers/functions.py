@@ -64,7 +64,7 @@ async def send_sticker(interaction: discord.Interaction, user: discord.User = No
     sticker_name = sticker['url'].split('/')[-1].split('.')[0]
     sticker_url = sticker['url']
     # fetch the image and get as discord file
-    file = discord.File(fetch_sticker(sticker_url), filename=f'{sticker_name}.{"gif" if sticker["type"] == "gif" else "jpg"}')
+    file = discord.File(fetch_sticker(sticker_url), filename=f'{sticker_name}.{"gif" if "gif" in sticker["type"] else "jpg"}')
     await interaction.followup.send(f"<@{user.id}>" if user else None, file=file, ephemeral=True)
 
     log_event = {

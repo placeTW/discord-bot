@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.app_commands import Choice
 
-from .consts import STYLE_TYPE_CHOICES, TAGS, TYPE_CHOICES
+from .consts import STYLE_TYPE_CHOICES, TAGS, TYPE_CHOICES, HOLIDAYS_TAGS_CHOICES, HOLIDAYS_TAGS
 from .functions import send_sticker
 FETCHED_TIMEOUT = 21600 # once every 6 hours
 
@@ -36,27 +36,18 @@ def register_commands(tree, guilds: list[discord.Object]):
 
     # Happy holidays command
     @sticker_group.command(
-        name="happyholidays",
-        description="Happy holidays stickers"
+        name="holiday",
+        description="Holiday stickers (search for a holiday sticker)"
     )
     @app_commands.describe(user='The user to ping')
     @app_commands.describe(latest='Get the latest sticker (random if false)')
+    @app_commands.describe(holiday='The holiday to search for')
+    @app_commands.choices(holiday=HOLIDAYS_TAGS_CHOICES)
     @app_commands.describe(style='The style of the sticker')
     @app_commands.choices(style=STYLE_TYPE_CHOICES)
-    async def happy_holidays(interaction: discord.Interaction, user: discord.User = None, style: Choice[str] = None, latest: bool = False):
-        await send_sticker(interaction, user, 'search', style.value if style else None, TAGS['happy_holidays'], latest)
+    async def holiday(interaction: discord.Interaction, holiday: Choice[str], user: discord.User = None, style: Choice[str] = None, latest: bool = False):
+        await send_sticker(interaction, user, 'search', style.value if style else None, HOLIDAYS_TAGS[holiday.value], latest)
 
-    # New year command
-    @sticker_group.command(
-        name="newyear",
-        description="New year stickers"
-    )
-    @app_commands.describe(user='The user to ping')
-    @app_commands.describe(latest='Get the latest sticker (random if false)')
-    @app_commands.describe(style='The style of the sticker')
-    @app_commands.choices(style=STYLE_TYPE_CHOICES)
-    async def new_year(interaction: discord.Interaction, user: discord.User = None, style: Choice[str] = None, latest: bool = False):
-        await send_sticker(interaction, user, 'search', style.value if style else None, TAGS['new_year'], latest)
 
     # Search command
     @sticker_group.command(
