@@ -18,6 +18,9 @@ def register_commands(tree, guilds: list[discord.Object]):
 
         # get the sticker urls
         stickers_list = fetch_stickers_list(type, style, query)
+        if (len(stickers_list) == 0):
+            await interaction.followup.send(f"No stickers found for query: {query}", ephemeral=True)
+            return
 
         if (latest):
             sticker = stickers_list[0]
