@@ -10,7 +10,7 @@ from .db_functions import (
     get_bbt_entries,
     get_bbt_leaderboard,
 )
-from ..modules import content_moderation
+from ..modules import logging, content_moderation
 
 
 def bubble_tea_string(description: str, location: str):
@@ -44,6 +44,13 @@ def register_commands(
         image: discord.Attachment = None,
     ):
         await interaction.response.defer()
+        if image and not await content_moderation.review_image(image):
+            await interaction.followup.send(
+                "Image rejected by content moderation.",
+                ephemeral=True,
+            )
+            return
+
         id = add_bbt_entry(
             interaction.created_at,
             interaction.user.id,
@@ -67,9 +74,19 @@ def register_commands(
         if (
             image
             and image.content_type.startswith("image/")
-            and await content_moderation.review_image(image)
         ):
             embed.set_image(url=image.url)
+
+        log_event = {
+            "event": "Bubble tea entry",
+            "author_id": interaction.user.id,
+            'metadata': {
+                'description': description,
+                'location': location if location else None,
+                'image': image.url if image else None,
+            }
+        }
+        await logging.log_event(interaction, log_event, content=description)
 
         await interaction.followup.send(embed=embed)
 
