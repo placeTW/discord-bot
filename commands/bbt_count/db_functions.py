@@ -3,6 +3,7 @@ from ..modules.supabase import supabaseClient
 
 TABLE = 'bubble_tea_entries'
 
+
 def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, location: str, description: str):
     response = (
         supabaseClient.table(TABLE).insert({
@@ -16,6 +17,7 @@ def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, location: s
     print(response)
     return response.data[0]['id']
 
+
 def remove_bbt_entry(id: int, user_id: int):
     response = (
         supabaseClient.table(TABLE).delete().match({
@@ -24,6 +26,7 @@ def remove_bbt_entry(id: int, user_id: int):
         }).execute()
     )
     print(response)
+
 
 def get_bbt_entries(user_id: int, year: int = None):
     data, c = (
@@ -41,6 +44,7 @@ def get_bbt_entries(user_id: int, year: int = None):
     if c == 0:
         return []
     return data[1]
+
 
 def get_bbt_leaderboard(guild_id: int, date: datetime):
     data, c = (
