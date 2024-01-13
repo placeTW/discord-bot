@@ -9,6 +9,7 @@ import datetime
 
 # user commands
 from commands.basic import basic_commands
+from commands.bbt_count import bbt_count
 from commands.config import config_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
@@ -89,6 +90,7 @@ guilds = [
 ]
 
 # * Register commands to all servers that the bot is in
+bbt_count.register_commands(tree, client, guilds)
 fetch_entry_cmd.register_commands(tree, guilds)
 fetch_entry_ui.register_commands(tree, guilds)
 one_o_one.register_commands(tree, guilds)
