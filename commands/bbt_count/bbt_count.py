@@ -86,7 +86,7 @@ def register_commands(
                 'image': image.url if image else None,
             }
         }
-        await logging.log_event(interaction, log_event, content=description)
+        await logging.log_event(interaction, log_event, content=description, log_to_channel=False)
 
         await interaction.followup.send(embed=embed)
 
