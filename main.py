@@ -33,7 +33,7 @@ from commands.boba import boba
 from commands.confessions import confession
 from commands.stats import stats
 from commands.tocfl import tocfl
-from commands.goodmorning import gm
+from commands.formosa_stickers import formosa_stickers
 
 from presence import watching
 
@@ -101,7 +101,7 @@ basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
 stats.register_commands(tree, client, guilds)
 pat.register_commands(tree, client, guilds)
-gm.register_commands(tree, guilds)
+formosa_stickers.register_commands(tree, guilds)
 
 
 # confessions needs the dictionary for the confession channel id
