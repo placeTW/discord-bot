@@ -130,7 +130,7 @@ def register_commands(
             f"For <@{user.id if user else interaction.user.id}>: {len(entries)} entries\n\n"
             + "\n".join(
                 [
-                    f"{entry['id']}. {str(datetime.datetime.fromisoformat(entry['created_at']).date())} - {bubble_tea_string(entry['description'], entry['location'])}"
+                    f"id: {entry['id']} - {str(datetime.datetime.fromisoformat(entry['created_at']).date())} - {bubble_tea_string(entry['description'], entry['location'])}"
                     for entry in entries
                 ]
             )
