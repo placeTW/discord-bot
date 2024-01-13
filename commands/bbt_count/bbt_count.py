@@ -106,7 +106,7 @@ def register_commands(
             )
 
     # list
-    @bbt_count.command(name="list", description="list bbt_count")
+    @bbt_count.command(name="list", description="List the bubble tea entries for a user in a given year")
     @app_commands.describe(
         user="User to list entries for (optional, default to self)"
     )
@@ -138,7 +138,7 @@ def register_commands(
         await interaction.followup.send(embed=embed)
 
     # leaderboard
-    @bbt_count.command(name="leaderboard", description="leaderboard bbt_count")
+    @bbt_count.command(name="leaderboard", description="List the top bubble tea drinkers in a given year")
     @app_commands.describe(
         year="Year to list leaderboard for (optional, default to current year)"
     )
