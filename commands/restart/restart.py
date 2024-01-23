@@ -32,7 +32,7 @@ def register_commands(tree, this_guild: discord.Object):
     ):
         embed = discord.Embed(
             title="Restarting...",
-            description=f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}, goodbye world",
+            description=f"Restarting{(f' and deploying `{branch.value}`' if branch is not None else '')}{' and reinstalling packages' if reinstall_requirements else ''}, goodbye world",
             color=discord.Color.red(),
         )
         random_gif = choice(list(GIFS_DIR.iterdir()))
