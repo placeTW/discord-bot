@@ -313,7 +313,7 @@ def register_commands(
             + "\n\nTotal costs: "
             + " + ".join(
                 [
-                    f"{numbers.format_currency(prices[currency]['total'], currency)} ({prices[currency]['count']}, {numbers.format_currency(prices[currency]['total']/prices[currency]['count'], currency)} average)"
+                    f"{numbers.format_currency(prices[currency]['total'], currency)} ({prices[currency]['count']}, {numbers.format_currency(prices[currency]['total']/prices[currency]['count'], currency)}/🧋)"
                     for currency in prices
                 ]
             )
