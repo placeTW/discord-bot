@@ -3,13 +3,15 @@ from ..modules.supabase import supabaseClient
 
 TABLE = "bubble_tea_entries"
 
-
+# Adds a new bubble tea entry to the database
 def add_bbt_entry(
     created_at: datetime,
     user_id: int,
     guild_id: int,
     location: str,
     description: str,
+    price: float,
+    currency: str,
 ):
     response = (
         supabaseClient.table(TABLE)
@@ -20,6 +22,8 @@ def add_bbt_entry(
                 "guild_id": guild_id,
                 "location": location,
                 "description": description,
+                "price": price,
+                "currency": currency,
             }
         )
         .execute()
@@ -27,7 +31,7 @@ def add_bbt_entry(
     print(response)
     return response.data[0]["id"]
 
-
+# Removes a bubble tea entry from the database by id
 def remove_bbt_entry(id: int, user_id: int):
     response = (
         supabaseClient.table(TABLE)
@@ -42,7 +46,41 @@ def remove_bbt_entry(id: int, user_id: int):
     )
     print(response)
 
+# Gets a bubble tea entry from the database by id
+def get_bbt_entry(id: int):
+    data, c = (
+        supabaseClient.table(TABLE)
+        .select("*")
+        .match(
+            {
+                "id": id,
+            }
+        )
+        .execute()
+    )
+    if c == 0:
+        return None
+    try:
+        return data[1][0]
+    except IndexError:
+        return None
 
+# Edits a bubble tea entry in the database by id
+def edit_bbt_entry(id: int, user_id: int, **kwargs):
+    response = (
+        supabaseClient.table(TABLE)
+        .update(kwargs)
+        .match(
+            {
+                "id": id,
+                "user_id": user_id,
+            }
+        )
+        .execute()
+    )
+    print(response)
+
+# Gets all bubble tea entries from the database for a user in a given year
 def get_bbt_entries(user_id: int, year: int = None):
     data, c = (
         supabaseClient.table(TABLE)
@@ -75,7 +113,7 @@ def get_bbt_entries(user_id: int, year: int = None):
         return []
     return data[1]
 
-
+# Gets the top bubble tea drinkers in a given year
 def get_bbt_leaderboard(guild_id: int, date: datetime):
     data, c = supabaseClient.rpc(
         "get_bubble_tea_counts",
