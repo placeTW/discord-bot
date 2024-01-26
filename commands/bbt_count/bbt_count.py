@@ -79,7 +79,7 @@ def register_commands(
         embed.add_field(
             name="Date",
             value=str(
-                datetime.datetime.fromisoformat(interaction.created_at.date())
+                datetime.datetime.fromisoformat(str(interaction.created_at.date()))
             ),
             inline=False,
         )
