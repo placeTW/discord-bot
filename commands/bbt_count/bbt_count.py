@@ -64,6 +64,7 @@ def register_commands(
             interaction.guild.id,
             location,
             description,
+            image.url if image else None,
             price,
             currency,
         )
@@ -78,9 +79,7 @@ def register_commands(
         )
         embed.add_field(
             name="Date",
-            value=str(
-                datetime.datetime.fromisoformat(str(interaction.created_at.date()))
-            ),
+            value=str(str(interaction.created_at.date())),
             inline=False,
         )
         embed.add_field(name="Description", value=description, inline=False)
@@ -313,7 +312,7 @@ def register_commands(
             + "\n\nTotal costs: "
             + " + ".join(
                 [
-                    f"{numbers.format_currency(prices[currency]['total'], currency, locale='en_US')} ({prices[currency]['count']}, average {numbers.format_currency(prices[currency]['total']/prices[currency]['count'], currency, locale='en_US')}/🧋)"
+                    f"{numbers.format_currency(prices[currency]['total'], currency, locale='en_US')} ({prices[currency]['count']}, avg {numbers.format_currency(prices[currency]['total']/prices[currency]['count'], currency, locale='en_US')}/🧋)"
                     for currency in prices
                 ]
             )
