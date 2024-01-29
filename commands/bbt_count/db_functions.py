@@ -5,12 +5,7 @@ TABLE = "bubble_tea_entries"
 
 
 # Adds a new bubble tea entry to the database
-def add_bbt_entry(
-    created_at: datetime,
-    user_id: int,
-    guild_id: int,
-    **kwargs
-):
+def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, **kwargs):
     response = (
         supabaseClient.table(TABLE)
         .insert(

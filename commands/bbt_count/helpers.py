@@ -22,9 +22,9 @@ def price_string(price: float, currency: str):
 def calculate_prices(entries: list[dict]):
     prices = {}
     for entry in entries:
-        if not entry.get('price'):
+        if not entry.get("price"):
             continue
-        currency = entry.get('currency', 'USD')
+        currency = entry.get("currency", "USD")
         # store the number of entries for a given currency as well as the total
         if currency in prices:
             prices[currency]["count"] += 1

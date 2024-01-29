@@ -16,7 +16,6 @@ from .db_functions import (
 )
 from .helpers import (
     bubble_tea_string,
-    price_string,
     calculate_prices,
     bbt_embed,
 )
