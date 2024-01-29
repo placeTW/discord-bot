@@ -9,11 +9,7 @@ def add_bbt_entry(
     created_at: datetime,
     user_id: int,
     guild_id: int,
-    location: str,
-    description: str,
-    image: str,
-    price: float,
-    currency: str,
+    **kwargs
 ):
     response = (
         supabaseClient.table(TABLE)
@@ -22,11 +18,7 @@ def add_bbt_entry(
                 "created_at": str(created_at),
                 "user_id": user_id,
                 "guild_id": guild_id,
-                "location": location,
-                "description": description,
-                "image": image,
-                "price": price,
-                "currency": currency,
+                **kwargs,
             }
         )
         .execute()

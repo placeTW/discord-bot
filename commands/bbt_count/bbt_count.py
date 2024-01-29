@@ -14,7 +14,12 @@ from .db_functions import (
     get_bbt_entries,
     get_bbt_leaderboard,
 )
-from .helpers import bubble_tea_string, price_string, calculate_prices
+from .helpers import (
+    bubble_tea_string,
+    price_string,
+    calculate_prices,
+    bbt_embed,
+)
 from ..modules import logging, content_moderation
 
 
@@ -51,46 +56,34 @@ def register_commands(
         currency: str = None,
     ):
         await interaction.response.defer()
-        if image and not await content_moderation.review_image(image):
+        if image and not (
+            await content_moderation.review_image(image)
+            or not image.content_type.startswith("image/")
+        ):
             await interaction.followup.send(
                 "Image rejected by content moderation.",
                 ephemeral=True,
             )
             return
 
+        add_data = {}
+        if description:
+            add_data["description"] = description
+        if location:
+            add_data["location"] = location
+        if image:
+            add_data["image"] = image.url
+        if price:
+            add_data["price"] = price
+        if currency:
+            add_data["currency"] = currency
+
         id = add_bbt_entry(
             interaction.created_at,
             interaction.user.id,
             interaction.guild.id,
-            location,
-            description,
-            image.url if image else None,
-            price,
-            currency,
+            **add_data,
         )
-        embed = discord.Embed(
-            title="New bubble tea entry",
-            description=f"<@{interaction.user.id}> added a bubble tea entry: {bubble_tea_string(description, location, price, currency)}",
-            color=discord.Color.green(),
-        )
-        embed.set_author(
-            name=interaction.user.display_name,
-            icon_url=interaction.user.avatar.url,
-        )
-        embed.add_field(
-            name="Date",
-            value=str(str(interaction.created_at.date())),
-            inline=False,
-        )
-        embed.add_field(name="Description", value=description, inline=False)
-        embed.add_field(name="Location", value=location, inline=False)
-        embed.add_field(
-            name="Price", value=price_string(price, currency), inline=False
-        )
-        embed.set_footer(text=f"id: {id}")
-
-        if image and image.content_type.startswith("image/"):
-            embed.set_image(url=image.url)
 
         log_event = {
             "event": "Bubble tea entry",
@@ -108,6 +101,15 @@ def register_commands(
             interaction, log_event, content=description, log_to_channel=False
         )
 
+        embed = bbt_embed(
+            id,
+            interaction.user.id,
+            str(interaction.created_at.date()),
+            interaction.user.display_name,
+            interaction.user.avatar.url,
+            add_data,
+            new=True,
+        )
         await interaction.followup.send(embed=embed)
 
     # remove
@@ -137,35 +139,15 @@ def register_commands(
                 ephemeral=True,
             )
             return
-        embed = discord.Embed(
-            title=f"Bubble tea entry #{id}",
-            description=f"Entry #{id} from <@{entry['user_id']}>: {bubble_tea_string(entry['description'], entry['location'], entry['price'], entry['currency'])}",
-            color=discord.Color.green(),
-        )
-        embed.set_author(
-            name=interaction.user.display_name,
-            icon_url=interaction.user.avatar.url,
-        )
-        if entry["image"]:
-            embed.set_image(url=entry["image"])
-        embed.add_field(
-            name="Date",
-            value=str(
-                datetime.datetime.fromisoformat(entry["created_at"]).date()
-            ),
-            inline=False,
-        )
-        embed.add_field(
-            name="Description", value=entry["description"], inline=False
-        )
-        embed.add_field(name="Location", value=entry["location"], inline=False)
-        embed.add_field(
-            name="Price",
-            value=price_string(entry["price"], entry["currency"]),
-            inline=False,
-        )
-        embed.set_footer(text=f"id: {id}")
 
+        embed = bbt_embed(
+            id,
+            None,
+            None,
+            interaction.user.display_name,
+            interaction.user.avatar.url,
+            entry,
+        )
         await interaction.response.send_message(embed=embed)
 
     # edit
@@ -228,37 +210,6 @@ def register_commands(
 
         edit_bbt_entry(id, interaction.user.id, **edit_data)
 
-        embed = discord.Embed(
-            title=f"Edited bubble tea entry #{id}",
-            description=f"Entry #{id} from <@{entry['user_id']}>: {bubble_tea_string(description if description else entry['description'], location if location else entry['location'], price if price else entry['price'], currency if currency else entry['currency'])}",
-            color=discord.Color.green(),
-        )
-        embed.set_author(
-            name=interaction.user.display_name,
-            icon_url=interaction.user.avatar.url,
-        )
-        if image and image.content_type.startswith("image/"):
-            embed.set_image(url=image.url)
-        embed.add_field(
-            name="Description",
-            value=description if description else entry["description"],
-            inline=False,
-        )
-        embed.add_field(
-            name="Location",
-            value=location if location else entry["location"],
-            inline=False,
-        )
-        embed.add_field(
-            name="Price",
-            value=price_string(
-                price if price else entry["price"],
-                currency if currency else entry["currency"],
-            ),
-            inline=False,
-        )
-        embed.set_footer(text=f"id: {id}")
-
         log_event = {
             "event": "Bubble tea entry edit",
             "author_id": interaction.user.id,
@@ -280,6 +231,14 @@ def register_commands(
             log_to_channel=False,
         )
 
+        embed = bbt_embed(
+            id,
+            interaction.user.id,
+            None,
+            interaction.user.display_name,
+            interaction.user.avatar.url,
+            {**entry, **edit_data},
+        )
         await interaction.followup.send(embed=embed)
 
     # list
