@@ -53,6 +53,7 @@ def register_commands(
         image: discord.Attachment = None,
         price: float = None,
         currency: str = None,
+        notes: str = None,
     ):
         await interaction.response.defer()
         if image and not (
@@ -76,6 +77,8 @@ def register_commands(
             add_data["price"] = price
         if currency:
             add_data["currency"] = currency
+        if notes:
+            add_data["notes"] = notes
 
         id = add_bbt_entry(
             interaction.created_at,
@@ -171,6 +174,7 @@ def register_commands(
         image: discord.Attachment = None,
         price: float = None,
         currency: str = None,
+        notes: str = None,
     ):
         await interaction.response.defer()
         if image and not await content_moderation.review_image(image):
@@ -206,6 +210,8 @@ def register_commands(
             edit_data["price"] = price
         if currency:
             edit_data["currency"] = currency
+        if notes:
+            edit_data["notes"] = notes
 
         edit_bbt_entry(id, interaction.user.id, **edit_data)
 

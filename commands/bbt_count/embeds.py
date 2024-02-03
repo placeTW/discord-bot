@@ -48,6 +48,8 @@ def bbt_entry_embed(
         value=price_string(entry.get("price"), entry.get("currency")),
         inline=False,
     )
+    if entry.get('notes'):
+        embed.add_field(name="Notes", value=entry.get('notes'), inline=False)
     embed.set_footer(text=f"id: {id}")
 
     return embed
