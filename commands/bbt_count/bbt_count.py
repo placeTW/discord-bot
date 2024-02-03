@@ -1,10 +1,10 @@
 import datetime
 import discord
 from discord import app_commands
-from babel import numbers
 
 
 from bot import TWPlaceClient
+from commands.bbt_count.consts import BBT_LIST_GROUP_BY_CHOICES
 
 from .db_functions import (
     add_bbt_entry,
@@ -14,16 +14,16 @@ from .db_functions import (
     get_bbt_entries,
     get_bbt_leaderboard,
 )
-from .helpers import (
-    bubble_tea_string,
-    calculate_prices,
-    bbt_embed,
+from .embeds import (
+    bbt_entry_embed,
+    bbt_list_default_embed,
+    bbt_list_grouped_embed,
 )
 from ..modules import logging, content_moderation
 
 
 def register_commands(
-    tree: discord.app_commands.CommandTree,
+    tree: app_commands.CommandTree,
     client: TWPlaceClient,
     guilds: list[discord.Object],
 ):
@@ -100,14 +100,14 @@ def register_commands(
             interaction, log_event, content=description, log_to_channel=False
         )
 
-        embed = bbt_embed(
+        embed = bbt_entry_embed(
             id,
             interaction.user.id,
             str(interaction.created_at.date()),
             interaction.user.display_name,
             interaction.user.avatar.url,
             add_data,
-            new=True,
+            title_prefix="New",
         )
         await interaction.followup.send(embed=embed)
 
@@ -139,7 +139,7 @@ def register_commands(
             )
             return
 
-        embed = bbt_embed(
+        embed = bbt_entry_embed(
             id,
             None,
             None,
@@ -230,13 +230,14 @@ def register_commands(
             log_to_channel=False,
         )
 
-        embed = bbt_embed(
+        embed = bbt_entry_embed(
             id,
             interaction.user.id,
             None,
             interaction.user.display_name,
             interaction.user.avatar.url,
             {**entry, **edit_data},
+            title_prefix="Edited",
         )
         await interaction.followup.send(embed=embed)
 
@@ -251,35 +252,30 @@ def register_commands(
     @app_commands.describe(
         year="Year to list entries for (optional, default to current year)"
     )
+    @app_commands.describe(group_by="Field to group by (optional)")
+    @app_commands.choices(group_by=BBT_LIST_GROUP_BY_CHOICES)
     async def bbt_count_list(
         interaction: discord.Interaction,
         user: discord.User = None,
         year: int = None,
+        group_by: app_commands.Choice[str] = None,
     ):
         await interaction.response.defer()
         entries = get_bbt_entries(
             user.id if user else interaction.user.id, year
         )
-        prices = calculate_prices(entries)
-        embed = discord.Embed(
-            title=f"Bubble tea entries {f'for {year}' if year else 'for the past year'} 🧋",
-            color=discord.Color.blue(),
-        )
-        embed.description = (
-            f"For <@{user.id if user else interaction.user.id}>: **{len(entries)} total entries**"
-            + "\n\nTotal costs: "
-            + " + ".join(
-                [
-                    f"{numbers.format_currency(prices[currency]['total'], currency, locale='en_US')} ({prices[currency]['count']}, avg {numbers.format_currency(prices[currency]['total']/prices[currency]['count'], currency, locale='en_US')}/🧋)"
-                    for currency in prices
-                ]
+        embed = (
+            bbt_list_default_embed(
+                user.id if user else interaction.user.id,
+                entries,
+                year,
             )
-            + "\n\n"
-            + "\n".join(
-                [
-                    f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry['created_at']).date())}` - {bubble_tea_string(entry['description'], entry['location'], entry['price'], entry['currency'])}{' (no image)' if not entry['image'] else ''}"
-                    for entry in entries
-                ]
+            if not group_by
+            else bbt_list_grouped_embed(
+                user.id if user else interaction.user.id,
+                entries,
+                year,
+                group_by.value,
             )
         )
         await interaction.followup.send(embed=embed)
