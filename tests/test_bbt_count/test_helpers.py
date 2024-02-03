@@ -114,5 +114,5 @@ def test_entry_string():
         "price": 3.5,
         "currency": "CAD",
     }
-    expected_result = "`1: 2021-10-01` - Classic Milk Tea at ABC Cafe for CA$3.50 🧋"
+    expected_result = "`1: 2021-10-01` - Classic Milk Tea at ABC Cafe for CA$3.50 🧋 (no image)"
     assert entry_string(entry) == expected_result

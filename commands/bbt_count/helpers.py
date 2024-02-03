@@ -59,4 +59,4 @@ def cost_string(prices: list[int], currency: str):
 
 
 def entry_string(entry: dict):
-    return f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry['created_at']).date())}` - {bubble_tea_string(entry['description'], entry['location'], entry['price'], entry['currency'])}{' (no image)' if not entry['image'] else ''}"
+    return f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).date())}` - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}{' (no image)' if not entry.get('image') else ''}"
