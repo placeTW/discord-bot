@@ -22,7 +22,7 @@ def price_string(price: float, currency: str):
 def calculate_prices(entries: list[dict], group_by: str):
     prices = {}
     for entry in entries:
-        price = entry.get("price", 0) or 0
+        price = entry.get("price") or 0
         currency = entry.get("currency", None)
         group_key = entry.get(group_by, "default_group")
 
