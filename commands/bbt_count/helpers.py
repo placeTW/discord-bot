@@ -35,7 +35,7 @@ def bubble_tea_data(
 def bubble_tea_string(
     description: str, location: str, price: float, currency: str
 ):
-    return f"__{description}__{f' at **{location}**' if location else ''}{f' for {price_string(price, currency)}' if price else ''} 🧋"
+    return f"**{description}**{f' at __{location}__' if location else ''}{f' for {price_string(price, currency)}' if price else ''} 🧋"
 
 
 def price_string(price: float, currency: str):
@@ -86,4 +86,9 @@ def cost_string(prices: list[int], currency: str):
 
 
 def entry_string(entry: dict, timezone: datetime.tzinfo):
-    return f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}` - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}{' (no image)' if not entry.get('image') else ''}{' *rating: ' + str(entry.get('rating')) + '*' if entry.get('rating') else ''} {entry.get('notes') or ''}".strip()
+    entry_string = f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}`"
+    entry_string += f" - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}"
+    entry_string += f"{' (no image)' if not entry.get('image') else ''}"
+    entry_string += f"{' *rating: ' + str(entry.get('rating')) + '*' if entry.get('rating') else ''}"
+    entry_string += f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
+    return entry_string.strip()
