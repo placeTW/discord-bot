@@ -5,6 +5,33 @@ import numpy as np
 locale = Locale("en", "US")
 
 
+def bubble_tea_data(
+    description: str,
+    location: str,
+    price: float,
+    currency: str,
+    image: str,
+    notes: str,
+    rating: float,
+):
+    data = {}
+    if description:
+        data["description"] = description
+    if location:
+        data["location"] = location
+    if price:
+        data["price"] = price
+    if currency:
+        data["currency"] = currency
+    if image:
+        data["image"] = image
+    if notes:
+        data["notes"] = notes
+    if rating:
+        data["rating"] = rating
+    return data
+
+
 def bubble_tea_string(
     description: str, location: str, price: float, currency: str
 ):
@@ -59,4 +86,4 @@ def cost_string(prices: list[int], currency: str):
 
 
 def entry_string(entry: dict):
-    return f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).date())}` - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}{' (no image)' if not entry.get('image') else ''} {entry.get('notes') or ''}".strip()
+    return f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).date())}` - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}{' (no image)' if not entry.get('image') else ''}{' rating: ' + entry.get('rating') if entry.get('rating') else ''} {entry.get('notes') or ''}".strip()

@@ -39,7 +39,7 @@ def remove_bbt_entry(id: int, user_id: int):
 
 
 # Gets a bubble tea entry from the database by id
-def get_bbt_entry(id: int):
+def get_bbt_entry(id: int) -> dict | None:
     data, c = (
         supabaseClient.table(TABLE)
         .select("*")

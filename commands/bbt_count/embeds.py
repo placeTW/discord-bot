@@ -50,6 +50,8 @@ def bbt_entry_embed(
     )
     if entry.get('notes'):
         embed.add_field(name="Notes", value=entry.get('notes'), inline=False)
+    if entry.get('rating'):
+        embed.add_field(name="Rating", value=entry.get('rating'), inline=False)
     embed.set_footer(text=f"id: {id}")
 
     return embed

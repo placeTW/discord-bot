@@ -19,6 +19,7 @@ from .embeds import (
     bbt_list_default_embed,
     bbt_list_grouped_embed,
 )
+from .helpers import bubble_tea_data
 from ..modules import logging, content_moderation
 
 
@@ -55,6 +56,7 @@ def register_commands(
         price: float = None,
         currency: str = None,
         notes: str = None,
+        rating: float = None,
     ):
         await interaction.response.defer()
         if image and not (
@@ -67,19 +69,15 @@ def register_commands(
             )
             return
 
-        add_data = {}
-        if description:
-            add_data["description"] = description
-        if location:
-            add_data["location"] = location
-        if image:
-            add_data["image"] = image.url
-        if price:
-            add_data["price"] = price
-        if currency:
-            add_data["currency"] = currency
-        if notes:
-            add_data["notes"] = notes
+        add_data = bubble_tea_data(
+            description,
+            location,
+            price,
+            currency,
+            image.url if image else None,
+            notes,
+            rating,
+        )
 
         id = add_bbt_entry(
             interaction.created_at,
@@ -92,13 +90,7 @@ def register_commands(
             "event": "Bubble tea entry",
             "author_id": interaction.user.id,
             "generated_id": str(id),
-            "metadata": {
-                "description": description,
-                "location": location if location else None,
-                "image": image.url if image else None,
-                "price": price if price else None,
-                "currency": currency if currency else None,
-            },
+            "metadata": add_data,
         }
         await logging.log_event(
             interaction, log_event, content=description, log_to_channel=False
@@ -177,6 +169,7 @@ def register_commands(
         price: float = None,
         currency: str = None,
         notes: str = None,
+        rating: float = None,
     ):
         await interaction.response.defer()
         if image and not await content_moderation.review_image(image):
@@ -201,19 +194,15 @@ def register_commands(
             )
             return
 
-        edit_data = {}
-        if description:
-            edit_data["description"] = description
-        if location:
-            edit_data["location"] = location
-        if image:
-            edit_data["image"] = image.url
-        if price:
-            edit_data["price"] = price
-        if currency:
-            edit_data["currency"] = currency
-        if notes:
-            edit_data["notes"] = notes
+        edit_data = bubble_tea_data(
+            description,
+            location,
+            price,
+            currency,
+            image.url if image else None,
+            notes,
+            rating,
+        )
 
         edit_bbt_entry(id, interaction.user.id, **edit_data)
 
@@ -221,15 +210,7 @@ def register_commands(
             "event": "Bubble tea entry edit",
             "author_id": interaction.user.id,
             "generated_id": str(id),
-            "metadata": {
-                "description": description
-                if description
-                else entry["description"],
-                "location": location if location else entry["location"],
-                "image": image.url if image else entry["image"],
-                "price": price if price else entry["price"],
-                "currency": currency if currency else entry["currency"],
-            },
+            "metadata": {**entry, **edit_data},
         }
         await logging.log_event(
             interaction,
@@ -302,9 +283,11 @@ def register_commands(
         await interaction.response.defer()
         leaderboard = get_bbt_leaderboard(
             interaction.guild.id,
-            datetime.datetime(year=year, month=1, day=1)
-            if year
-            else interaction.created_at,
+            (
+                datetime.datetime(year=year, month=1, day=1)
+                if year
+                else interaction.created_at
+            ),
         )
         embed = discord.Embed(
             title=f"Top bubble tea drinkers of {year if year else interaction.created_at.year} in {client.guilds_dict[interaction.guild.id]['server_name']}",
