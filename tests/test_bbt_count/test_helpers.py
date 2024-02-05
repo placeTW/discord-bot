@@ -117,5 +117,5 @@ def test_entry_string():
         "rating": 4.5,
         "image": None,
     }
-    expected_result = "`1: 2021-10-01` - **Classic Milk Tea** at __ABC Cafe__ for CA$3.50 🧋 (no image) *rating: 4.5* This is a classic milk tea with pearls. It's a little sweet, but not too much."
+    expected_result = "`1: 2021-10-01` - **Classic Milk Tea** at __ABC Cafe__ for CA$3.50 🧋 (no image) *rating: 4.5* notes: This is a classic milk tea with pearls. It's a little sweet, but not too much."
     assert entry_string(entry, None) == expected_result
