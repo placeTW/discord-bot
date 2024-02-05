@@ -103,6 +103,7 @@ def register_commands(
             interaction.user.display_name,
             interaction.user.avatar.url,
             add_data,
+            interaction.created_at.astimezone().tzinfo,
             title_prefix="New",
         )
         await interaction.followup.send(embed=embed)
@@ -142,6 +143,7 @@ def register_commands(
             interaction.user.display_name,
             interaction.user.avatar.url,
             entry,
+            interaction.created_at.astimezone().tzinfo,
         )
         await interaction.response.send_message(embed=embed)
 
@@ -226,6 +228,7 @@ def register_commands(
             interaction.user.display_name,
             interaction.user.avatar.url,
             {**entry, **edit_data},
+            interaction.created_at.astimezone().tzinfo,
             title_prefix="Edited",
         )
         await interaction.followup.send(embed=embed)
@@ -258,12 +261,14 @@ def register_commands(
                 user.id if user else interaction.user.id,
                 entries,
                 year,
+                interaction.created_at.astimezone().tzinfo,
             )
             if not group_by
             else bbt_list_grouped_embed(
                 user.id if user else interaction.user.id,
                 entries,
                 year,
+                interaction.created_at.astimezone().tzinfo,
                 group_by.value,
             )
         )

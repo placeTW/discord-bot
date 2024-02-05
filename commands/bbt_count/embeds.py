@@ -17,6 +17,7 @@ def bbt_entry_embed(
     name: str,
     icon_url: str,
     entry: dict,
+    timezone: datetime.tzinfo,
     title_prefix="",
 ):
     embed = discord.Embed(
@@ -35,7 +36,7 @@ def bbt_entry_embed(
         value=date
         if date
         else str(
-            datetime.datetime.fromisoformat(entry.get("created_at")).date()
+            datetime.datetime.fromisoformat(entry.get("created_at")).astimezone(timezone).date()
         ),
         inline=False,
     )
@@ -61,6 +62,7 @@ def bbt_list_default_embed(
     user_id: int,
     entries: list[dict],
     year: int,
+    timezone: datetime.tzinfo,
 ):
     prices = calculate_prices(entries, None).get("default_group", {})
     embed = discord.Embed(
@@ -77,7 +79,7 @@ def bbt_list_default_embed(
             ]
         )
         + "\n\n"
-        + "\n".join([entry_string(entry) for entry in entries])
+        + "\n".join([entry_string(entry, timezone) for entry in entries])
     )
     return embed
 
@@ -86,6 +88,7 @@ def bbt_list_grouped_embed(
     user_id: int,
     entries: list[dict],
     year: int,
+    timezone: datetime.tzinfo,
     group_by: str,
 ):
     prices = calculate_prices(entries, group_by)
@@ -106,6 +109,6 @@ def bbt_list_grouped_embed(
             embed.description += f"\n{currency}: {cost_string(prices[group][currency]['prices'], currency)}"
         embed.description += "\n\n"
         embed.description += "\n".join(
-            [entry_string(entry) for entry in group_entries]
+            [entry_string(entry, timezone) for entry in group_entries]
         )
     return embed
