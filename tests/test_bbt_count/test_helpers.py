@@ -113,6 +113,9 @@ def test_entry_string():
         "location": "ABC Cafe",
         "price": 3.5,
         "currency": "CAD",
+        "notes": "This is a classic milk tea with pearls. It's a little sweet, but not too much.",
+        "rating": 4.5,
+
     }
-    expected_result = "`1: 2021-10-01` - Classic Milk Tea at ABC Cafe for CA$3.50 🧋 (no image)"
+    expected_result = "`1: 2021-10-01` - __Classic Milk Tea__ at **ABC Cafe** for CA$3.50 🧋 *rating: 4.5* This is a classic milk tea with pearls. It's a little sweet, but not too much."
     assert entry_string(entry) == expected_result
