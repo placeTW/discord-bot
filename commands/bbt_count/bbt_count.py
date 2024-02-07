@@ -48,6 +48,7 @@ def register_commands(
         currency="Currency of the price (optional, Taiwan dollar = TWD, US dollar = USD, etc.)"
     )
     @app_commands.describe(notes="Additional notes (optional)")
+    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
     async def bbt_count_add(
         interaction: discord.Interaction,
         description: str,
@@ -162,6 +163,7 @@ def register_commands(
     @app_commands.describe(price="Price of the bubble tea (optional)")
     @app_commands.describe(currency="Currency of the price (optional)")
     @app_commands.describe(notes="Additional notes (optional)")
+    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
     async def bbt_count_edit(
         interaction: discord.Interaction,
         id: int,

@@ -74,9 +74,9 @@ def bbt_list_default_embed(
         color=discord.Color.blue(),
     )
     embed.description = (
-        f"For <@{user_id}>: **{len(entries)} total entries**"
+        f"For <@{user_id}>: **{len(entries)} total entries**\n"
         + (
-            f"\nAverage of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/len(entries):.3f} days"
+            f"Average of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/len(entries):.3f} days"
             + "\n\n__Total costs__:\n"
             + "\n".join(
                 [
