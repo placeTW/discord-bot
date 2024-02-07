@@ -33,10 +33,14 @@ def bbt_entry_embed(
         embed.set_image(url=entry.get("image"))
     embed.add_field(
         name="Date",
-        value=date
-        if date
-        else str(
-            datetime.datetime.fromisoformat(entry.get("created_at")).astimezone(timezone).date()
+        value=(
+            date
+            if date
+            else str(
+                datetime.datetime.fromisoformat(entry.get("created_at"))
+                .astimezone(timezone)
+                .date()
+            )
         ),
         inline=False,
     )
@@ -49,10 +53,10 @@ def bbt_entry_embed(
         value=price_string(entry.get("price"), entry.get("currency")),
         inline=False,
     )
-    if entry.get('notes'):
-        embed.add_field(name="Notes", value=entry.get('notes'), inline=False)
-    if entry.get('rating'):
-        embed.add_field(name="Rating", value=entry.get('rating'), inline=False)
+    if entry.get("notes"):
+        embed.add_field(name="Notes", value=entry.get("notes"), inline=False)
+    if entry.get("rating"):
+        embed.add_field(name="Rating", value=entry.get("rating"), inline=False)
     embed.set_footer(text=f"id: {id}")
 
     return embed
@@ -61,7 +65,7 @@ def bbt_entry_embed(
 def bbt_list_default_embed(
     user_id: int,
     entries: list[dict],
-    year: int,
+    year: int | None,
     timezone: datetime.tzinfo,
 ):
     prices = calculate_prices(entries, None).get("default_group", {})
@@ -71,15 +75,20 @@ def bbt_list_default_embed(
     )
     embed.description = (
         f"For <@{user_id}>: **{len(entries)} total entries**"
-        + "\n\n__Total costs__:\n"
-        + "\n".join(
-            [
-                cost_string(prices[currency]["prices"], currency)
-                for currency in prices
-            ]
+        + (
+            f"\nAverage of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/len(entries):.3f} days"
+            + "\n\n__Total costs__:\n"
+            + "\n".join(
+                [
+                    cost_string(prices[currency]["prices"], currency)
+                    for currency in prices
+                ]
+            )
+            + "\n\n"
+            + "\n".join([entry_string(entry, timezone) for entry in entries])
         )
-        + "\n\n"
-        + "\n".join([entry_string(entry, timezone) for entry in entries])
+        if len(entries)
+        else ""
     )
     return embed
 

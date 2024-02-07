@@ -35,7 +35,7 @@ def bubble_tea_data(
 def bubble_tea_string(
     description: str, location: str, price: float, currency: str
 ):
-    return f"**{description}**{f' at __{location}__' if location else ''}{f' for {price_string(price, currency)}' if price else ''} 🧋"
+    return f"**{description}**{f' at __{location}__' if location else ''}{f' for {price_string(price, currency)}' if price else ''}"
 
 
 def price_string(price: float, currency: str):
