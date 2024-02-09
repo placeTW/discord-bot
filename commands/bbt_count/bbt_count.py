@@ -270,7 +270,7 @@ def register_commands(
                     button: discord.ui.Button,
                 ):
                     await self.msg.edit(
-                        content=f"Transferred entry #{id} to <@{transfer_user.id}>",
+                        content=f"Transferring entry #{id} to <@{transfer_user.id}>",
                         embed=None,
                         view=None,
                     )
