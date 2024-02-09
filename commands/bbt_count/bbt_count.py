@@ -75,6 +75,7 @@ def register_commands(
 
         add_data = bubble_tea_data(
             description,
+            None,
             location,
             price,
             currency,
