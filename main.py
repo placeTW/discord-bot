@@ -83,28 +83,31 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 tocfl.register_commands(tree, placetw_guild, client)
 
+# * Register commands to the provided list of servers
+def register_commands(guilds: list[discord.Object]):
+    bbt_count.register_commands(tree, client, guilds)
+    fetch_entry_cmd.register_commands(tree, guilds)
+    fetch_entry_ui.register_commands(tree, guilds)
+    one_o_one.register_commands(tree, guilds)
+    hgs.register_commands(tree, guilds)
+    random_shiba.register_commands(tree, guilds)
+    random_capoo.register_commands(tree, guilds)
+    gothefucktosleep.register_commands(tree, guilds)
+    boba.register_commands(tree, guilds)
+    basic_commands.register_commands(tree, guilds)
+    config_commands.register_commands(tree, client, guilds)
+    stats.register_commands(tree, client, guilds)
+    pat.register_commands(tree, client, guilds)
+    formosa_stickers.register_commands(tree, guilds)
+
+
 # * register commands to the other servers
-guilds = [
+bot_guilds = [
     discord.Object(id=int(server_id))
     for server_id in client.guilds_dict.keys()
 ]
 
-# * Register commands to all servers that the bot is in
-bbt_count.register_commands(tree, client, guilds)
-fetch_entry_cmd.register_commands(tree, guilds)
-fetch_entry_ui.register_commands(tree, guilds)
-one_o_one.register_commands(tree, guilds)
-hgs.register_commands(tree, guilds)
-random_shiba.register_commands(tree, guilds)
-random_capoo.register_commands(tree, guilds)
-gothefucktosleep.register_commands(tree, guilds)
-boba.register_commands(tree, guilds)
-basic_commands.register_commands(tree, guilds)
-config_commands.register_commands(tree, client, guilds)
-stats.register_commands(tree, client, guilds)
-pat.register_commands(tree, client, guilds)
-formosa_stickers.register_commands(tree, guilds)
-
+register_commands(bot_guilds)
 
 # confessions needs the dictionary for the confession channel id
 confession.register_commands(tree, client)
@@ -193,6 +196,7 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_guild_join(guild):
+    register_commands([guild])
     await tree.sync(guild=guild)
     supabaseClient.table("server_config").insert(
         {
