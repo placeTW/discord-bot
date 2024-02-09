@@ -59,14 +59,14 @@ def get_bbt_entry(id: int) -> dict | None:
 
 
 # Edits a bubble tea entry in the database by id
-def edit_bbt_entry(id: int, user_id: int, **kwargs):
+def edit_bbt_entry(id: int, owner_user_id: int, **kwargs):
     response = (
         supabaseClient.table(TABLE)
         .update(kwargs)
         .match(
             {
                 "id": id,
-                "user_id": user_id,
+                "user_id": owner_user_id,
             }
         )
         .execute()

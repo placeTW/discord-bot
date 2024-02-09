@@ -18,6 +18,7 @@ from .embeds import (
     bbt_entry_embed,
     bbt_list_default_embed,
     bbt_list_grouped_embed,
+    user_transfer_embed,
 )
 from .helpers import bubble_tea_data
 from ..modules import logging, content_moderation
@@ -48,7 +49,9 @@ def register_commands(
         currency="Currency of the price (optional, Taiwan dollar = TWD, US dollar = USD, etc.)"
     )
     @app_commands.describe(notes="Additional notes (optional)")
-    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
+    @app_commands.describe(
+        rating="Personal rating of the bubble tea (optional)"
+    )
     async def bbt_count_add(
         interaction: discord.Interaction,
         description: str,
@@ -141,8 +144,16 @@ def register_commands(
             id,
             None,
             None,
-            interaction.user.display_name if interaction.user.id == entry.get('user_id') else None,
-            interaction.user.avatar.url if interaction.user.id == entry.get('user_id') else None,
+            (
+                interaction.user.display_name
+                if interaction.user.id == entry.get("user_id")
+                else None
+            ),
+            (
+                interaction.user.avatar.url
+                if interaction.user.id == entry.get("user_id")
+                else None
+            ),
             entry,
             interaction.created_at.astimezone().tzinfo,
         )
@@ -163,11 +174,17 @@ def register_commands(
     @app_commands.describe(price="Price of the bubble tea (optional)")
     @app_commands.describe(currency="Currency of the price (optional)")
     @app_commands.describe(notes="Additional notes (optional)")
-    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
+    @app_commands.describe(
+        rating="Personal rating of the bubble tea (optional)"
+    )
+    @app_commands.describe(
+        transfer_user="Transfer the entry to another user (optional)"
+    )
     async def bbt_count_edit(
         interaction: discord.Interaction,
         id: int,
         description: str = None,
+        transfer_user: discord.User = None,
         location: str = None,
         image: discord.Attachment = None,
         price: float = None,
@@ -198,42 +215,90 @@ def register_commands(
             )
             return
 
-        edit_data = bubble_tea_data(
-            description,
-            location,
-            price,
-            currency,
-            image.url if image else None,
-            notes,
-            rating,
-        )
+        async def edit(user: discord.User = None):
+            edit_data = bubble_tea_data(
+                description,
+                user.id if user else None,
+                location,
+                price,
+                currency,
+                image.url if image else None,
+                notes,
+                rating,
+            )
 
-        edit_bbt_entry(id, interaction.user.id, **edit_data)
+            edit_bbt_entry(id, interaction.user.id, **edit_data)
 
-        log_event = {
-            "event": "Bubble tea entry edit",
-            "author_id": interaction.user.id,
-            "generated_id": str(id),
-            "metadata": {**entry, **edit_data},
-        }
-        await logging.log_event(
-            interaction,
-            log_event,
-            content=description if description else entry["description"],
-            log_to_channel=False,
-        )
+            log_event = {
+                "event": "Bubble tea entry edit",
+                "author_id": interaction.user.id,
+                "generated_id": str(id),
+                "metadata": {**entry, **edit_data},
+            }
+            await logging.log_event(
+                interaction,
+                log_event,
+                content=description if description else entry["description"],
+                log_to_channel=False,
+            )
 
-        embed = bbt_entry_embed(
-            id,
-            interaction.user.id,
-            None,
-            interaction.user.display_name,
-            interaction.user.avatar.url,
-            {**entry, **edit_data},
-            interaction.created_at.astimezone().tzinfo,
-            title_prefix="Edited",
-        )
-        await interaction.followup.send(embed=embed)
+            embed = bbt_entry_embed(
+                id,
+                interaction.user.id,
+                None,
+                interaction.user.display_name,
+                interaction.user.avatar.url,
+                {**entry, **edit_data},
+                interaction.created_at.astimezone().tzinfo,
+                title_prefix="Edited",
+            )
+            await interaction.followup.send(embed=embed)
+
+        # Show transfer button choices if transfer_user is specified
+        if transfer_user and transfer_user.id != interaction.user.id:
+            class TransferButtonView(discord.ui.View):
+                def __init__(self):
+                    super().__init__()
+                    self.msg: discord.Message = None
+
+                @discord.ui.button(
+                    label="Yes", style=discord.ButtonStyle.green
+                )
+                async def transfer_button_yes(
+                    self,
+                    interaction: discord.Interaction,
+                    button: discord.ui.Button,
+                ):
+                    await self.msg.edit(
+                        content=f"Transferred entry #{id} to <@{transfer_user.id}>",
+                        embed=None,
+                        view=None,
+                    )
+                    # Transfer the entry to the new user
+                    await edit(transfer_user)
+
+                @discord.ui.button(label="No", style=discord.ButtonStyle.red)
+                async def transfer_button_no(
+                    self,
+                    interaction: discord.Interaction,
+                    button: discord.ui.Button,
+                ):
+                    await self.msg.edit(
+                        content="Transfer cancelled", embed=None, view=None
+                    )
+                    # Cancel the transfer and edit the entry normally
+                    await edit()
+
+            button = TransferButtonView()
+            msg: discord.Message = await interaction.followup.send(
+                embed=user_transfer_embed(transfer_user.id, id),
+                view=button,
+            )
+            button.msg = msg
+            return
+        # Otherwise normally edit the entry
+        else:
+            await edit()
 
     # list
     @bbt_count.command(

@@ -60,6 +60,18 @@ def bbt_entry_embed(
     return embed
 
 
+def user_transfer_embed(
+    transfer_user_id: int,
+    entry_id: int,
+):
+    embed = discord.Embed(
+        title=f"Transferring entry #{entry_id} 🧋",
+        description=f"Are you sure you want to transfer this bubble tea entry to <@{transfer_user_id}>?\n\n**This action is irreversible**",
+        color=discord.Color.red(),
+    )
+    return embed
+
+
 def bbt_list_default_embed(
     user_id: int,
     entries: list[dict],

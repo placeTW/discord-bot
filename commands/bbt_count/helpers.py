@@ -7,6 +7,7 @@ locale = Locale("en", "US")
 
 def bubble_tea_data(
     description: str,
+    user_id: int,
     location: str,
     price: float,
     currency: str,
@@ -17,6 +18,8 @@ def bubble_tea_data(
     data = {}
     if description:
         data["description"] = description
+    if user_id:
+        data["user_id"] = user_id
     if location:
         data["location"] = location
     if price:
@@ -90,5 +93,7 @@ def entry_string(entry: dict, timezone: datetime.tzinfo):
     entry_string += f" - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}"
     entry_string += f"{' (no image)' if not entry.get('image') else ''}"
     entry_string += f"{' *rating: ' + str(entry.get('rating')) + '*' if entry.get('rating') else ''}"
-    entry_string += f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
+    entry_string += (
+        f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
+    )
     return entry_string.strip()
