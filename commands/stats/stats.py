@@ -7,12 +7,11 @@ from ..modules.supabase import supabaseClient
 
 
 def register_commands(
-    tree: discord.app_commands.CommandTree,
+    tree: app_commands.CommandTree,
     client: TWPlaceClient,
-    guilds: list[discord.Object],
 ):
     stats = app_commands.Group(name="stats", description="Stats functions")
     pat_stats = pat_stats_commands()
 
     stats.add_command(pat_stats)
-    tree.add_command(stats, guilds=guilds)
+    tree.add_command(stats)

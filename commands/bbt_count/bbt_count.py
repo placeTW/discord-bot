@@ -26,7 +26,6 @@ from ..modules import logging, content_moderation
 def register_commands(
     tree: app_commands.CommandTree,
     client: TWPlaceClient,
-    guilds: list[discord.Object],
 ):
     bbt_count = app_commands.Group(
         name="bbt_count", description="Bubble tea counts"
@@ -308,4 +307,4 @@ def register_commands(
         )
         await interaction.followup.send(embed=embed)
 
-    tree.add_command(bbt_count, guilds=guilds)
+    tree.add_command(bbt_count)
