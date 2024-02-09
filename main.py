@@ -107,9 +107,8 @@ confession.register_commands(tree, client)
 # sync the slash commands servers
 @client.event
 async def on_ready():
-    for guild_id in client.guilds_dict.keys():
-        guild = discord.Object(id=guild_id)
-        await tree.sync(guild=guild)
+    await tree.sync(placetw_guild)
+    await tree.sync()
     # Enable logging
     logging.init(client, deployment_date)
     print("Bot is ready.")
