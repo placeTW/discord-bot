@@ -12,13 +12,10 @@ SELF_PAT_GIFS = Path(Path(__file__).parent, "self_pat_gifs")
 BOT_PAT_GIFS = Path(Path(__file__).parent, "bot_pat_gifs")
 
 
-def register_commands(
-    tree, client: TWPlaceClient, guilds: list[discord.Object]
-):
+def register_commands(tree: app_commands.CommandTree, client: TWPlaceClient):
     @tree.command(
         name="pat",
         description="Pat",
-        guilds=guilds,
     )
     @app_commands.rename(user_to_pat="member")
     async def pat(

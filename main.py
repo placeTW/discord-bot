@@ -83,27 +83,21 @@ restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)
 tocfl.register_commands(tree, placetw_guild, client)
 
-# * register commands to the other servers
-guilds = [
-    discord.Object(id=int(server_id))
-    for server_id in client.guilds_dict.keys()
-]
-
 # * Register commands to all servers that the bot is in
-bbt_count.register_commands(tree, client, guilds)
-fetch_entry_cmd.register_commands(tree, guilds)
-fetch_entry_ui.register_commands(tree, guilds)
-one_o_one.register_commands(tree, guilds)
-hgs.register_commands(tree, guilds)
-random_shiba.register_commands(tree, guilds)
-random_capoo.register_commands(tree, guilds)
-gothefucktosleep.register_commands(tree, guilds)
-boba.register_commands(tree, guilds)
-basic_commands.register_commands(tree, guilds)
-config_commands.register_commands(tree, client, guilds)
-stats.register_commands(tree, client, guilds)
-pat.register_commands(tree, client, guilds)
-formosa_stickers.register_commands(tree, guilds)
+bbt_count.register_commands(tree, client)
+fetch_entry_cmd.register_commands(tree)
+fetch_entry_ui.register_commands(tree)
+one_o_one.register_commands(tree)
+hgs.register_commands(tree)
+random_shiba.register_commands(tree)
+random_capoo.register_commands(tree)
+gothefucktosleep.register_commands(tree)
+boba.register_commands(tree)
+basic_commands.register_commands(tree)
+config_commands.register_commands(tree, client)
+stats.register_commands(tree, client)
+pat.register_commands(tree, client)
+formosa_stickers.register_commands(tree)
 
 
 # confessions needs the dictionary for the confession channel id
@@ -193,13 +187,14 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_guild_join(guild):
-    await tree.sync(guild=guild)
     supabaseClient.table("server_config").insert(
         {
             "guild_id": str(guild.id),
             "server_name": guild.name,
+            "prod_config": is_prod,
         }
     ).execute()
+    await tree.sync()
 
 
 client.run(TOKEN)

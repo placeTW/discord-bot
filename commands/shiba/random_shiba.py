@@ -12,11 +12,10 @@ async def get_shiba(link):
     return await _async_get_json(link)
 
 
-def register_commands(tree, guilds: list[discord.Object]):
+def register_commands(tree: discord.app_commands.CommandTree):
     @tree.command(
         name="doge",
         description="Random Shiba or Akita image",
-        guilds=guilds,
     )
     async def random_shiba(
         interaction: discord.Interaction,
