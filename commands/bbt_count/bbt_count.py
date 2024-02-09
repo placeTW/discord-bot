@@ -141,8 +141,8 @@ def register_commands(
             id,
             None,
             None,
-            interaction.user.display_name,
-            interaction.user.avatar.url,
+            interaction.user.display_name if interaction.user.id == entry.get('user_id') else None,
+            interaction.user.avatar.url if interaction.user.id == entry.get('user_id') else None,
             entry,
             interaction.created_at.astimezone().tzinfo,
         )

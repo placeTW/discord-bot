@@ -14,8 +14,8 @@ def bbt_entry_embed(
     id: int,
     user_id: int,
     date: str,
-    name: str,
-    icon_url: str,
+    name: str | None,
+    icon_url: str | None,
     entry: dict,
     timezone: datetime.tzinfo,
     title_prefix="",
@@ -25,10 +25,8 @@ def bbt_entry_embed(
         description=f"Entry #{id} from <@{entry.get('user_id', user_id)}>: {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}",
         color=discord.Color.green(),
     )
-    embed.set_author(
-        name=name,
-        icon_url=icon_url,
-    )
+    if name and icon_url:
+        embed.set_author(name=name, icon_url=icon_url)
     if entry.get("image"):
         embed.set_image(url=entry.get("image"))
     embed.add_field(
