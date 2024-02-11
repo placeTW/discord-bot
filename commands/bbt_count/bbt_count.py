@@ -64,16 +64,9 @@ def register_commands(
     ):
         await interaction.response.defer()
         
-        image_review = await content_moderation.review_image(image)
         if image and not image.content_type.startswith("image/"):
             await interaction.followup.send(
                 "Invalid image type. Please upload an image file.",
-                ephemeral=True,
-            )
-            return
-        if image and not image_review:
-            await interaction.followup.send(
-                "Image rejected by content moderation.",
                 ephemeral=True,
             )
             return
