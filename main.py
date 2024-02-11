@@ -18,7 +18,7 @@ from commands.meow.meow import meow_meow
 from commands.modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
-from commands.pat import pat
+from commands.pat import pat, pat_network
 from commands.reacttw import react_tw
 from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
@@ -103,6 +103,7 @@ basic_commands.register_commands(tree, guilds)
 config_commands.register_commands(tree, client, guilds)
 stats.register_commands(tree, client, guilds)
 pat.register_commands(tree, client, guilds)
+pat_network.register_commands(tree, client, guilds)
 formosa_stickers.register_commands(tree, guilds)
 
 
