@@ -371,7 +371,7 @@ def register_commands(
             [
                 f"{i+1}. <@{user_data.get('user_id')}>: {user_data.get('count')} 🧋"
                 + (
-                    f" *average rating: {user_data.get('average_rating'):.3f}*"
+                    f" *average given rating: {user_data.get('average_rating'):.3f}*"
                     if user_data.get("average_rating")
                     else ""
                 )

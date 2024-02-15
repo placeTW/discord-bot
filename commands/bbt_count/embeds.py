@@ -155,7 +155,7 @@ def bbt_stats_embed(
                     entry.get("total_price") or 0,
                     entry.get("entry_count", 0),
                     entry.get("currency"),
-                ) + (f" *average rating: {entry.get('average_rating'):.3f}*" if entry.get("average_rating") else '')
+                ) + (f" *average given rating: {entry.get('average_rating'):.3f}*" if entry.get("average_rating") else '')
             )
             for entry in entries
         ]
