@@ -6,7 +6,9 @@ from commands.bbt_count.helpers import (
     calculate_prices,
     entry_string,
     price_string,
+    cost_string_prices,
     cost_string,
+    average_string,
 )
 
 
@@ -84,13 +86,12 @@ def bbt_list_default_embed(
         color=discord.Color.blue(),
     )
     embed.description = (
-        f"For <@{user_id}>: **{len(entries)} total entries**\n"
+        f"For <@{user_id}>: **{len(entries)} total entries**\n{average_string(year, len(entries))}"
         + (
-            f"Average of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/len(entries):.3f} days"
-            + "\n\n__Total costs__:\n"
+            "\n\n__Total costs__:\n"
             + "\n".join(
                 [
-                    cost_string(prices[currency]["prices"], currency)
+                    cost_string_prices(prices[currency]["prices"], currency)
                     for currency in prices
                 ]
             )
@@ -125,9 +126,38 @@ def bbt_list_grouped_embed(
             f"\n\n---\n**{group}: {len(group_entries)} entries**"
         )
         for currency in prices[group]:
-            embed.description += f"\n{currency}: {cost_string(prices[group][currency]['prices'], currency)}"
+            embed.description += f"\n{currency}: {cost_string_prices(prices[group][currency]['prices'], currency)}"
         embed.description += "\n\n"
         embed.description += "\n".join(
             [entry_string(entry, timezone) for entry in group_entries]
         )
+    return embed
+
+
+def bbt_stats_embed(
+    user_id: int, entries: list[dict], year: int, group_by_location: bool
+):
+    total_count = sum([entry.get("entry_count", 0) for entry in entries])
+    embed = discord.Embed(
+        title=f"Bubble tea stats {f'for {year}' if year else 'for the past year'} {'grouped by location ' if group_by_location else ''}🧋",
+        color=discord.Color.green(),
+    )
+    embed.description = f"For <@{user_id}>: **{total_count} total entries**\n{average_string(year, total_count)}\n\n"
+    embed.description += "\n".join(
+        [
+            (
+                (
+                    f'- **{entry.get("location")}**: '
+                    if group_by_location
+                    else ""
+                )
+                + cost_string(
+                    entry.get("total_price") or 0,
+                    entry.get("entry_count", 0),
+                    entry.get("currency"),
+                )
+            )
+            for entry in entries
+        ]
+    )
     return embed

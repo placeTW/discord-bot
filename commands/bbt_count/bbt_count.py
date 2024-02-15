@@ -13,12 +13,14 @@ from .db_functions import (
     edit_bbt_entry,
     get_bbt_entries,
     get_bbt_leaderboard,
+    get_bubble_tea_stats,
 )
 from .embeds import (
     bbt_entry_embed,
     bbt_list_default_embed,
     bbt_list_grouped_embed,
     user_transfer_embed,
+    bbt_stats_embed,
 )
 from .helpers import bubble_tea_data
 from ..modules import logging, content_moderation
@@ -63,7 +65,7 @@ def register_commands(
         rating: float = None,
     ):
         await interaction.response.defer()
-        
+
         image_review = await content_moderation.review_image(image)
         if image and not image.content_type.startswith("image/"):
             await interaction.followup.send(
@@ -262,6 +264,7 @@ def register_commands(
 
         # Show transfer button choices if transfer_user is specified
         if transfer_user and transfer_user.id != interaction.user.id:
+
             class TransferButtonView(discord.ui.View):
                 def __init__(self):
                     super().__init__()
@@ -376,6 +379,29 @@ def register_commands(
                 f"{i+1}. <@{user_data['user_id']}>: {user_data['count']} 🧋"
                 for i, user_data in enumerate(leaderboard)
             ]
+        )
+        await interaction.followup.send(embed=embed)
+
+    @bbt_count.command(
+        name="stats", description="Get the stats for a user for a given year"
+    )
+    async def bbt_count_stats(
+        interaction: discord.Interaction,
+        year: int = None,
+        group_by_location: bool = False,
+    ):
+        await interaction.response.defer()
+        stats = get_bubble_tea_stats(
+            interaction.user.id,
+            (
+                datetime.datetime(year=year, month=1, day=1)
+                if year
+                else interaction.created_at
+            ),
+            group_by_location,
+        )
+        embed = bbt_stats_embed(
+            interaction.user.id, stats, year, group_by_location
         )
         await interaction.followup.send(embed=embed)
 

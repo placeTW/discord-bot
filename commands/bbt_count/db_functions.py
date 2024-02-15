@@ -120,6 +120,21 @@ def get_bbt_leaderboard(guild_id: int, date: datetime):
     if c == 0:
         return []
     results = data[1]
-    # sort the data
-    results.sort(key=lambda x: x["count"], reverse=True)
+    return results
+
+
+def get_bubble_tea_stats(
+    user_id: int, date: datetime, group_by_location=False
+):
+    data, c = supabaseClient.rpc(
+        "get_bubble_tea_stats",
+        {
+            "user_id": user_id,
+            "date": str(date),
+            "group_by_location": group_by_location,
+        },
+    ).execute()
+    if c == 0:
+        return []
+    results = data[1]
     return results
