@@ -65,7 +65,7 @@ def register_commands(
         rating: float = None,
     ):
         await interaction.response.defer()
-        
+
         if image and not image.content_type.startswith("image/"):
             await interaction.followup.send(
                 "Invalid image type. Please upload an image file.",
@@ -369,7 +369,12 @@ def register_commands(
         )
         embed.description = "\n".join(
             [
-                f"{i+1}. <@{user_data['user_id']}>: {user_data['count']} 🧋"
+                f"{i+1}. <@{user_data.get('user_id')}>: {user_data.get('count')} 🧋"
+                + (
+                    f" *average rating: {user_data.get('average_rating'):.3f}*"
+                    if user_data.get("average_rating")
+                    else ""
+                )
                 for i, user_data in enumerate(leaderboard)
             ]
         )
