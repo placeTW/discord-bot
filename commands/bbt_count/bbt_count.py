@@ -385,6 +385,12 @@ def register_commands(
     @bbt_count.command(
         name="stats", description="Get the stats for a user for a given year"
     )
+    @app_commands.describe(
+        year="Year to get stats for (optional, default to current year)"
+    )
+    @app_commands.describe(
+        group_by_location="Group the stats by location (optional)"
+    )
     async def bbt_count_stats(
         interaction: discord.Interaction,
         year: int = None,
