@@ -86,7 +86,7 @@ def calculate_prices(entries: list[dict], group_by: str):
 
 def cost_string_prices(prices: list[int], currency: str):
     p = np.array(prices)
-    return cost_string(p.sum(), p[p.nonzero()].size, currency)
+    return cost_string(p[p.nonzero()].sum(), p.size, currency)
 
 
 def cost_string(total_price: float, count: int, currency: str):
