@@ -1,5 +1,7 @@
 import discord
 import datetime
+import calendar
+
 
 from commands.bbt_count.helpers import (
     bubble_tea_string,
@@ -8,6 +10,7 @@ from commands.bbt_count.helpers import (
     price_string,
     cost_string_prices,
     cost_string,
+    average_year_string,
     average_string,
 )
 
@@ -86,7 +89,7 @@ def bbt_list_default_embed(
         color=discord.Color.blue(),
     )
     embed.description = (
-        f"For <@{user_id}>: **{len(entries)} total entries**\n{average_string(year, len(entries))}"
+        f"For <@{user_id}>: **{len(entries)} total entries**\n{average_year_string(year, len(entries))}"
         + (
             "\n\n__Total costs__:\n"
             + "\n".join(
@@ -139,6 +142,7 @@ def bbt_stats_embed(
     entries: list[dict],
     year: int,
     group_by_location: bool,
+    monthly_counts: list[dict],
     latest: dict,
     timezone: datetime.tzinfo,
 ):
@@ -147,11 +151,12 @@ def bbt_stats_embed(
         title=f"Bubble tea stats {f'for {year}' if year else 'for the past year'} {'grouped by location ' if group_by_location else ''}🧋",
         color=discord.Color.green(),
     )
-    embed.description = f"For <@{user_id}>: **{total_count} total entries**\n{average_string(year, total_count)}\n\n"
+    embed.description = f"For <@{user_id}>: **{total_count} total entries**\n{average_year_string(year, total_count)}\n"
     embed.description += "\n".join(
         [
             (
-                '- ' + (
+                "- "
+                + (
                     f'**{entry.get("location")}**: '
                     if group_by_location
                     else ""
@@ -170,9 +175,20 @@ def bbt_stats_embed(
             for entry in entries
         ]
     )
+    current_year = year if year else datetime.datetime.now().year
+    embed.description += "\n\n"
+    embed.description += "\n".join(
+        [
+            f"**{calendar.month_name[monthly_count.get('month', 0)]}**: {monthly_count.get('entry_count')} entries ({average_string(calendar.monthrange(current_year, monthly_count.get('month', 0))[1], monthly_count.get('entry_count'))})"
+            + (
+                f"\n- *average given rating: {monthly_count.get('average_rating'):.3f}*"
+                if monthly_count.get("average_rating")
+                else ""
+            )
+            for monthly_count in monthly_counts
+        ]
+    )
     if latest:
         embed.description += "\n\n**Latest entry**:\n"
         embed.description += entry_string(latest, timezone)
-    else:
-        embed.description += "\n\nNo entries found for this year"
     return embed

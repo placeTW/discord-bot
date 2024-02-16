@@ -103,5 +103,21 @@ def entry_string(entry: dict, timezone: datetime.tzinfo):
     return entry_string.strip()
 
 
-def average_string(year: int, entry_count: int):
-    return f"Average of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/entry_count:.3f} days"
+def average_string(days: int, entry_count: int):
+    return (
+        f"Average of 1 🧋 every {days/entry_count:.3f} days"
+        if days and entry_count
+        else "Average of 0 🧋"
+    )
+
+
+def average_year_string(year: int, entry_count: int):
+    days = (
+        (
+            datetime.date.today()
+            if not year or year == datetime.date.today().year
+            else datetime.date(year, 12, 31)
+        )
+        - datetime.date(year or datetime.date.today().year, 1, 1)
+    ).days
+    return average_string(days, entry_count)

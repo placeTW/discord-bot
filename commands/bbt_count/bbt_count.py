@@ -8,6 +8,7 @@ from commands.bbt_count.consts import BBT_LIST_GROUP_BY_CHOICES
 
 from .db_functions import (
     add_bbt_entry,
+    get_bubble_tea_monthly_counts,
     remove_bbt_entry,
     get_bbt_entry,
     edit_bbt_entry,
@@ -410,12 +411,22 @@ def register_commands(
             ),
             group_by_location,
         )
+        monthly_counts = get_bubble_tea_monthly_counts(
+            user_id,
+            (
+                datetime.datetime(year=year, month=1, day=1)
+                if year
+                else interaction.created_at
+            ),
+        )
+
         latest = get_latest_bubble_tea_entry(user_id)
         embed = bbt_stats_embed(
             user_id,
             stats,
             year,
             group_by_location,
+            monthly_counts,
             latest,
             interaction.created_at.astimezone().tzinfo,
         )
