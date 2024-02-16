@@ -385,6 +385,9 @@ def register_commands(
         name="stats", description="Get the stats for a user for a given year"
     )
     @app_commands.describe(
+        user="User to get stats for (optional, default to self)"
+    )
+    @app_commands.describe(
         year="Year to get stats for (optional, default to current year)"
     )
     @app_commands.describe(
@@ -392,12 +395,14 @@ def register_commands(
     )
     async def bbt_count_stats(
         interaction: discord.Interaction,
+        user: discord.User = None,
         year: int = None,
         group_by_location: bool = False,
     ):
         await interaction.response.defer()
+        user_id = user.id if user else interaction.user.id
         stats = get_bubble_tea_stats(
-            interaction.user.id,
+            user_id,
             (
                 datetime.datetime(year=year, month=1, day=1)
                 if year
@@ -405,9 +410,9 @@ def register_commands(
             ),
             group_by_location,
         )
-        latest = get_latest_bubble_tea_entry(interaction.user.id)
+        latest = get_latest_bubble_tea_entry(user_id)
         embed = bbt_stats_embed(
-            interaction.user.id,
+            user_id,
             stats,
             year,
             group_by_location,

@@ -173,4 +173,6 @@ def bbt_stats_embed(
     if latest:
         embed.description += "\n\n**Latest entry**:\n"
         embed.description += entry_string(latest, timezone)
+    else:
+        embed.description += "\n\nNo entries found for this year"
     return embed
