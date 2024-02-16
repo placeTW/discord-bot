@@ -138,3 +138,20 @@ def get_bubble_tea_stats(
         return []
     results = data[1]
     return results
+
+def get_latest_bubble_tea_entry(user_id: int):
+    data, c = (
+        supabaseClient.table(TABLE)
+        .select("*")
+        .match(
+            {
+                "user_id": user_id,
+            }
+        )
+        .order("created_at", desc=True)
+        .limit(1)
+        .execute()
+    )
+    if c == 0:
+        return None
+    return data[1][0]

@@ -135,7 +135,12 @@ def bbt_list_grouped_embed(
 
 
 def bbt_stats_embed(
-    user_id: int, entries: list[dict], year: int, group_by_location: bool
+    user_id: int,
+    entries: list[dict],
+    year: int,
+    group_by_location: bool,
+    latest: dict,
+    timezone: datetime.tzinfo,
 ):
     total_count = sum([entry.get("entry_count", 0) for entry in entries])
     embed = discord.Embed(
@@ -155,9 +160,17 @@ def bbt_stats_embed(
                     entry.get("total_price") or 0,
                     entry.get("entry_count", 0),
                     entry.get("currency"),
-                ) + (f" *average given rating: {entry.get('average_rating'):.3f}*" if entry.get("average_rating") else '')
+                )
+                + (
+                    f" *average given rating: {entry.get('average_rating'):.3f}*"
+                    if entry.get("average_rating")
+                    else ""
+                )
             )
             for entry in entries
         ]
     )
+    if latest:
+        embed.description += "\n\n**Latest entry**:\n"
+        embed.description += entry_string(latest, timezone)
     return embed

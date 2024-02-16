@@ -14,6 +14,7 @@ from .db_functions import (
     get_bbt_entries,
     get_bbt_leaderboard,
     get_bubble_tea_stats,
+    get_latest_bubble_tea_entry,
 )
 from .embeds import (
     bbt_entry_embed,
@@ -404,8 +405,14 @@ def register_commands(
             ),
             group_by_location,
         )
+        latest = get_latest_bubble_tea_entry(interaction.user.id)
         embed = bbt_stats_embed(
-            interaction.user.id, stats, year, group_by_location
+            interaction.user.id,
+            stats,
+            year,
+            group_by_location,
+            latest,
+            interaction.created_at.astimezone().tzinfo,
         )
         await interaction.followup.send(embed=embed)
 
