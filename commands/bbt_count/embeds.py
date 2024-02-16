@@ -182,7 +182,7 @@ def bbt_stats_embed(
             [
                 f"**{calendar.month_name[monthly_count.get('month', 0)]}**: {monthly_count.get('entry_count')} entries ({average_month_string(current_year, monthly_count.get('month', 0), monthly_count.get('entry_count'))})"
                 + (
-                    f"\n- */average given rating: {monthly_count.get('average_rating'):.3f}*"
+                    f"\n- *average given rating: {monthly_count.get('average_rating'):.3f}*"
                     if monthly_count.get("average_rating")
                     else ""
                 )
