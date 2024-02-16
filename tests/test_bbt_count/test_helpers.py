@@ -2,7 +2,7 @@ from commands.bbt_count.helpers import (
     bubble_tea_string,
     price_string,
     calculate_prices,
-    cost_string_prices,
+    cost_string,
     entry_string,
 )
 
@@ -102,7 +102,7 @@ def test_cost_string():
     prices = [3.5, 4.0, 3.0, 0]
     currency = "USD"
     expected_result = "$10.50 (4, avg $3.50/🧋)"
-    assert cost_string_prices(prices, currency) == expected_result
+    assert cost_string(prices, currency) == expected_result
 
 
 def test_entry_string():

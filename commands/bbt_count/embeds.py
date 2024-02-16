@@ -7,7 +7,6 @@ from commands.bbt_count.helpers import (
     calculate_prices,
     entry_string,
     price_string,
-    cost_string_prices,
     cost_string,
     average_year_string,
     average_month_string,
@@ -93,7 +92,7 @@ def bbt_list_default_embed(
             "\n\n__Total costs__:\n"
             + "\n".join(
                 [
-                    cost_string_prices(prices[currency]["prices"], currency)
+                    cost_string(prices[currency]["prices"], currency)
                     for currency in prices
                 ]
             )
@@ -128,7 +127,7 @@ def bbt_list_grouped_embed(
             f"\n\n---\n**{group}: {len(group_entries)} entries**"
         )
         for currency in prices[group]:
-            embed.description += f"\n{currency}: {cost_string_prices(prices[group][currency]['prices'], currency)}"
+            embed.description += f"\n{currency}: {cost_string(prices[group][currency]['prices'], currency)}"
         embed.description += "\n\n"
         embed.description += "\n".join(
             [entry_string(entry, timezone) for entry in group_entries]
@@ -145,7 +144,7 @@ def bbt_stats_embed(
     latest: dict,
     timezone: datetime.tzinfo,
 ):
-    total_count = sum([entry.get("entry_count", 0) for entry in entries])
+    total_count = sum([len(entry.get("prices_list", 0)) for entry in entries])
     embed = discord.Embed(
         title=f"Bubble tea stats {f'for {year}' if year else 'for the past year'} {'grouped by location ' if group_by_location else ''}🧋",
         color=discord.Color.green(),
@@ -163,8 +162,7 @@ def bbt_stats_embed(
                         else ""
                     )
                     + cost_string(
-                        entry.get("total_price") or 0,
-                        entry.get("entry_count", 0),
+                        entry.get("prices_list") or [],
                         entry.get("currency"),
                     )
                     + (

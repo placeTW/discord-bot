@@ -87,13 +87,9 @@ def calculate_prices(entries: list[dict], group_by: str):
     return prices
 
 
-def cost_string_prices(prices: list[int], currency: str):
+def cost_string(prices: list[float], currency: str):
     p = np.array(prices)
-    return cost_string(p[p.nonzero()].sum(), p.size, currency)
-
-
-def cost_string(total_price: float, count: int, currency: str):
-    return f"{numbers.format_currency(total_price, currency, locale='en_US')} ({count}, avg {numbers.format_currency(total_price/count if total_price and count else 0, currency, locale='en_US')}/🧋)"
+    return f"{numbers.format_currency(p.sum(), currency, locale='en_US')} ({p.size}, avg {numbers.format_currency(p[p.nonzero()].mean() if p.sum() else 0, currency, locale='en_US')}/🧋)"
 
 
 def entry_string(entry: dict, timezone: datetime.tzinfo):
