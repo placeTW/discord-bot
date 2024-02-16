@@ -43,6 +43,9 @@ def register_commands(
         description="Short description of the bubble tea that you got"
     )
     @app_commands.describe(
+        date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)"
+    )
+    @app_commands.describe(
         location="Where you got the bubble tea from (optional)"
     )
     @app_commands.describe(
@@ -59,6 +62,7 @@ def register_commands(
     async def bbt_count_add(
         interaction: discord.Interaction,
         description: str,
+        date: str = None,
         location: str = None,
         image: discord.Attachment = None,
         price: float = None,
@@ -75,8 +79,19 @@ def register_commands(
             )
             return
 
+        if date:
+            try:
+                created_at = datetime.datetime.fromisoformat(date).astimezone()
+            except ValueError:
+                await interaction.followup.send(
+                    "Invalid date format. Please use the format YYYY-MM-DD, e.g. 2021-12-31",
+                    ephemeral=True,
+                )
+                return
+
         add_data = bubble_tea_data(
             description,
+            None,
             None,
             location,
             price,
@@ -87,7 +102,7 @@ def register_commands(
         )
 
         id = add_bbt_entry(
-            interaction.created_at,
+            created_at if date and created_at else interaction.created_at,
             interaction.user.id,
             interaction.guild.id,
             **add_data,
@@ -106,7 +121,7 @@ def register_commands(
         embed = bbt_entry_embed(
             id,
             interaction.user.id,
-            str(interaction.created_at.date()),
+            str(created_at.date()) if date and created_at else str(interaction.created_at.date()),
             interaction.user.display_name,
             interaction.user.avatar.url,
             add_data,
@@ -166,6 +181,9 @@ def register_commands(
     @bbt_count.command(name="edit", description="Edit a bubble tea entry")
     @app_commands.describe(id="ID of the bubble tea entry to edit")
     @app_commands.describe(
+        date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)"
+    )
+    @app_commands.describe(
         description="Short description of the bubble tea that you got (optional)"
     )
     @app_commands.describe(
@@ -186,6 +204,7 @@ def register_commands(
     async def bbt_count_edit(
         interaction: discord.Interaction,
         id: int,
+        date: str = None,
         description: str = None,
         transfer_user: discord.User = None,
         location: str = None,
@@ -202,6 +221,16 @@ def register_commands(
                 ephemeral=True,
             )
             return
+
+        if date:
+            try:
+                created_at = datetime.datetime.fromisoformat(date).astimezone()
+            except ValueError:
+                await interaction.followup.send(
+                    "Invalid date format. Please use the format YYYY-MM-DD, e.g. 2021-12-31",
+                    ephemeral=True,
+                )
+                return
 
         entry = get_bbt_entry(id)
         if not entry:
@@ -222,6 +251,7 @@ def register_commands(
             edit_data = bubble_tea_data(
                 description,
                 user.id if user else None,
+                str(created_at) if date and created_at else None,
                 location,
                 price,
                 currency,
@@ -420,7 +450,11 @@ def register_commands(
             ),
         )
 
-        latest = get_latest_bubble_tea_entry(user_id) if year and year == datetime.datetime.now().year else None
+        latest = (
+            get_latest_bubble_tea_entry(user_id)
+            if year and year == datetime.datetime.now().year
+            else None
+        )
         embed = bbt_stats_embed(
             user_id,
             stats,

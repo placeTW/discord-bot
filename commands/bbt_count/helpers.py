@@ -9,6 +9,7 @@ locale = Locale("en", "US")
 def bubble_tea_data(
     description: str,
     user_id: int,
+    created_at: datetime.datetime,
     location: str,
     price: float,
     currency: str,
@@ -21,6 +22,8 @@ def bubble_tea_data(
         data["description"] = description
     if user_id:
         data["user_id"] = user_id
+    if created_at:
+        data["created_at"] = created_at
     if location:
         data["location"] = location
     if price:

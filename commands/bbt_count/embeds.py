@@ -36,13 +36,13 @@ def bbt_entry_embed(
     embed.add_field(
         name="Date",
         value=(
-            date
-            if date
-            else str(
+            str(
                 datetime.datetime.fromisoformat(entry.get("created_at"))
                 .astimezone(timezone)
                 .date()
             )
+            if entry.get("created_at")
+            else date
         ),
         inline=False,
     )
