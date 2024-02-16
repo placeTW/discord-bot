@@ -1,12 +1,16 @@
 import discord
 import datetime
+import calendar
 
 from commands.bbt_count.helpers import (
     bubble_tea_string,
     calculate_prices,
     entry_string,
     price_string,
+    cost_string_prices,
     cost_string,
+    average_year_string,
+    average_month_string,
 )
 
 
@@ -84,13 +88,12 @@ def bbt_list_default_embed(
         color=discord.Color.blue(),
     )
     embed.description = (
-        f"For <@{user_id}>: **{len(entries)} total entries**\n"
+        f"For <@{user_id}>: **{len(entries)} total entries**\n{average_year_string(year, len(entries))}"
         + (
-            f"Average of 1 🧋 every {(((datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31)) - datetime.date(year or datetime.date.today().year, 1, 1)).days)/len(entries):.3f} days"
-            + "\n\n__Total costs__:\n"
+            "\n\n__Total costs__:\n"
             + "\n".join(
                 [
-                    cost_string(prices[currency]["prices"], currency)
+                    cost_string_prices(prices[currency]["prices"], currency)
                     for currency in prices
                 ]
             )
@@ -125,9 +128,68 @@ def bbt_list_grouped_embed(
             f"\n\n---\n**{group}: {len(group_entries)} entries**"
         )
         for currency in prices[group]:
-            embed.description += f"\n{currency}: {cost_string(prices[group][currency]['prices'], currency)}"
+            embed.description += f"\n{currency}: {cost_string_prices(prices[group][currency]['prices'], currency)}"
         embed.description += "\n\n"
         embed.description += "\n".join(
             [entry_string(entry, timezone) for entry in group_entries]
         )
+    return embed
+
+
+def bbt_stats_embed(
+    user_id: int,
+    entries: list[dict],
+    year: int,
+    group_by_location: bool,
+    monthly_counts: list[dict],
+    latest: dict,
+    timezone: datetime.tzinfo,
+):
+    total_count = sum([entry.get("entry_count", 0) for entry in entries])
+    embed = discord.Embed(
+        title=f"Bubble tea stats {f'for {year}' if year else 'for the past year'} {'grouped by location ' if group_by_location else ''}🧋",
+        color=discord.Color.green(),
+    )
+    embed.description = f"For <@{user_id}>: **{total_count} total entries**\n{average_year_string(year, total_count)}\n\n"
+    if total_count > 0:
+        embed.description += f"{'__Total costs__' if not group_by_location else '__Costs by location__'}:\n"
+        embed.description += "\n".join(
+            [
+                (
+                    "- "
+                    + (
+                        f'**{entry.get("location")}**: '
+                        if group_by_location
+                        else ""
+                    )
+                    + cost_string(
+                        entry.get("total_price") or 0,
+                        entry.get("entry_count", 0),
+                        entry.get("currency"),
+                    )
+                    + (
+                        f" *average given rating: {entry.get('average_rating'):.3f}*"
+                        if entry.get("average_rating")
+                        else ""
+                    )
+                )
+                for entry in entries
+            ]
+        )
+        current_year = year if year else datetime.datetime.now().year
+        embed.description += "\n\n__Monthly counts__:\n"
+        embed.description += "\n".join(
+            [
+                f"**{calendar.month_name[monthly_count.get('month', 0)]}**: {monthly_count.get('entry_count')} entries ({average_month_string(current_year, monthly_count.get('month', 0), monthly_count.get('entry_count'))})"
+                + (
+                    f"\n- */average given rating: {monthly_count.get('average_rating'):.3f}*"
+                    if monthly_count.get("average_rating")
+                    else ""
+                )
+                for monthly_count in monthly_counts
+            ]
+        )
+        if latest:
+            embed.description += "\n\n**Latest entry**:\n"
+            embed.description += entry_string(latest, timezone)
     return embed

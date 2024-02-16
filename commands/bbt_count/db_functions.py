@@ -120,6 +120,59 @@ def get_bbt_leaderboard(guild_id: int, date: datetime):
     if c == 0:
         return []
     results = data[1]
-    # sort the data
-    results.sort(key=lambda x: x["count"], reverse=True)
     return results
+
+
+# Gets the bubble tea stats for a user in a given year
+def get_bubble_tea_stats(
+    user_id: int, date: datetime, group_by_location=False
+):
+    data, c = supabaseClient.rpc(
+        "get_bubble_tea_stats",
+        {
+            "user_id": user_id,
+            "date": str(date),
+            "group_by_location": group_by_location,
+        },
+    ).execute()
+    if c == 0:
+        return []
+    results = data[1]
+    return results
+
+
+# Gets the bubble tea monthly counts for a user
+def get_bubble_tea_monthly_counts(user_id: int, date: datetime):
+    data, c = supabaseClient.rpc(
+        "get_bubble_tea_monthly_counts",
+        {
+            "user_id": user_id,
+            "date": str(date),
+        },
+    ).execute()
+    if c == 0:
+        return []
+    results = data[1]
+    return results
+
+
+# Get the user's latest bubble tea entry
+def get_latest_bubble_tea_entry(user_id: int):
+    data, c = (
+        supabaseClient.table(TABLE)
+        .select("*")
+        .match(
+            {
+                "user_id": user_id,
+            }
+        )
+        .order("created_at", desc=True)
+        .limit(1)
+        .execute()
+    )
+    if c == 0:
+        return None
+    try:
+        return data[1][0]
+    except IndexError:
+        return None

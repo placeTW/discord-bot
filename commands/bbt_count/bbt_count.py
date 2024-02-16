@@ -8,17 +8,21 @@ from commands.bbt_count.consts import BBT_LIST_GROUP_BY_CHOICES
 
 from .db_functions import (
     add_bbt_entry,
+    get_bubble_tea_monthly_counts,
     remove_bbt_entry,
     get_bbt_entry,
     edit_bbt_entry,
     get_bbt_entries,
     get_bbt_leaderboard,
+    get_bubble_tea_stats,
+    get_latest_bubble_tea_entry,
 )
 from .embeds import (
     bbt_entry_embed,
     bbt_list_default_embed,
     bbt_list_grouped_embed,
     user_transfer_embed,
+    bbt_stats_embed,
 )
 from .helpers import bubble_tea_data
 from ..modules import logging, content_moderation
@@ -63,7 +67,7 @@ def register_commands(
         rating: float = None,
     ):
         await interaction.response.defer()
-        
+
         if image and not image.content_type.startswith("image/"):
             await interaction.followup.send(
                 "Invalid image type. Please upload an image file.",
@@ -255,6 +259,7 @@ def register_commands(
 
         # Show transfer button choices if transfer_user is specified
         if transfer_user and transfer_user.id != interaction.user.id:
+
             class TransferButtonView(discord.ui.View):
                 def __init__(self):
                     super().__init__()
@@ -366,9 +371,64 @@ def register_commands(
         )
         embed.description = "\n".join(
             [
-                f"{i+1}. <@{user_data['user_id']}>: {user_data['count']} 🧋"
+                f"{i+1}. <@{user_data.get('user_id')}>: {user_data.get('count')} 🧋"
+                + (
+                    f" *average given rating: {user_data.get('average_rating'):.3f}*"
+                    if user_data.get("average_rating")
+                    else ""
+                )
                 for i, user_data in enumerate(leaderboard)
             ]
+        )
+        await interaction.followup.send(embed=embed)
+
+    @bbt_count.command(
+        name="stats", description="Get the stats for a user for a given year"
+    )
+    @app_commands.describe(
+        user="User to get stats for (optional, default to self)"
+    )
+    @app_commands.describe(
+        year="Year to get stats for (optional, default to current year)"
+    )
+    @app_commands.describe(
+        group_by_location="Group the stats by location (optional)"
+    )
+    async def bbt_count_stats(
+        interaction: discord.Interaction,
+        user: discord.User = None,
+        year: int = None,
+        group_by_location: bool = False,
+    ):
+        await interaction.response.defer()
+        user_id = user.id if user else interaction.user.id
+        stats = get_bubble_tea_stats(
+            user_id,
+            (
+                datetime.datetime(year=year, month=1, day=1)
+                if year
+                else interaction.created_at
+            ),
+            group_by_location,
+        )
+        monthly_counts = get_bubble_tea_monthly_counts(
+            user_id,
+            (
+                datetime.datetime(year=year, month=1, day=1)
+                if year
+                else interaction.created_at
+            ),
+        )
+
+        latest = get_latest_bubble_tea_entry(user_id) if year and year == datetime.datetime.now().year else None
+        embed = bbt_stats_embed(
+            user_id,
+            stats,
+            year,
+            group_by_location,
+            monthly_counts,
+            latest,
+            interaction.created_at.astimezone().tzinfo,
         )
         await interaction.followup.send(embed=embed)
 

@@ -1,6 +1,7 @@
 from babel import numbers, Locale
 import datetime
 import numpy as np
+import calendar
 
 locale = Locale("en", "US")
 
@@ -83,9 +84,13 @@ def calculate_prices(entries: list[dict], group_by: str):
     return prices
 
 
-def cost_string(prices: list[int], currency: str):
+def cost_string_prices(prices: list[int], currency: str):
     p = np.array(prices)
-    return f"{numbers.format_currency(p.sum(), currency, locale='en_US')} ({p.size}, avg {numbers.format_currency(p[p.nonzero()].mean() if p.sum() else 0, currency, locale='en_US')}/🧋)"
+    return cost_string(p.sum(), p.size, currency)
+
+
+def cost_string(total_price: float, count: int, currency: str):
+    return f"{numbers.format_currency(total_price, currency, locale='en_US')} ({count}, avg {numbers.format_currency(total_price/count if total_price and count else 0, currency, locale='en_US')}/🧋)"
 
 
 def entry_string(entry: dict, timezone: datetime.tzinfo):
@@ -97,3 +102,43 @@ def entry_string(entry: dict, timezone: datetime.tzinfo):
         f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
     )
     return entry_string.strip()
+
+
+def average_string(days: int, entry_count: int, is_current: bool):
+    return (
+        f"Average of 1 🧋 every {days/entry_count:.3f} days {'*so far*' if is_current else ''}".strip()
+        if days and entry_count
+        else "Average of 0 🧋"
+    )
+
+
+def average_year_string(year: int, entry_count: int):
+    days = (
+        (
+            datetime.date.today()
+            if not year or year == datetime.date.today().year
+            else datetime.date(year, 12, 31)
+        )
+        - datetime.date(year or datetime.date.today().year, 1, 1)
+    ).days + 1
+    is_current = not year or year == datetime.date.today().year
+    return average_string(days, entry_count, is_current)
+
+
+def average_month_string(year: int, month: int, entry_count: int):
+    ## check if the year and month are the current year and month, and if so, use the days from the beginning to the current date
+    days = (
+        (
+            datetime.date.today()
+            if (not year or year == datetime.date.today().year)
+            and month == datetime.date.today().month
+            else datetime.date(
+                year, month, calendar.monthrange(year, month)[1]
+            )
+        )
+        - datetime.date(year or datetime.date.today().year, month, 1)
+    ).days + 1
+    is_current = (
+        not year or year == datetime.date.today().year
+    ) and month == datetime.date.today().month
+    return average_string(days, entry_count, is_current)
