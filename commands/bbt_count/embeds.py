@@ -151,8 +151,8 @@ def bbt_stats_embed(
     embed.description += "\n".join(
         [
             (
-                (
-                    f'- **{entry.get("location")}**: '
+                '- ' + (
+                    f'**{entry.get("location")}**: '
                     if group_by_location
                     else ""
                 )
