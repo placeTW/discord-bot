@@ -420,7 +420,7 @@ def register_commands(
             ),
         )
 
-        latest = get_latest_bubble_tea_entry(user_id)
+        latest = get_latest_bubble_tea_entry(user_id) if year and year == datetime.datetime.now().year else None
         embed = bbt_stats_embed(
             user_id,
             stats,
