@@ -99,9 +99,9 @@ def test_calculate_prices_group_by_currency():
 
 
 def test_cost_string():
-    prices = [3.5, 4.0, 3.0, 0]
+    prices = [3.5, 4.0, 3.0, 0, None]
     currency = "USD"
-    expected_result = "$10.50 (4, avg $3.50/🧋)"
+    expected_result = "$10.50 (5, avg $3.50/🧋)"
     assert cost_string(prices, currency) == expected_result
 
 
