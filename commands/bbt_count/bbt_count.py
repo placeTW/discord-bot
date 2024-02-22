@@ -215,9 +215,9 @@ def register_commands(
         rating: float = None,
     ):
         await interaction.response.defer()
-        if image and not await content_moderation.review_image(image):
+        if image and not image.content_type.startswith("image/"):
             await interaction.followup.send(
-                "Image rejected by content moderation.",
+                "Invalid image type. Please upload an image file.",
                 ephemeral=True,
             )
             return
