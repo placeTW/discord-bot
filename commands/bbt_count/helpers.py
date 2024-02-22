@@ -142,3 +142,18 @@ def average_month_string(year: int, month: int, entry_count: int):
         not year or year == datetime.date.today().year
     ) and month == datetime.date.today().month
     return average_string(days, entry_count, is_current)
+
+def rating_string(entry: dict):
+    return 'ratings: ' + (
+        f"min: {entry.get('minimum_rating'):.3f}, "
+        if entry.get("minimum_rating")
+        else ""
+    ) + (
+        f"avg: {entry.get('average_rating'):.3f}, "
+        if entry.get("average_rating")
+        else ""
+    ) + (
+        f"max: {entry.get('maximum_rating'):.3f}"
+        if entry.get("maximum_rating")
+        else ""
+    )

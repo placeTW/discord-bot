@@ -10,6 +10,7 @@ from commands.bbt_count.helpers import (
     cost_string,
     average_year_string,
     average_month_string,
+    rating_string,
 )
 
 
@@ -166,7 +167,7 @@ def bbt_stats_embed(
                         entry.get("currency"),
                     )
                     + (
-                        f" *average given rating: {entry.get('average_rating'):.3f}*"
+                        f'\n  - *{rating_string(entry)}*'
                         if entry.get("average_rating")
                         else ""
                     )
@@ -180,7 +181,7 @@ def bbt_stats_embed(
             [
                 f"**{calendar.month_name[monthly_count.get('month', 0)]}**: {monthly_count.get('entry_count')} entries ({average_month_string(current_year, monthly_count.get('month', 0), monthly_count.get('entry_count'))})"
                 + (
-                    f"\n- *average given rating: {monthly_count.get('average_rating'):.3f}*"
+                    '\n- ' + rating_string(monthly_count)
                     if monthly_count.get("average_rating")
                     else ""
                 )
