@@ -25,6 +25,7 @@ from commands.react_baltics import react_baltics
 from commands.react_czech import react_czech
 from commands.react_ph import react_ph
 from commands.react_hgs import react_hgs
+from commands.react_earthquake import react_earthquake
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
@@ -179,6 +180,12 @@ async def on_message(message: discord.Message):
         except Exception as e:
             print("failed to react UA: ", e)
         events.append("ua")
+    if react_earthquake.is_earthquake_message(message):
+        try:
+            await react_earthquake.send_react_earthquake(message)
+        except Exception as e:
+            print("failed to react earthquake: ", e)
+        events.append("earthquake")
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
