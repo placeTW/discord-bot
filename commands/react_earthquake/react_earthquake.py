@@ -1,5 +1,6 @@
 from re import compile, IGNORECASE, UNICODE
 import discord
+from ..modules.probability import mock_bernoulli
 
 KEYWORDS_EARTHQUAKE = {
   'earthquake',
@@ -16,4 +17,5 @@ def is_earthquake_message(message: discord.Message):
     return EARTHQUAKE_REGEX.search(message.content)
 
 async def send_react_earthquake(message: discord.Message):
-    await message.reply("https://www.youtube.com/watch?v=P24eOUl46k0")
+    if mock_bernoulli(0.75):
+        await message.reply("https://www.youtube.com/watch?v=P24eOUl46k0")
