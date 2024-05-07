@@ -21,13 +21,13 @@ KEYWORDS_EN = [
 
 KEYWORDS_LT = [r"kar[šs]tas\s+g[ėe]j[ųu]\s+seksas"]
 
-KEYWORDS_LV = [r"(?:Dedzīgs|Kaislīgs) geju sekss"]
+KEYWORDS_LV = [r"(?:Dedzīgs|Kaislīgs)\s+geju\s+sekss"]
 
-KEYWORDS_UA = [r"гарячий гей секс"]
+KEYWORDS_UA = [r"гарячий\s+гей\s+секс"]
 
 KEYWORDS_TW = [r"(?:激情|熱烈)(?:同志|同性)(?:性愛|性交)", r"ㄏㄍㄙ"]
 
 HGS_REGEX = compile(
-    rf"\b(?:{'|'.join(KEYWORDS_EN + KEYWORDS_LT + KEYWORDS_UA)})\b|{'|'.join(KEYWORDS_TW)}",
+    rf"\b(?:{'|'.join(KEYWORDS_EN + KEYWORDS_LT + KEYWORDS_LV + KEYWORDS_UA)})\b|{'|'.join(KEYWORDS_TW)}",
     flags=IGNORECASE | UNICODE,
 )
