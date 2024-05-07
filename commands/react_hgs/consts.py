@@ -14,15 +14,16 @@ POSSIBLE_REACTS_TROLLS = [
     "<:UATroll:1142824293470838854>",
 ]
 
-KEYWORDS_EN = (
+KEYWORDS_EN = [
     "HGS",
     "hot gay sex",
-)
+]
 
-KEYWORDS_TW = (r"(?:同志)(?:激情|熱烈)(?:性愛|性交)", r"ㄏㄍㄙ")
+KEYWORDS_LT = [r"kar[šs]tas\s+g[ėe]j[ųu]\s+seksas"]
 
+KEYWORDS_TW = [r"(?:同志)(?:激情|熱烈)(?:性愛|性交)", r"ㄏㄍㄙ"]
 
 HGS_REGEX = compile(
-    rf"\b(?:{'|'.join(KEYWORDS_EN)})\b|{'|'.join(KEYWORDS_TW)}",
+    rf"\b(?:{'|'.join(KEYWORDS_EN + KEYWORDS_LT)})\b|{'|'.join(KEYWORDS_TW)}",
     flags=IGNORECASE | UNICODE,
 )
