@@ -184,3 +184,11 @@ guilds.env.hjson
 *.ipynb
 *.xlsx
 tocfl_8000.csv
+
+# specifically for topic_detection
+*.bin
+*.ftz
+commands/topic_detection/models
+commands/topic_detection/*.ipynb
+commands/topic_detection/*.txt
+commands/topic_detection/train/
