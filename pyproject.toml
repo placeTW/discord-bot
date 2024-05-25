@@ -20,8 +20,8 @@ shortuuid = "^1.0.13"
 validators = "^0.28.2"
 beautifulsoup4 = "^4.12.3"
 gitpython = "^3.1.43"
-
 pytest = "^8.2.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
