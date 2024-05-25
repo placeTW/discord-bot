@@ -45,7 +45,6 @@ from commands.modules.supabase import supabaseClient
 from commands.modules import config
 import bot
 import sys
-import utils
 from git import Repo
 import platform
 

@@ -1,4 +1,3 @@
-import utils
 from ..modules.supabase import supabaseClient
 
 def fetch_config(is_prod: bool):

@@ -75,7 +75,7 @@ def edit_bbt_entry(id: int, owner_user_id: int, **kwargs):
 
 
 # Gets all bubble tea entries from the database for a user in a given year
-def get_bbt_entries(user_id: int, year: int = None):
+def get_bbt_entries(user_id: int, year: int = None, page: int = 1):
     data, c = (
         supabaseClient.table(TABLE)
         .select("*")
@@ -101,6 +101,7 @@ def get_bbt_entries(user_id: int, year: int = None):
             }
         )
         .order("created_at", desc=True)
+        .range(page * 10, (page - 1) * 10)
         .execute()
     )
     if c == 0:
