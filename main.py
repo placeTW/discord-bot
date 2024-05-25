@@ -47,7 +47,7 @@ import bot
 import sys
 import utils
 from git import Repo
-
+import platform
 
 # load environment vars (from .env)
 load_dotenv()
@@ -72,6 +72,8 @@ async def deployment_info(interaction: discord.Interaction):
     msg = f"""
 PlaceTW discord bot ({'prod' if is_prod else 'dev'} deployment)
 Branch deployed: `{Repo().active_branch.name}`
+Python version: `{platform.python_version()}`
+Operating system: `{platform.platform()}`
 Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
 https://github.com/placeTW/discord-bot
     """
