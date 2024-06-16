@@ -6,8 +6,8 @@ from discord import app_commands
 import validators
 
 from bot import TWPlaceClient
-from ..modules import logging, content_moderation
-from ..modules.supabase import supabaseClient
+from modules import logging, content_moderation
+from modules.supabase import supabaseClient
 
 @dataclass
 class ConfessionConfig:

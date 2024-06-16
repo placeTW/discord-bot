@@ -10,7 +10,7 @@ from .consts import (
     LV_REACTS,
     ET_REACTS,
 )
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 
 
 def is_baltic_message(message: discord.Message):

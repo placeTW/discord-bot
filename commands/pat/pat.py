@@ -1,6 +1,6 @@
 import time
 import discord
-from ..modules import logging
+from modules import logging
 from discord import app_commands
 from pathlib import Path
 from random import choice

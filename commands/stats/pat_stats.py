@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from ..modules.supabase import supabaseClient
+from modules.supabase import supabaseClient
 
 def get_pat_stats(pat_type: str):
     data, c = supabaseClient.table(f'total_{pat_type}_counts').select("*").limit(10).execute()

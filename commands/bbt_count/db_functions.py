@@ -1,5 +1,5 @@
 import datetime
-from ..modules.supabase import supabaseClient
+from modules.supabase import supabaseClient
 
 TABLE = "bubble_tea_entries"
 

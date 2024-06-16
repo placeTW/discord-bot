@@ -2,7 +2,7 @@ from typing import Any
 import discord
 from presence import watching
 from discord.ext import tasks
-from commands.modules.config import fetch_config
+from modules.config import fetch_config
 
 CHANGE_STATUS_INTERVAL_HOURS = 1
 

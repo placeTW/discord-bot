@@ -6,7 +6,7 @@ so that both fetch_entry and fetch_entry_ui can use it
 import discord
 
 from commands.entry_consts.consts import I18N_JSON_URL
-from ..modules import async_utils, postprocess
+from modules import async_utils, postprocess
 
 
 async def get_json(how="url", json_url="") -> dict:

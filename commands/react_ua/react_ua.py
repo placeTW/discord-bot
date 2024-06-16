@@ -1,6 +1,6 @@
 import discord
 from .consts import POSSIBLE_REACTS, UA_REGEX
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 
 
 def is_UA_message(message: discord.Message):

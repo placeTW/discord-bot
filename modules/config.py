@@ -1,4 +1,4 @@
-from ..modules.supabase import supabaseClient
+from modules.supabase import supabaseClient
 
 def fetch_config(is_prod: bool):
   supabase_data = supabaseClient.table("server_config").select("*").eq('prod_config', is_prod).execute().data

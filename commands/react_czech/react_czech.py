@@ -1,6 +1,6 @@
 import discord
 from .consts import POSSIBLE_REACTS, CZECH_REGEX
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 
 
 def is_czech_message(message: discord.Message):
