@@ -4,7 +4,7 @@ from io import BytesIO
 import random
 import discord
 
-from ..modules import logging
+from modules import logging
 
 from .consts import POSSIBLE_URLS, SITE_URL
 

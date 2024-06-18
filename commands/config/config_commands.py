@@ -1,13 +1,13 @@
 
 from discord import app_commands
 from discord.app_commands import Choice
-from commands.modules import logging
+from modules import logging
 
 import discord
 from bot import TWPlaceClient
 from commands.config.consts import POSSIBLE_CHANNEL_CONFIG_FIELDS
-from commands.modules.supabase import supabaseClient
-from commands.modules.config import set_config
+from modules.supabase import supabaseClient
+from modules.config import set_config
 
 def register_commands(
     tree: discord.app_commands.CommandTree,

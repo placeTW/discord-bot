@@ -3,7 +3,7 @@ import datetime
 import os
 import sys
 import discord
-from ..modules.supabase import supabaseClient
+from modules.supabase import supabaseClient
 
 from dotenv import load_dotenv
 from .supabase import supabaseClient

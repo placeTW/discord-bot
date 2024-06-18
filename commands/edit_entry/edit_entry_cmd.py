@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 
 from commands.fetch_entry.fetch_entry_main import _fetch_entry_with_json
-from ..modules import async_utils
+from modules import async_utils
 from discord.app_commands import Choice
 from .interfaces import submit_entry_modal
 

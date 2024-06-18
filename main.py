@@ -15,7 +15,7 @@ from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
 from commands.meow.meow import meow_meow
-from commands.modules import logging
+from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.pat import pat
@@ -30,7 +30,7 @@ from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
-from commands.gothefucktosleep import gothefucktosleep
+from commands.fucking import fucking
 from commands.boba import boba
 from commands.confessions import confession
 from commands.stats import stats
@@ -41,8 +41,8 @@ from presence import watching
 
 from mentioned import mention_responses
 
-from commands.modules.supabase import supabaseClient
-from commands.modules import config
+from modules.supabase import supabaseClient
+from modules import config
 import bot
 import sys
 from git import Repo
@@ -68,13 +68,14 @@ placetw_guild = discord.Object(
     guild=placetw_guild,
 )
 async def deployment_info(interaction: discord.Interaction):
+    branch_name = Repo().active_branch.name
     msg = f"""
 PlaceTW discord bot ({'prod' if is_prod else 'dev'} deployment)
-Branch deployed: `{Repo().active_branch.name}`
+Branch deployed: `{branch_name}`
 Python version: `{platform.python_version()}`
 Operating system: `{platform.platform()}`
 Deployed on `{deployment_date.ctime()} ({deployment_date.astimezone().tzinfo})`
-https://github.com/placeTW/discord-bot
+https://github.com/placeTW/discord-bot{f'/tree/{branch_name}' if branch_name != 'main' else ''}
     """
     await interaction.response.send_message(msg)
 
@@ -91,21 +92,25 @@ guilds = [
     for server_id in client.guilds_dict.keys()
 ]
 
-# * Register commands to all servers that the bot is in
-bbt_count.register_commands(tree, client, guilds)
-fetch_entry_cmd.register_commands(tree, guilds)
-fetch_entry_ui.register_commands(tree, guilds)
-one_o_one.register_commands(tree, guilds)
-hgs.register_commands(tree, guilds)
-random_shiba.register_commands(tree, guilds)
-random_capoo.register_commands(tree, guilds)
-gothefucktosleep.register_commands(tree, guilds)
-boba.register_commands(tree, guilds)
-basic_commands.register_commands(tree, guilds)
-config_commands.register_commands(tree, client, guilds)
-stats.register_commands(tree, client, guilds)
-pat.register_commands(tree, client, guilds)
-formosa_stickers.register_commands(tree, guilds)
+def register_commands(tree, client, guilds):
+    # * Register commands to all servers that the bot is in
+    bbt_count.register_commands(tree, client, guilds)
+    fetch_entry_cmd.register_commands(tree, guilds)
+    fetch_entry_ui.register_commands(tree, guilds)
+    one_o_one.register_commands(tree, guilds)
+    hgs.register_commands(tree, guilds)
+    random_shiba.register_commands(tree, guilds)
+    random_capoo.register_commands(tree, guilds)
+    fucking.register_commands(tree, guilds)
+    boba.register_commands(tree, guilds)
+    basic_commands.register_commands(tree, guilds)
+    config_commands.register_commands(tree, client, guilds)
+    stats.register_commands(tree, client, guilds)
+    pat.register_commands(tree, client, guilds)
+    formosa_stickers.register_commands(tree, guilds)
+
+
+register_commands(tree, client, guilds)
 
 
 # confessions needs the dictionary for the confession channel id
@@ -201,13 +206,14 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_guild_join(guild):
-    await tree.sync(guild=guild)
     supabaseClient.table("server_config").insert(
         {
             "guild_id": str(guild.id),
             "server_name": guild.name,
         }
     ).execute()
+    register_commands(tree, client, [guild])
+    await tree.sync(guild=guild)
 
 
 client.run(TOKEN)

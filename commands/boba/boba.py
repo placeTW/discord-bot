@@ -9,7 +9,7 @@ from detecto.core import Model
 from discord import app_commands
 from PIL import Image, ImageDraw
 
-from commands.modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 from pathlib import Path
 
 BOBA_DIR = Path(__file__).parent  # this file's dir

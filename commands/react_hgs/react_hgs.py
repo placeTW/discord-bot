@@ -1,6 +1,6 @@
 import discord
 from .consts import POSSIBLE_REACTS_HGS, POSSIBLE_REACTS_TROLLS, HGS_REGEX
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 from random import shuffle, choice
 
 

@@ -1,7 +1,7 @@
 from random import choice, randint, shuffle
 import discord
 
-from commands.modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 from .consts import (
     CHISOBCAT,
     MEOW,

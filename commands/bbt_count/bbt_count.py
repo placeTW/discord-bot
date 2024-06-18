@@ -25,7 +25,7 @@ from .embeds import (
     bbt_stats_embed,
 )
 from .helpers import bubble_tea_data
-from ..modules import logging, content_moderation
+from modules import logging, content_moderation
 
 
 def register_commands(

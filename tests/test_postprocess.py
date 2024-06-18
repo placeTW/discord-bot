@@ -1,4 +1,4 @@
-import commands.modules.postprocess as postprocess
+import modules.postprocess as postprocess
 
 
 def test_postprocess_fetch_field():

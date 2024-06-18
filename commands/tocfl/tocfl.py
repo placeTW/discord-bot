@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 
 from bot import TWPlaceClient
-from ..modules.supabase import supabaseClient
+from modules.supabase import supabaseClient
 from random import randint
 from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
 

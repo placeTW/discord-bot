@@ -1,6 +1,6 @@
 from re import compile, IGNORECASE, UNICODE
 import discord
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 
 KEYWORDS_EARTHQUAKE = {
   'earthquake',

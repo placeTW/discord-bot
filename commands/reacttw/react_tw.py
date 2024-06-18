@@ -1,6 +1,6 @@
 import discord
 from .consts import POSSIBLE_REACTS, TW_REGEX
-from ..modules.probability import mock_bernoulli
+from modules.probability import mock_bernoulli
 
 
 def is_TW_message(message: discord.Message):

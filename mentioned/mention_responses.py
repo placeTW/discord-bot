@@ -1,5 +1,7 @@
 import random
 import discord
+from modules.probability import mock_bernoulli
+
 
 # a dict of possible responses and their weights when the bot is mentioned.
 POSSIBLE_RESPONSES_MAP = {
@@ -10,7 +12,7 @@ POSSIBLE_RESPONSES_MAP = {
     "<:Black_Bear:1132603463126237244>": 1,
     "<:101_Top:1132608896222113951>\n<:101_Floor:1132608196515725332>": 1,
     "<:PineappleCake:1156373382565212323>": 1,
-    "<:slipper:1132961055304323143>": 1,
+    "<:twslipper:1156375845330485298>": 1,
     "喵": 1,
     "🧋": 1,
     # from Baltics server
@@ -27,5 +29,6 @@ def get_random_response() -> str:
 
 
 async def reply_with_random_response(message: discord.Message):
-    response = get_random_response()
-    await message.reply(response)
+    if mock_bernoulli(0.95):
+        response = get_random_response()
+        await message.reply(response)

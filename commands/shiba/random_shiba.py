@@ -1,5 +1,5 @@
 import discord
-from ..modules.async_utils import _async_get_json
+from modules.async_utils import _async_get_json
 from random import choice
 
 POSSIBLE_BREEDS = (

@@ -1,7 +1,7 @@
 import aiohttp
 import discord
 from discord import app_commands
-from ..modules import async_utils, postprocess
+from modules import async_utils, postprocess
 import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
