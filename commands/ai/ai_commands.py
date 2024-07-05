@@ -1,6 +1,7 @@
 from discord import app_commands
 import discord
 from modules.ai.llm import get_response, list_models
+from utils.splitter import split_text
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -16,7 +17,9 @@ def register_commands(
         await interaction.response.defer()
         try:
             response = get_response(question, model)
-            await interaction.followup.send(response)
+            split_response = split_text(response)
+            for chunk in split_response:
+                await interaction.followup.send(chunk)
         except Exception as e:
             await interaction.followup.send(f"An error occurred: {e}")
 

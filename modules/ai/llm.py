@@ -15,11 +15,10 @@ def list_models() -> list[str]:
 
 def get_response(prompt: str, model: str = "") -> str:
     completion: ChatCompletion = openai.chat.completions.create(
-        model=model if model else os.getenv("LLM_MODEL"),
+        model=model if model else os.getenv("DEFAULT_LLM_MODEL"),
         messages=[
             {"role": "user", "content": prompt}
         ],
-        stream=False,
-        max_tokens=250
+        stream=False
     )
     return completion.choices[0].message.content
