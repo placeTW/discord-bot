@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import datetime
 
 # user commands
-from commands.ai import llm_commands
+from commands.ai import ai_commands
 from commands.basic import basic_commands
 from commands.bbt_count import bbt_count
 from commands.config import config_commands
@@ -82,7 +82,7 @@ https://github.com/placeTW/discord-bot{f'/tree/{branch_name}' if branch_name != 
 
 
 # * register commands the just the placetw server
-llm_commands.register_commands(tree, [placetw_guild])
+ai_commands.register_commands(tree, [placetw_guild])
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 watching.register_commands(tree, placetw_guild, client)

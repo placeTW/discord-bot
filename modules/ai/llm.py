@@ -1,3 +1,4 @@
+import requests
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 import os
@@ -9,9 +10,17 @@ openai = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-def get_response(prompt: str) -> str:
+def list_models() -> list[str]:
+    # TODO: use the OpenAI implementation
+    # Should be compatible with Ollama soon: https://github.com/ollama/ollama/pull/5007
+    # return openai.models.list().data
+    URL = os.getenv("OPENAI_BASE_URL").replace('/v1', '') + "/api/tags"
+    response = requests.get(URL)
+    return [model['model'] for model in response.json()['models']]
+
+def get_response(prompt: str, model: str = "") -> str:
     completion: ChatCompletion = openai.chat.completions.create(
-        model=os.getenv("LLM_MODEL"),
+        model=model or os.getenv("LLM_MODEL"),
         messages=[
             {"role": "user", "content": prompt}
         ],
