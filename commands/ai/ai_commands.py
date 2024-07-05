@@ -27,5 +27,8 @@ def register_commands(
     )
     async def llm_models(interaction: discord.Interaction):
         await interaction.response.defer()
-        models = list_models()
-        await interaction.followup.send("\n".join(models))
+        try:
+            models = list_models()
+            await interaction.followup.send("\n".join(models))
+        except Exception as e:
+            await interaction.followup.send(f"An error occurred: {e}")
