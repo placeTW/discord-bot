@@ -28,6 +28,11 @@ CZECH_MEOWs = [
 ]
 CZECH_MEOWs = [rf"\b{meow}\b" for meow in CZECH_MEOWs] # to match whole words only
 
+MISC_MEOWs = [
+    "ᓚᘏᗢ",
+]
+MISC_MEOWs = [rf"\b{meow}\b" for meow in MISC_MEOWs] # to match whole words only
+
 POSSIBLE_MEOW_MESSAGES = [
     MEOW,
     TRADITIONAL_CAT,
@@ -36,7 +41,7 @@ POSSIBLE_MEOW_MESSAGES = [
     '錨',
     'ㄇㄧㄠ',
     
-] + POSSIBLE_MEOW_REACTS + JP_MEOWs
+] + POSSIBLE_MEOW_REACTS + JP_MEOWs + BALTIC_MEOWs + CZECH_MEOWs + MISC_MEOWs
 
 CHISOBCAT = '<:ChisobCat:1157361078452375582>'
 SHIBELOL = '<:dogekek:1132350110148333718>'
