@@ -18,6 +18,7 @@ BALTIC_MEOWs = [
     "mjäu",
     # Latvian
     "mjau",
+    "ņau",
     # Lithuanian
     "miau",
 ]
