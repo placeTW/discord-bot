@@ -8,12 +8,21 @@ POSSIBLE_MEOW_REACTS = [
     '<:Capoo:1139357657698938991>'
 ]
 
-JP_MEOWs = [
+ZH_MEOWS = [
+    MEOW,
+    TRADITIONAL_CAT,
+    'meow',
+    '瞄',
+    '錨',
+    'ㄇㄧㄠ',
+]
+
+JP_MEOWS = [
     "ニャー",
     "にゃー",
 ]
 
-BALTIC_MEOWs = [
+BALTIC_MEOWS = [
     # Estonian
     "mjäu",
     # Latvian
@@ -22,32 +31,22 @@ BALTIC_MEOWs = [
     # Lithuanian
     "miau",
 ]
-BALTIC_MEOWs = [rf"\b{meow}\b" for meow in BALTIC_MEOWs] # to match whole words only
 
-CZECH_MEOWs = [
+CZECH_MEOWS = [
     "mňau",
 ]
-CZECH_MEOWs = [rf"\b{meow}\b" for meow in CZECH_MEOWs] # to match whole words only
 
-MISC_MEOWs = [
+MISC_MEOWS = [
     "ᓚᘏᗢ",
 ]
-MISC_MEOWs = [rf"\b{meow}\b" for meow in MISC_MEOWs] # to match whole words only
 
-POSSIBLE_MEOW_MESSAGES = [
-    MEOW,
-    TRADITIONAL_CAT,
-    'meow',
-    '瞄',
-    '錨',
-    'ㄇㄧㄠ',
-    
-] + POSSIBLE_MEOW_REACTS + JP_MEOWs + BALTIC_MEOWs + CZECH_MEOWs + MISC_MEOWs
+POSSIBLE_MEOW_MESSAGES = ZH_MEOWS + POSSIBLE_MEOW_REACTS + JP_MEOWS + BALTIC_MEOWS + CZECH_MEOWS + MISC_MEOWS
+POSSIBLE_MEOW_MATCHES = ZH_MEOWS + POSSIBLE_MEOW_REACTS + JP_MEOWS + [rf"\b{meow}\b" for meow in BALTIC_MEOWS + CZECH_MEOWS + MISC_MEOWS] # to match whole words only
 
 CHISOBCAT = '<:ChisobCat:1157361078452375582>'
 SHIBELOL = '<:dogekek:1132350110148333718>'
 
 MEOW_REGEX = compile(
-    rf"(?:{'|'.join(POSSIBLE_MEOW_MESSAGES)})",
+    rf"(?:{'|'.join(POSSIBLE_MEOW_MATCHES)})",
     flags=IGNORECASE | UNICODE,
 )
