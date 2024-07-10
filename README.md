@@ -1,4 +1,43 @@
-# Place TW Discord Bot
+# PlaceTW Discord Bot
+
+A bot developed by Taiwan's r/place community for various discord functions
+
+To get support on this bot, visit the [bot-tech-support](https://discord.com/channels/959467908315111444/1137057312268374199) channel in our server https://discord.gg/8xSQKCHSnT
+
+# Getting started
+
+To get started on developing for this bot, you'll need the following:
+- [Python](https://www.python.org/)
+- A code editor
+
+Start by cloning this project on your computer
+
+## Setting up a virtual environment
+
+This project uses Poetry to manage packages. Follow the instructions [here](https://python-poetry.org/docs/#installation) to get started with poetry.
+
+Once you have poetry set up, run `poetry shell` to start the poetry virtual environment.
+
+To install the packages required for this project, run `poetry install`. 
+
+
+## Running the bot
+
+To run the bot, run `python main.py`.
+
+You'll need the following environment variables in a `.env` file for development:
+```
+DISCORD_TOKEN_DEV=
+GITHUB_TOKEN=
+YOUTUBE_API_KEY=
+MODERATE_CONTENT_API_KEY=
+
+PLACETW_SERVER_ID=
+LOG_CHANNEL=
+
+SUPABASE_URL=
+SUPABASE_SECRET_KEY=
+```
 
 ## Current Functionalities
 
