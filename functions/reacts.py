@@ -47,7 +47,7 @@ def load_react_resources() -> dict[str, ReactResource]:
     for file in REACT_RESOURCES_DIR.iterdir():
         if file.suffix != ".json":
             continue
-        with open(file, "r") as f:
+        with open(file, mode="r", encoding="utf8") as f:
             filename = file.stem
             data = json.load(f)
             resources[filename] = ReactResource(**data)
