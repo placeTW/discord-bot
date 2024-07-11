@@ -71,20 +71,29 @@ def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
     for possible_reaction in possible_reactions:
         if possible_reaction.react_only_one: # If only one of the possible reactions should be added
-            await message.add_reaction(choice(possible_reaction.reactions))
+            await add_reaction(message, choice(possible_reaction.reactions))
         else:
             for reaction in sample(possible_reaction.reactions, len(possible_reaction.reactions)): # Shuffle the reactions
                 if possible_reaction.react_with_all: # If all of the possible reactions should be added
-                    await message.add_reaction(reaction)
+                    await add_reaction(message, reaction)
                 else: # If the reaction should be added with a certain chance
                     if mock_bernoulli(possible_reaction.chance):
-                        await message.add_reaction(reaction)
+                        await add_reaction(message, reaction)
+
+async def add_reaction(message: Message, reaction: str) -> None:
+    try:
+        await message.add_reaction(reaction)
+    except Exception as e:
+        print('Failed to react to message:', e, reaction)
 
 async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
     for reply in replies:
-        if mock_bernoulli(reply.chance):
-            # TODO: Handle different types of replies
-            await message.reply(reply.message)
+        try:
+            if mock_bernoulli(reply.chance):
+                # TODO: Handle different types of replies
+                await message.reply(reply.message)
+        except Exception as e:
+            print('Failed to reply to message:', e, reply)
 
 
 async def handle_message_react(message: Message)  -> list[str]:
