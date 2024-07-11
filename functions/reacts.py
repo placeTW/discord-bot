@@ -1,3 +1,4 @@
+from enum import StrEnum
 import json
 from pathlib import Path
 from pydantic import BaseModel
@@ -6,6 +7,12 @@ from discord import Message
 
 from modules.probability import mock_bernoulli
 
+class ReactReplyType(StrEnum):
+    text = "text"
+    image = "image"
+    video = "video"
+    audio = "audio"
+    file = "file"
 
 class ReactMatches(BaseModel):
     match_whole_word: bool
@@ -19,7 +26,7 @@ class ReactPossibleReaction(BaseModel):
 class ReactReply(BaseModel):
     chance: float
     message: str
-    type: str = "text"
+    type: ReactReplyType = "text"
 
 class ReactResource(BaseModel):
     matches: list[ReactMatches]
@@ -30,16 +37,17 @@ class ReactResource(BaseModel):
 REACT_RESOURCES_DIR = Path(Path(__file__).parent, "..", "resources", "reacts")
 
 
-def load_react_resources() -> list[ReactResource]:
-    resources = []
+def load_react_resources() -> dict[str, ReactResource]:
+    resources = {}
     for file in REACT_RESOURCES_DIR.iterdir():
         with open(file, "r") as f:
+            filename = file.stem
             data = json.load(f)
-            resources.append(ReactResource(**data))
+            resources[filename] = ReactResource(**data)
     return resources
 
 
-REACT_RESOURCES: list[ReactResource] = load_react_resources()
+REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 
 def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
     for possible_match in matches:
@@ -52,8 +60,9 @@ def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
     return False
 
 
-async def handle_react(message: Message):
-    for resource in REACT_RESOURCES:
+async def handle_react(message: Message)  -> list[str]:
+    events = []
+    for event_name, resource in REACT_RESOURCES.items():
         if check_matches(message.content, resource.matches):
             for possible_reaction in resource.possible_reactions:
                 for reaction in possible_reaction.reactions:
@@ -66,5 +75,6 @@ async def handle_react(message: Message):
                 if mock_bernoulli(reply.chance):
                     # TODO: Handle different types of replies
                     await message.reply(reply.message)
-            break
+            events.append(event_name)
             
+    return events

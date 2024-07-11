@@ -151,7 +151,8 @@ async def on_message(message: discord.Message):
         await mention_responses.reply_with_random_response(message)
         events.append("pinged")
 
-    await handle_react(message)
+    react_events = await handle_react(message)
+    events += react_events
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
