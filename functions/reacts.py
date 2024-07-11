@@ -69,12 +69,12 @@ def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
     return False
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
-    for possible_reaction in sample(possible_reactions, len(possible_reactions)): # Shuffle the reactions
+    for possible_reaction in possible_reactions:
         if possible_reaction.react_only_one: # If only one of the possible reactions should be added
             await message.add_reaction(choice(possible_reaction.reactions))
         else:
-            for reaction in possible_reaction.reactions: # If all of the possible reactions should be added
-                if possible_reaction.react_with_all:
+            for reaction in sample(possible_reaction.reactions, len(possible_reaction.reactions)): # Shuffle the reactions
+                if possible_reaction.react_with_all: # If all of the possible reactions should be added
                     await message.add_reaction(reaction)
                 else: # If the reaction should be added with a certain chance
                     if mock_bernoulli(possible_reaction.chance):
