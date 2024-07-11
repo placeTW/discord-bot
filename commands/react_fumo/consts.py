@@ -44,17 +44,10 @@ POSSIBLE_REACTS_FUMO = [  # must be a list to be shuffleable
 ]
 
 KEYWORDS_EN = [
-    "Bruh",
-    "bruh",
-    "fr",
-    "fr fr",
-]
-
-KEYWORDS_TW = ["酷",
-"笑死"
+    "fumo",
 ]
 
 FUMU_REGEX = compile(
-    rf"\b(?:{'|'.join(KEYWORDS_EN)})\b|{'|'.join(KEYWORDS_TW)}",
+    rf"\b(?:{'|'.join(KEYWORDS_EN)})\b",
     flags=IGNORECASE | UNICODE,
 )
