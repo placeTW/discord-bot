@@ -16,15 +16,15 @@ class ReactReplyType(StrEnum):
     file = "file"
 
 class ReactMatches(BaseModel):
-    match_link_id: str = ""
     match_whole_word: bool
     keywords: list[str]
+    match_link_id: str = ""
 
 class ReactPossibleReaction(BaseModel):
-    match_link_id: str = ""
-    other_reactions: list[str] = []
     chance: float
     reactions: list[str]
+    match_link_id: str = ""
+    other_reactions: list[str] = []
     react_with_all: bool = False
     react_only_one: bool = False
 
@@ -57,23 +57,25 @@ REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 # For testing
 def check_resource_match(message_content: str, resource_name: str) -> bool:
     resource = REACT_RESOURCES[resource_name]
-    return bool(check_matches(message_content, resource.matches))
+    matches = check_matches(message_content, resource.matches)
+    return bool(matches)
 
-def check_matches(message_content: str, matches: list[ReactMatches]) -> bool | set[str]:
+def check_matches(message_content: str, matches: list[ReactMatches]) -> set[str]:
+    matches_result = set()
     matched = False
-    matches = set()
     for possible_match in matches:
         if possible_match.match_whole_word:
             if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
-                if possible_match.match_link_id:
-                    matches.append(possible_match.match_link_id)
                 matched = True
+                if possible_match.match_link_id:
+                    matches_result.add(possible_match.match_link_id)
         else:
             if compile(rf"{'|'.join(possible_match.keywords)}", flags=IGNORECASE | UNICODE).search(message_content):
-                if possible_match.match_link_id:
-                    matches.append(possible_match.match_link_id)
                 matched = True
-    return matched
+                if possible_match.match_link_id:
+                    matches_result.add(possible_match.match_link_id)
+    # Return the link IDs if there are any, otherwise return the matched boolean
+    return matches_result if len(matches_result) > 0 else matched
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
     for possible_reaction in possible_reactions:
