@@ -15,7 +15,7 @@ from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
 from commands.meow.meow import meow_meow
-from functions.reacts import handle_react
+from functions.reacts import handle_message_react
 from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
@@ -151,7 +151,7 @@ async def on_message(message: discord.Message):
         await mention_responses.reply_with_random_response(message)
         events.append("pinged")
 
-    react_events = await handle_react(message)
+    react_events = await handle_message_react(message)
     events += react_events
 
     if hsinchu_wind.is_hsinchu_message(message):

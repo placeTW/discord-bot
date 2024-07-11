@@ -59,22 +59,28 @@ def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
                 return True
     return False
 
+async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
+    for possible_reaction in possible_reactions:
+        for reaction in possible_reaction.reactions:
+            if possible_reaction.react_with_all:
+                await message.add_reaction(reaction)
+            else:
+                if mock_bernoulli(possible_reaction.chance):
+                    await message.add_reaction(reaction)
 
-async def handle_react(message: Message)  -> list[str]:
+async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
+    for reply in replies:
+        if mock_bernoulli(reply.chance):
+            # TODO: Handle different types of replies
+            await message.reply(reply.message)
+
+
+async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
         if check_matches(message.content, resource.matches):
-            for possible_reaction in resource.possible_reactions:
-                for reaction in possible_reaction.reactions:
-                    if possible_reaction.react_with_all:
-                        await message.add_reaction(reaction)
-                    else:
-                        if mock_bernoulli(possible_reaction.chance):
-                            await message.add_reaction(reaction)
-            for reply in resource.replies:
-                if mock_bernoulli(reply.chance):
-                    # TODO: Handle different types of replies
-                    await message.reply(reply.message)
+            await react_to_message(message, resource.possible_reactions)
+            await reply_to_message(message, resource.replies)
             events.append(event_name)
             
     return events
