@@ -1,7 +1,6 @@
 from re import compile, IGNORECASE, UNICODE
 
 POSSIBLE_REACTS_FUMO = [  # must be a list to be shuffleable
-    "<:lt_tw_hgs:1139647918442283038>",
     "<a:FumoBop:1260215543269560450>",
     "<a:FumoBounce:1258766137366282301>",
     "<:FumoOk:1260215591126433822>",
