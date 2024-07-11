@@ -15,6 +15,7 @@ from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
 from commands.meow.meow import meow_meow
+from functions.reacts import handle_react
 from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
@@ -150,48 +151,7 @@ async def on_message(message: discord.Message):
         await mention_responses.reply_with_random_response(message)
         events.append("pinged")
 
-    if react_tw.is_TW_message(message):
-        try:
-            await react_tw.send_react_tw(message)
-        except Exception as e:
-            print("failed to react Taiwan: ", e)
-        events.append("tw")
-    if react_hgs.is_hgs_message(message):
-        try:
-            await react_hgs.send_react_hgs(message)
-        except Exception as e:
-            print("failed to react HGS: ", e)
-        events.append("hgs")
-    if react_baltics.is_baltic_message(message):
-        try:
-            await react_baltics.send_react_baltic(message)
-        except Exception as e:
-            print("failed to react Baltics: ", e)
-        events.append("baltics")
-    if react_czech.is_czech_message(message):
-        try:
-            await react_czech.send_react_czech(message)
-        except Exception as e:
-            print("failed to react Czech: ", e)
-        events.append("czech")
-    if react_ph.is_ph_message(message):
-        try:
-            await react_ph.send_react_ph(message)
-        except Exception as e:
-            print("failed to react PH: ", e)
-        events.append("ph")
-    if react_ua.is_UA_message(message):
-        try:
-            await react_ua.send_react_ua(message)
-        except Exception as e:
-            print("failed to react UA: ", e)
-        events.append("ua")
-    if react_earthquake.is_earthquake_message(message):
-        try:
-            await react_earthquake.send_react_earthquake(message)
-        except Exception as e:
-            print("failed to react earthquake: ", e)
-        events.append("earthquake")
+    await handle_react(message)
 
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
