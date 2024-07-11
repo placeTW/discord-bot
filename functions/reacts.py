@@ -15,9 +15,9 @@ class ReactReplyType(StrEnum):
     audio = "audio"
     file = "file"
 
-class ReactMatches(BaseModel):
-    match_whole_word: bool
+class ReactCriterias(BaseModel):
     keywords: list[str]
+    match_whole_word: bool
     match_link_id: str = ""
 
 class ReactPossibleReaction(BaseModel):
@@ -34,7 +34,7 @@ class ReactReply(BaseModel):
     type: ReactReplyType = "text"
 
 class ReactResource(BaseModel):
-    matches: list[ReactMatches]
+    criteria: list[ReactCriterias]
     possible_reactions: list[ReactPossibleReaction] | None = None
     replies: list[ReactReply] | None = None
     
@@ -45,6 +45,8 @@ REACT_RESOURCES_DIR = Path(Path(__file__).parent, "..", "resources", "reacts")
 def load_react_resources() -> dict[str, ReactResource]:
     resources = {}
     for file in REACT_RESOURCES_DIR.iterdir():
+        if file.suffix != ".json":
+            continue
         with open(file, "r") as f:
             filename = file.stem
             data = json.load(f)
@@ -57,13 +59,13 @@ REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 # For testing
 def check_resource_match(message_content: str, resource_name: str) -> bool:
     resource = REACT_RESOURCES[resource_name]
-    matches = check_matches(message_content, resource.matches)
+    matches = check_matches(message_content, resource.criteria)
     return bool(matches)
 
-def check_matches(message_content: str, matches: list[ReactMatches]) -> bool | set[str]:
+def check_matches(message_content: str, criteria: list[ReactCriterias]) -> bool | set[str]:
     match_id_results = set()
     found_match = False
-    for possible_match in matches:
+    for possible_match in criteria:
         if possible_match.match_whole_word:
             if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
                 found_match = True
@@ -117,7 +119,7 @@ async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
 async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
-        match_results = check_matches(message.content, resource.matches)
+        match_results = check_matches(message.content, resource.criteria)
         if bool(match_results):
             # If the match results are not a set, it means that there was a match but no link IDs were found
             if not isinstance(match_results, set):

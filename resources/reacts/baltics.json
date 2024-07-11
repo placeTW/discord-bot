@@ -1,5 +1,5 @@
 {
-  "matches": [
+  "criteria": [
     {
       "match_link_id": "baltics_lt",
       "match_whole_word": true,
