@@ -27,7 +27,7 @@ The JSON file should have the following structure:
       "react_with_one": boolean (optional)
     }
   ],
-  "replies": [
+  "possible_replies": [
     {
       "chance": float,
       "message": str,
@@ -55,7 +55,7 @@ The JSON file should have the following structure:
   - If `react_with_all` and `react_with_one` are both `false`, the probability is calcuated per reaction.
 
 
-`replies`: The possible replies that the bot will reply to the original message with if the criteria match.
+`possible_replies`: The possible replies that the bot will reply to the original message with if the criteria match.
 - `chance`: A float that represents the probability of the reply occurring. This should be a value between 0 and 1.
 - `message`: A string that represents the reply message that the bot will use.
 - `type`: An optional string that specifies the type of the reply message. 

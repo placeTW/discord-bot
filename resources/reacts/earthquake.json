@@ -9,7 +9,7 @@
       "keywords": ["地震", "這杯水在晃"]
     }
   ],
-  "replies": [
+  "possible_replies": [
     {
       "chance": 0.9,
       "message": "https://www.youtube.com/watch?v=P24eOUl46k0",
