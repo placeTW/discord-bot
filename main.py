@@ -23,6 +23,7 @@ from commands.reacttw import react_tw
 from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
 from commands.react_czech import react_czech
+from commands.react_fumo import react_fumo
 from commands.react_ph import react_ph
 from commands.react_hgs import react_hgs
 from commands.react_earthquake import react_earthquake
@@ -174,6 +175,13 @@ async def on_message(message: discord.Message):
         except Exception as e:
             print("failed to react Czech: ", e)
         events.append("czech")
+    if react_fumo.is_fumu_message(message):
+        try:
+            await react_fumo.send_react_fumo(message)
+        except Exception as e:
+            print("failed to react Fumo: ", e)
+        events.append("fumo")
+    
     if react_ph.is_ph_message(message):
         try:
             await react_ph.send_react_ph(message)
