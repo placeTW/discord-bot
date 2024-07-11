@@ -30,8 +30,8 @@ class ReactReply(BaseModel):
 
 class ReactResource(BaseModel):
     matches: list[ReactMatches]
-    possible_reactions: list[ReactPossibleReaction]
-    replies: list[ReactReply]
+    possible_reactions: list[ReactPossibleReaction] | None = None
+    replies: list[ReactReply] | None = None
     
 
 REACT_RESOURCES_DIR = Path(Path(__file__).parent, "..", "resources", "reacts")
@@ -79,8 +79,10 @@ async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
         if check_matches(message.content, resource.matches):
-            await react_to_message(message, resource.possible_reactions)
-            await reply_to_message(message, resource.replies)
+            if resource.possible_reactions:
+                await react_to_message(message, resource.possible_reactions)
+            if resource.replies:
+                await reply_to_message(message, resource.replies)
             events.append(event_name)
             
     return events

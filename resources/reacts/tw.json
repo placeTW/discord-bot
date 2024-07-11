@@ -89,7 +89,7 @@
   ],
   "replies": [
     {
-      "chance": 0.07,
+      "chance": 1,
       "message": "https://www.youtube.com/watch?v=AN0rQR0RlOM",
       "type": "text"
     }
