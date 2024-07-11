@@ -49,13 +49,18 @@ def load_react_resources() -> dict[str, ReactResource]:
 
 REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 
+# For testing
+def check_resource_match(message_content: str, resource_name: str) -> bool:
+    resource = REACT_RESOURCES[resource_name]
+    return check_matches(message_content, resource.matches)
+
 def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
     for possible_match in matches:
         if possible_match.match_whole_word:
-            if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", IGNORECASE | UNICODE).search(message_content):
+            if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
                 return True
         else:
-            if compile(rf"{'|'.join(possible_match.keywords)}", IGNORECASE | UNICODE).search(message_content):
+            if compile(rf"{'|'.join(possible_match.keywords)}", flags=IGNORECASE | UNICODE).search(message_content):
                 return True
     return False
 
