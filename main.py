@@ -20,13 +20,7 @@ from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.pat import pat
-from commands.reacttw import react_tw
-from commands.react_ua import react_ua
 from commands.react_baltics import react_baltics
-from commands.react_czech import react_czech
-from commands.react_ph import react_ph
-from commands.react_hgs import react_hgs
-from commands.react_earthquake import react_earthquake
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
