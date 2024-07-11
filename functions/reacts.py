@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel
 from re import compile, IGNORECASE, UNICODE
 from discord import Message
+from random import choice, sample
 
 from modules.probability import mock_bernoulli
 
@@ -15,13 +16,16 @@ class ReactReplyType(StrEnum):
     file = "file"
 
 class ReactMatches(BaseModel):
+    id: str = ""
     match_whole_word: bool
     keywords: list[str]
 
 class ReactPossibleReaction(BaseModel):
+    id: str = ""
     chance: float
     reactions: list[str]
     react_with_all: bool = False
+    react_only_one: bool = False
 
 class ReactReply(BaseModel):
     chance: float
@@ -65,13 +69,16 @@ def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
     return False
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
-    for possible_reaction in possible_reactions:
-        for reaction in possible_reaction.reactions:
-            if possible_reaction.react_with_all:
-                await message.add_reaction(reaction)
-            else:
-                if mock_bernoulli(possible_reaction.chance):
+    for possible_reaction in sample(possible_reactions, len(possible_reactions)): # Shuffle the reactions
+        if possible_reaction.react_only_one: # If only one of the possible reactions should be added
+            await message.add_reaction(choice(possible_reaction.reactions))
+        else:
+            for reaction in possible_reaction.reactions: # If all of the possible reactions should be added
+                if possible_reaction.react_with_all:
                     await message.add_reaction(reaction)
+                else: # If the reaction should be added with a certain chance
+                    if mock_bernoulli(possible_reaction.chance):
+                        await message.add_reaction(reaction)
 
 async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
     for reply in replies:
