@@ -8,7 +8,7 @@ POSTITIVE_TEST_CASES = ("Taga-Taiwan",)
     "test_str",
     POSTITIVE_TEST_CASES,
 )
-def test_react_baltics_regex_yes_match(test_str: str):
+def test_react_ph_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
     # * isolated string
     assert check_resource_match(test_str, "ph")
@@ -24,7 +24,7 @@ def test_react_baltics_regex_yes_match(test_str: str):
     "test_str",
     POSTITIVE_TEST_CASES,
 )
-def test_react_baltics_regex_no_match(test_str: str):
+def test_react_ph_regex_no_match(test_str: str):
     """Tests that these strings return FALSE."""
     # * surrounded by text
     assert not check_resource_match(f"a{test_str}b", "ph")
