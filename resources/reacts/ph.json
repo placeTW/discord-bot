@@ -1,0 +1,19 @@
+{
+  "matches": [
+    {
+      "match_whole_word": true,
+      "keywords": [
+        "Taga-Taiwan"
+      ]
+    }
+  ],
+  "possible_reactions": [
+    {
+      "chance": 0.69,
+      "reactions": [
+        "❤",
+        "<:bubblemilktea:1132632348651966596>"
+      ]
+    }
+  ]
+}
