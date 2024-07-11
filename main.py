@@ -20,7 +20,6 @@ from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.pat import pat
-from commands.react_baltics import react_baltics
 from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
