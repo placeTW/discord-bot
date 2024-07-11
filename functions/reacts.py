@@ -16,12 +16,13 @@ class ReactReplyType(StrEnum):
     file = "file"
 
 class ReactMatches(BaseModel):
-    id: str = ""
+    match_link_id: str = ""
     match_whole_word: bool
     keywords: list[str]
 
 class ReactPossibleReaction(BaseModel):
-    id: str = ""
+    match_link_id: str = ""
+    other_reactions: list[str] = []
     chance: float
     reactions: list[str]
     react_with_all: bool = False
@@ -56,24 +57,31 @@ REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 # For testing
 def check_resource_match(message_content: str, resource_name: str) -> bool:
     resource = REACT_RESOURCES[resource_name]
-    return check_matches(message_content, resource.matches)
+    return bool(check_matches(message_content, resource.matches))
 
-def check_matches(message_content: str, matches: list[ReactMatches]) -> bool:
+def check_matches(message_content: str, matches: list[ReactMatches]) -> bool | set[str]:
+    matched = False
+    matches = set()
     for possible_match in matches:
         if possible_match.match_whole_word:
             if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
-                return True
+                if possible_match.match_link_id:
+                    matches.append(possible_match.match_link_id)
+                matched = True
         else:
             if compile(rf"{'|'.join(possible_match.keywords)}", flags=IGNORECASE | UNICODE).search(message_content):
-                return True
-    return False
+                if possible_match.match_link_id:
+                    matches.append(possible_match.match_link_id)
+                matched = True
+    return matched
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
     for possible_reaction in possible_reactions:
+        reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions)) # List of reactions in random order
         if possible_reaction.react_only_one: # If only one of the possible reactions should be added
-            await add_reaction(message, choice(possible_reaction.reactions))
+            await add_reaction(message, choice(reactions_list))
         else:
-            for reaction in sample(possible_reaction.reactions, len(possible_reaction.reactions)): # Shuffle the reactions
+            for reaction in reactions_list:
                 if possible_reaction.react_with_all: # If all of the possible reactions should be added
                     await add_reaction(message, reaction)
                 else: # If the reaction should be added with a certain chance
@@ -99,7 +107,8 @@ async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
 async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
-        if check_matches(message.content, resource.matches):
+        matches = check_matches(message.content, resource.matches)
+        if bool(matches):
             if resource.possible_reactions:
                 await react_to_message(message, resource.possible_reactions)
             if resource.replies:
