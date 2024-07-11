@@ -1,7 +1,7 @@
 {
   "matches": [
     {
-      "match_link_id": "match_hgs_en",
+      "note": "match_hgs_en",
       "match_whole_word": true,
       "keywords": [
         "HGS",
@@ -9,35 +9,35 @@
       ]
     },
     {
-      "match_link_id": "match_hgs_lt",
+      "note": "match_hgs_lt",
       "match_whole_word": true,
       "keywords": [
         "kar[šs]tas\\s+g[ėe]j[ųu]\\s+seksas"
       ]
     },
     {
-      "match_link_id": "match_hgs_lv",
+      "note": "match_hgs_lv",
       "match_whole_word": true,
       "keywords": [
         "(?:Dedzīgs|Kaislīgs)\\s+geju\\s+sekss"
       ]
     },
     {
-      "match_link_id": "match_hgs_ee",
+      "note": "match_hgs_ee",
       "match_whole_word": true,
       "keywords": [
         "Kuum gei seks"
       ]
     },
     {
-      "match_link_id": "match_hgs_ua",
+      "note": "match_hgs_ua",
       "match_whole_word": true,
       "keywords": [
         "гарячий\\s+гей\\s+секс"
       ]
     },
     {
-      "match_link_id": "match_hgs_tw",
+      "note": "match_hgs_tw",
       "match_whole_word": false,
       "keywords": [
         "(?:激情|熱烈)(?:同志|同性)(?:性愛|性交)",
@@ -47,7 +47,7 @@
   ],
   "possible_reactions": [
     {
-      "match_link_id": "react_tw_hgs",
+      "note": "react_tw_hgs",
       "chance": 0.69,
       "reactions": [
         "<:lt_tw_hgs:1139647918442283038>",
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "match_link_id": "react_tw_trolls",
+      "note": "react_tw_trolls",
       "react_only_one": true,
       "chance": 0.87,
       "reactions": [

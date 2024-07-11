@@ -45,8 +45,8 @@
   ],
   "possible_reactions": [
     {
-      "match_link_id": "baltics_tw",
-      "other_reactions": [
+      "match_link_id": "baltics",
+      "other_match_link_ids": [
         "baltics_lt",
         "baltics_lv",
         "baltics_ee"

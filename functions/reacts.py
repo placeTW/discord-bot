@@ -24,7 +24,7 @@ class ReactPossibleReaction(BaseModel):
     chance: float
     reactions: list[str]
     match_link_id: str = ""
-    other_reactions: list[str] = []
+    other_match_link_ids: list[str] = []
     react_with_all: bool = False
     react_only_one: bool = False
 
@@ -60,26 +60,34 @@ def check_resource_match(message_content: str, resource_name: str) -> bool:
     matches = check_matches(message_content, resource.matches)
     return bool(matches)
 
-def check_matches(message_content: str, matches: list[ReactMatches]) -> set[str]:
-    matches_result = set()
-    matched = False
+def check_matches(message_content: str, matches: list[ReactMatches]) -> bool | set[str]:
+    match_id_results = set()
+    found_match = False
     for possible_match in matches:
         if possible_match.match_whole_word:
             if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
-                matched = True
+                found_match = True
                 if possible_match.match_link_id:
-                    matches_result.add(possible_match.match_link_id)
+                    match_id_results.add(possible_match.match_link_id)
         else:
             if compile(rf"{'|'.join(possible_match.keywords)}", flags=IGNORECASE | UNICODE).search(message_content):
-                matched = True
+                found_match = True
                 if possible_match.match_link_id:
-                    matches_result.add(possible_match.match_link_id)
-    # Return the link IDs if there are any, otherwise return the matched boolean
-    return matches_result if len(matches_result) > 0 else matched
+                    match_id_results.add(possible_match.match_link_id)
+    # Return the link IDs if there are any, otherwise return if there was a match
+    return match_id_results if len(match_id_results) > 0 else found_match
 
-async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction]) -> None:
+async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction], match_id_results: set[str] = None) -> None:
     for possible_reaction in possible_reactions:
-        reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions)) # List of reactions in random order
+        # If the matched linked results exists, check if the reaction is linked to any of the matches 
+        # Or if the reaction has other links to matches and is linked to any of the matched links
+        # If not, skip the reaction
+        if match_id_results \
+            and (possible_reaction.match_link_id and possible_reaction.match_link_id not in match_id_results \
+                  or possible_reaction.other_match_link_ids and not any(matched in possible_reaction.other_match_link_ids for matched in match_id_results)):
+            continue
+        # List of reactions in random order
+        reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions))
         if possible_reaction.react_only_one: # If only one of the possible reactions should be added
             await add_reaction(message, choice(reactions_list))
         else:
@@ -109,10 +117,13 @@ async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
 async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
-        matches = check_matches(message.content, resource.matches)
-        if bool(matches):
+        match_results = check_matches(message.content, resource.matches)
+        if bool(match_results):
+            # If the match results are not a set, it means that there was a match but no link IDs were found
+            if not isinstance(match_results, set):
+                match_results = None
             if resource.possible_reactions:
-                await react_to_message(message, resource.possible_reactions)
+                await react_to_message(message, resource.possible_reactions, match_results)
             if resource.replies:
                 await reply_to_message(message, resource.replies)
             events.append(event_name)
