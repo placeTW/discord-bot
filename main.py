@@ -38,7 +38,7 @@ from commands.stats import stats
 from commands.tocfl import tocfl
 from commands.formosa_stickers import formosa_stickers
 
-from presence import watching
+from activities import activity
 
 from mentioned import mention_responses
 
@@ -84,7 +84,7 @@ https://github.com/placeTW/discord-bot{f'/tree/{branch_name}' if branch_name != 
 # * register commands the just the placetw server
 edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
-watching.register_commands(tree, placetw_guild, client)
+activity.register_commands(tree, placetw_guild, client)
 tocfl.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
