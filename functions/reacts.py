@@ -86,7 +86,7 @@ def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool |
     found_match = False
     for possible_match in criteria:
         if possible_match.match_whole_word:
-            if search(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE):
+            if search(rf"\b(?:{'|'.join(possible_match.keywords)})\b", message_content, flags=IGNORECASE | UNICODE):
                 found_match = True
                 if possible_match.match_link_id:
                     match_id_results.add(possible_match.match_link_id)
