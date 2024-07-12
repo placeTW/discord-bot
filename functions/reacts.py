@@ -81,9 +81,9 @@ def check_matches(message_content: str, criteria: list[ReactCriterias]) -> bool 
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction], match_id_results: set[str] = None) -> None:
     for possible_reaction in possible_reactions:
-        # If the matched linked results exists, check if the reaction is linked to any of the matches 
-        # Or if the reaction has other links to matches and is linked to any of the matched links
-        # If not, skip the reaction
+        # If the matched linked results exists:
+        #     check if the reaction is linked to any of the matches or if the reaction has other links to matches and is linked to any of the matched links
+        #     skip the reaction if the reaction isn't linked to any match or other match
         if match_id_results \
             and (possible_reaction.match_link_id and possible_reaction.match_link_id not in match_id_results \
                   or possible_reaction.other_match_link_ids and not any(matched in possible_reaction.other_match_link_ids for matched in match_id_results)):
@@ -108,6 +108,7 @@ async def add_reaction(message: Message, reaction: str) -> None:
 
 async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
     for reply in replies:
+        # TODO: Extract match link id to a function, use here too
         try:
             if mock_bernoulli(reply.chance):
                 # TODO: Handle different types of replies
@@ -122,6 +123,7 @@ async def handle_message_react(message: Message)  -> list[str]:
         match_results = check_matches(message.content, resource.criteria)
         if bool(match_results):
             # If the match results are not a set, it means that there was a match but no link IDs were found
+            # All the possible reactions/replies will be used in this case
             if not isinstance(match_results, set):
                 match_results = None
             if resource.possible_reactions:
