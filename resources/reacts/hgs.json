@@ -58,7 +58,7 @@
     },
     {
       "note": "react_tw_trolls",
-      "react_only_one": true,
+      "max_react_limit": 1,
       "chance": 0.87,
       "reactions": [
         "<:roc_troll:1133368648967405610>",

@@ -24,7 +24,7 @@ The JSON file should have the following structure:
       "match_link_id": str (optional),
       "other_match_link_ids": list[str] (optional),
       "react_with_all": boolean (optional),
-      "react_with_one": boolean (optional)
+      "max_react_limit": int (optional)
     }
   ],
   "possible_replies": [
@@ -51,9 +51,7 @@ The JSON file should have the following structure:
 - `match_link_id`: An optional string that specifies the link ID that the reaction should match. If specified, the reaction will only trigger if the criteria with the specified link ID matches.
 - `other_match_link_ids`: An optional list of strings that specify link IDs of other criteria that can trigger the reaction. If specified, the reaction will trigger if any of the criteria with the specified link IDs match.
 - `react_with_all`: An optional boolean that determines whether the bot should react with **all** of the specified reactions if the reaction occurs.
-- `react_with_one`: An optional boolean that determines whether the bot should react with **only one** of the specified reactions if the reaction occurs.
-  - If `react_with_all` and `react_with_one` are both `true`, `react_with_all` will take precedence.
-  - If `react_with_all` and `react_with_one` are both `false`, the probability is calcuated per reaction.
+- `max_react_limit`: An optional numberf or the maximum number of reactions that can be added to a message.
 
 
 `possible_replies`: The possible replies that the bot will reply to the original message with if the criteria match.

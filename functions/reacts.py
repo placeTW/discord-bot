@@ -29,7 +29,7 @@ class ReactResponse(BaseModel):
 class ReactPossibleReaction(ReactResponse):
     reactions: list[str]
     react_with_all: bool = False
-    react_only_one: bool = False
+    max_react_limit: int = -1
 
 class ReactPossibleReply(ReactResponse):
     message: str
@@ -83,7 +83,7 @@ def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool |
 
 def response_has_match_link(response: ReactResponse, match_id_results: set[str] | None = None) -> bool:
     # check if the response is linked to any of the matches or if the reaction has other links to matches and is linked to any of the matched links
-    return match_id_results and (response.match_link_id in match_id_results or any(link_id in match_id_results for link_id in response.other_match_link_ids))
+    return not match_id_results or (response.match_link_id in match_id_results or any(link_id in match_id_results for link_id in response.other_match_link_ids))
 
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction], match_id_results: set[str] = None) -> None:
     for possible_reaction in possible_reactions:
@@ -92,15 +92,17 @@ async def react_to_message(message: Message, possible_reactions: list[ReactPossi
             continue
         # List of reactions in random order
         reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions))
-        if possible_reaction.react_only_one: # If only one of the possible reactions should be added
-            await add_reaction(message, choice(reactions_list))
-        else:
-            for reaction in reactions_list:
-                if possible_reaction.react_with_all: # If all of the possible reactions should be added
+        reaction_count = 0
+        for reaction in reactions_list:
+            if possible_reaction.react_with_all: # If all of the possible reactions should be added
+                await add_reaction(message, reaction)
+                reaction_count += 1
+            elif possible_reaction.max_react_limit > 0 and reaction_count >= possible_reaction.max_react_limit:
+                break
+            else: # If the reaction should be added with a certain chance
+                if mock_bernoulli(possible_reaction.chance):
                     await add_reaction(message, reaction)
-                else: # If the reaction should be added with a certain chance
-                    if mock_bernoulli(possible_reaction.chance):
-                        await add_reaction(message, reaction)
+                    reaction_count += 1
 
 async def add_reaction(message: Message, reaction: str) -> None:
     try:
