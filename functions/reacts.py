@@ -2,7 +2,7 @@ from enum import StrEnum
 import json
 from pathlib import Path
 from pydantic import BaseModel
-from re import compile, IGNORECASE, UNICODE
+from re import search, IGNORECASE, UNICODE
 from discord import Message
 from random import choice, sample
 
@@ -46,6 +46,8 @@ class ReactPossibleReply(ReactResponse):
     message: str
     # The type of the reply message.
     type: ReactReplyType = "text"
+    # How many times the reply message can be sent.
+    multiplier: int = 1
 
 class ReactResource(BaseModel):
     # A list of objects that define the criteria for a message to match the reaction. A message can match any of the criteria to trigger the possible responses.
@@ -84,12 +86,12 @@ def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool |
     found_match = False
     for possible_match in criteria:
         if possible_match.match_whole_word:
-            if compile(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE).search(message_content):
+            if search(rf"\b(?:{'|'.join(possible_match.keywords)})\b", flags=IGNORECASE | UNICODE):
                 found_match = True
                 if possible_match.match_link_id:
                     match_id_results.add(possible_match.match_link_id)
         else:
-            if compile(rf"{'|'.join(possible_match.keywords)}", flags=IGNORECASE | UNICODE).search(message_content):
+            if search(rf"{'|'.join(possible_match.keywords)}", message_content, flags=IGNORECASE | UNICODE):
                 found_match = True
                 if possible_match.match_link_id:
                     match_id_results.add(possible_match.match_link_id)
