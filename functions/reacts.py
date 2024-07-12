@@ -4,7 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel
 from re import search, IGNORECASE, UNICODE
 from discord import Message
-from random import choice, sample
+from random import sample
 
 from modules.probability import mock_bernoulli
 
