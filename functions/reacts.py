@@ -75,7 +75,7 @@ def load_react_resources() -> dict[str, ReactResource]:
 
 REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 
-# For testing
+# For testing in pytest to test a specific resource
 def check_resource_match(message_content: str, resource_name: str) -> bool:
     resource = REACT_RESOURCES[resource_name]
     matches = check_matches(message_content, resource.criteria)
