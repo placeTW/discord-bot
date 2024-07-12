@@ -16,28 +16,43 @@ class ReactReplyType(StrEnum):
     file = "file"
 
 class ReactCriteria(BaseModel):
+    # A list of keywords that the message must contain. Supports regex.
     keywords: list[str]
+    # Whether the keywords should match the whole word or not.
     match_whole_word: bool
+    # The link ID of the match. If the message matches the criteria, the link ID will be used to link the reaction/reply to the match.
     match_link_id: str = ""
 
+# A response that can be triggered by a message that matches the criteria.
 class ReactResponse(BaseModel):
+    # The chance that the reaction/reply will be triggered. A float between 0 and 1.
     chance: float
+    # The link ID of the match. If specified, the reaction/reply will only be triggered if the message matches the criteria and is linked to the match
     match_link_id: str = ""
+    # A list of link IDs of other matches that the reaction/reply can be linked to.
     other_match_link_ids: list[str] = []
 
 
 class ReactPossibleReaction(ReactResponse):
+    # A list of reactions that can be added to the message.
     reactions: list[str]
+    # Whether all of the possible reactions should be added to the message.
     react_with_all: bool = False
+    # The maximum number of reactions that can be added to the message. If -1, there is no limit.
     max_react_limit: int = -1
 
 class ReactPossibleReply(ReactResponse):
+    # The reply message that can be sent.
     message: str
+    # The type of the reply message.
     type: ReactReplyType = "text"
 
 class ReactResource(BaseModel):
+    # A list of objects that define the criteria for a message to match the reaction. A message can match any of the criteria to trigger the possible responses.
     criteria: list[ReactCriteria]
+    # A list of possible reactions that can be added to the message.
     possible_reactions: list[ReactPossibleReaction] | None = None
+    # A list of possible replies that can be sent.
     possible_replies: list[ReactPossibleReply] | None = None
     
 

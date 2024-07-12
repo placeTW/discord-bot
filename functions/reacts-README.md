@@ -20,16 +20,18 @@ The JSON file should have the following structure:
   "possible_reactions": [
     {
       "chance": float,
-      "reactions": list[str],
       "match_link_id": str (optional),
       "other_match_link_ids": list[str] (optional),
+      "reactions": list[str],
       "react_with_all": boolean (optional),
       "max_react_limit": int (optional)
     }
   ],
   "possible_replies": [
     {
-      "chance": float,
+      "chance": float,,
+      "match_link_id": str (optional),
+      "other_match_link_ids": list[str] (optional),
       "message": str,
       "type": str (optional)
     }
@@ -37,32 +39,4 @@ The JSON file should have the following structure:
 }
 ```
 
-## Description of the JSON structure
-
-`criteria`: A list of objects that define the criteria for a message to match the reaction. A message must match all of the criteria in order to trigger the reaction.
-- `keywords`: A list of keywords that the message must contain. If `match_whole_word` is `true`, the message must contain the entire keyword. If `match_whole_word` is `false`, the message must contain the keyword as a substring.
-  - Supports Regex strings
-- `match_whole_word`: A boolean that determines whether the keyword must be a whole word or a substring.
-- `match_link_id`: An optional string that specifies the link ID of the message that the criteria should match. If specified, this is used to send a reply that has the same link ID as the matching criteria.
-
-`possible_reactions`: The possible reactions that the bot will react to the original message to if the criteria match.
-- `chance`: A float that represents the probability of the reaction occurring. This should be a value between 0 and 1.
-- `reactions`: A list of strings that represent the reactions that the bot can use. These should be discord emoji names, which can be found when you type `\:emoji:` in a discord message.
-- `match_link_id`: An optional string that specifies the link ID that the reaction should match. If specified, the reaction will only trigger if the criteria with the specified link ID matches.
-- `other_match_link_ids`: An optional list of strings that specify link IDs of other criteria that can trigger the reaction. If specified, the reaction will trigger if any of the criteria with the specified link IDs match.
-- `react_with_all`: An optional boolean that determines whether the bot should react with **all** of the specified reactions if the reaction occurs.
-- `max_react_limit`: An optional numberf or the maximum number of reactions that can be added to a message.
-
-
-`possible_replies`: The possible replies that the bot will reply to the original message with if the criteria match.
-- `chance`: A float that represents the probability of the reply occurring. This should be a value between 0 and 1.
-- `message`: A string that represents the reply message that the bot will use.
-- `type`: An optional string that specifies the type of the reply message. 
-  - The type can be one of the following: 
-    - `text`: The bot will send the text as the reply message.
-    - TODO: Multimedia types - `message` is a path to the file that the bot will send as the reply message. The file should be put in the `resources/reacts/content` directory.
-      - `image`
-      - `video`
-      - `audio`
-      - `file`
-    
+Refer to the comments in the code for more information on each field.
