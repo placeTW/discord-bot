@@ -15,28 +15,30 @@ class ReactReplyType(StrEnum):
     audio = "audio"
     file = "file"
 
-class ReactCriterias(BaseModel):
+class ReactCriteria(BaseModel):
     keywords: list[str]
     match_whole_word: bool
     match_link_id: str = ""
 
-class ReactPossibleReaction(BaseModel):
+class ReactResponse(BaseModel):
     chance: float
-    reactions: list[str]
     match_link_id: str = ""
     other_match_link_ids: list[str] = []
+
+
+class ReactPossibleReaction(ReactResponse):
+    reactions: list[str]
     react_with_all: bool = False
     react_only_one: bool = False
 
-class ReactReply(BaseModel):
-    chance: float
+class ReactPossibleReply(ReactResponse):
     message: str
     type: ReactReplyType = "text"
 
 class ReactResource(BaseModel):
-    criteria: list[ReactCriterias]
+    criteria: list[ReactCriteria]
     possible_reactions: list[ReactPossibleReaction] | None = None
-    possible_replies: list[ReactReply] | None = None
+    possible_replies: list[ReactPossibleReply] | None = None
     
 
 REACT_RESOURCES_DIR = Path(Path(__file__).parent, "..", "resources", "reacts")
@@ -62,7 +64,7 @@ def check_resource_match(message_content: str, resource_name: str) -> bool:
     matches = check_matches(message_content, resource.criteria)
     return bool(matches)
 
-def check_matches(message_content: str, criteria: list[ReactCriterias]) -> bool | set[str]:
+def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool | set[str]:
     match_id_results = set()
     found_match = False
     for possible_match in criteria:
@@ -79,14 +81,14 @@ def check_matches(message_content: str, criteria: list[ReactCriterias]) -> bool 
     # Return the link IDs if there are any, otherwise return if there was a match
     return match_id_results if len(match_id_results) > 0 else found_match
 
+def response_has_match_link(response: ReactResponse, match_id_results: set[str] | None = None) -> bool:
+    # check if the response is linked to any of the matches or if the reaction has other links to matches and is linked to any of the matched links
+    return match_id_results and (response.match_link_id in match_id_results or any(link_id in match_id_results for link_id in response.other_match_link_ids))
+
 async def react_to_message(message: Message, possible_reactions: list[ReactPossibleReaction], match_id_results: set[str] = None) -> None:
     for possible_reaction in possible_reactions:
-        # If the matched linked results exists:
-        #     check if the reaction is linked to any of the matches or if the reaction has other links to matches and is linked to any of the matched links
-        #     skip the reaction if the reaction isn't linked to any match or other match
-        if match_id_results \
-            and (possible_reaction.match_link_id and possible_reaction.match_link_id not in match_id_results \
-                  or possible_reaction.other_match_link_ids and not any(matched in possible_reaction.other_match_link_ids for matched in match_id_results)):
+        # If the matched linked results exists check if the reaction is linked to a match
+        if not response_has_match_link(possible_reaction, match_id_results):
             continue
         # List of reactions in random order
         reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions))
@@ -106,15 +108,17 @@ async def add_reaction(message: Message, reaction: str) -> None:
     except Exception as e:
         print('Failed to react to message:', e, reaction)
 
-async def reply_to_message(message: Message, replies: list[ReactReply]) -> None:
-    for reply in replies:
-        # TODO: Extract match link id to a function, use here too
+async def reply_to_message(message: Message, possible_replies: list[ReactPossibleReply], match_id_results: set[str] = None) -> None:
+    for possible_reply in possible_replies:
+        # If the matched linked results exists check if the reply is linked to a match
+        if not response_has_match_link(possible_reply, match_id_results):
+            continue
         try:
-            if mock_bernoulli(reply.chance):
+            if mock_bernoulli(possible_reply.chance):
                 # TODO: Handle different types of replies
-                await message.reply(reply.message)
+                await message.reply(possible_reply.message)
         except Exception as e:
-            print('Failed to reply to message:', e, reply)
+            print('Failed to reply to message:', e, possible_reply)
 
 
 async def handle_message_react(message: Message)  -> list[str]:
