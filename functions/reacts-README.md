@@ -41,6 +41,7 @@ The JSON file should have the following structure:
 
 `criteria`: A list of objects that define the criteria for a message to match the reaction. A message must match all of the criteria in order to trigger the reaction.
 - `keywords`: A list of keywords that the message must contain. If `match_whole_word` is `true`, the message must contain the entire keyword. If `match_whole_word` is `false`, the message must contain the keyword as a substring.
+  - Supports Regex strings
 - `match_whole_word`: A boolean that determines whether the keyword must be a whole word or a substring.
 - `match_link_id`: An optional string that specifies the link ID of the message that the criteria should match. If specified, this is used to send a reply that has the same link ID as the matching criteria.
 
