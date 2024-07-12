@@ -1,7 +1,8 @@
 import datetime
 import discord
 from re import compile, IGNORECASE, UNICODE
-from ..react_baltics.react_baltics import mock_bernoulli
+
+from modules.probability import mock_bernoulli
 
 KEYWORDS = ("HSINCHU", "新竹")
 
