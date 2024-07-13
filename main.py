@@ -14,7 +14,6 @@ from commands.config import config_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
 from commands.edit_entry import edit_entry_cmd
-from commands.meow.meow import meow_meow
 from functions.reacts import handle_message_react
 from modules import logging
 from commands.one_o_one import one_o_one
@@ -150,9 +149,6 @@ async def on_message(message: discord.Message):
     if hsinchu_wind.is_hsinchu_message(message):
         await hsinchu_wind.send_hsinchu_msg(message)
         events.append("hsinchu")
-
-    if await meow_meow(message):
-        events.append("meow")
 
     if len(events) > 0:
         await logging.log_message_event(message, events)
