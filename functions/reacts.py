@@ -105,46 +105,44 @@ def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool |
     # If no link IDs were found, return if there was a match
     return criteria_links if len(criteria_links) > 0 else found_match
 
-def evaluate_event_condition(event: ReactEvent, criteria_links: set[str] | None = None) -> bool:
+def evaluate_event_condition(condition: str, criteria_links: set[str] | None = None) -> bool:
     """
-    Evaluates a boolean expression condition against a set of match link IDs.
+    Evaluates a boolean condition string against a set of match link IDs.
 
-    This function safely evaluates a string containing a boolean expression,
-    where the operands are link IDs. It checks if the condition is satisfied
-    based on the presence of link IDs in the provided set of criteria_links.
+    This function takes a condition string containing boolean expressions and link IDs,
+    and evaluates it based on the presence of those link IDs in the provided set.
+    It supports boolean operations (and, or, not) and treats any unrecognized word
+    as a potential link ID.
 
     Args:
-        condition (str): A string containing a boolean expression to evaluate.
-            Supported operations include 'and', 'or', and 'not'.
-            Link IDs should be represented as strings (e.g., "'link_id'").
-            Example: "'baltic_meows' or ('hgs' and not 'tw')"
-        
-        criteria_links (set[str]): A set of link IDs to check against.
+        condition (str): A string containing a boolean expression with link IDs.
+                         Example: "baltic_meows or (hgs and not tw)"
+        criteria_links (set): A set of strings representing the active link IDs.
 
     Returns:
-        bool: True if the condition is satisfied, False otherwise.
+        bool: The result of evaluating the condition against the match_link_ids.
 
     Raises:
         SyntaxError: If the condition string contains invalid Python syntax.
-        NameError: If an unsupported operation is used in the condition.
+        NameError: If an unrecognized operation is used in the condition.
 
     Example:
-        >>> criteria_links = {'baltic_meows', 'tw'}
-        >>> evaluate_condition("'baltic_meows' or 'hgs'", criteria_links)
+        >>> match_link_ids = {'baltic_meows', 'tw'}
+        >>> evaluate_condition("baltic_meows or hgs", match_link_ids)
         True
-        >>> evaluate_condition("'hgs' and 'tw'", criteria_links)
+        >>> evaluate_condition("hgs and tw", match_link_ids)
         False
 
     Note:
-        This function uses AST transformation to safely evaluate the condition,
-        preventing arbitrary code execution. Only boolean operations and link ID
-        checks are allowed in the condition string.
+        This function uses AST transformation to safely evaluate the condition
+        without using eval() on raw input. It's designed to prevent arbitrary
+        code execution while allowing flexible condition specifications.
     """
     def link_id_exists(link_id):
         return link_id in criteria_links
     
     # Parse the condition string into an AST
-    parsed_expr = ast.parse(event.condition, mode='eval')
+    parsed_expr = ast.parse(condition, mode='eval')
     
     allowed_names = {
         'or': or_,
@@ -180,7 +178,7 @@ def evaluate_event_condition(event: ReactEvent, criteria_links: set[str] | None 
 async def react_to_message(message: Message, possible_reactions: list[ReactEventReaction], match_id_results: set[str] = None) -> None:
     for possible_reaction in possible_reactions:
         # If the matched linked results exists check if the reaction is linked to a match
-        if not evaluate_event_condition(possible_reaction, match_id_results):
+        if not evaluate_event_condition(possible_reaction.condition, match_id_results):
             continue
         # List of reactions in random order
         reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions))
@@ -205,7 +203,7 @@ async def add_reaction(message: Message, reaction: str) -> None:
 async def reply_to_message(message: Message, possible_replies: list[ReactEventReply], match_id_results: set[str] = None) -> None:
     for possible_reply in possible_replies:
         # If the matched linked results exists check if the reply is linked to a match
-        if not evaluate_event_condition(possible_reply, match_id_results):
+        if not evaluate_event_condition(possible_reply.condition, match_id_results):
             continue
         try:
             if mock_bernoulli(possible_reply.chance):
