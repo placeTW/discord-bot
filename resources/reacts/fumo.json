@@ -5,13 +5,15 @@
       "keywords": [
         "fumo",
         "yon",
-        "touhou"
+        "touhou",
+        "2hu",
+        "東方"
       ]
     }
   ],
   "possible_reactions": [
     {
-      "chance": 0.25,
+      "chance": 0.125,
       "max_react_limit": 3,
       "reactions": [
         "<a:FumoBop:1260215543269560450>",
