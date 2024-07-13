@@ -41,13 +41,13 @@ class ReactEvent(BaseModel):
     chance: float
     # The content of the event
     content: str | list[str] | ReactMessage | list[ReactMessage]
+    # The maximum number of reactions/replies that can be added to the message.
+    max_limit: int = -1
 
 
 class ReactEventReaction(ReactEvent):
     # Whether all of the possible reactions should be added to the message.
     react_with_all: bool = False
-    # The maximum number of reactions that can be added to the message. If -1, there is no limit.
-    max_react_limit: int = -1
 
 class ReactEventReply(ReactEvent):
     # How many times the reply message could be sent.
@@ -126,7 +126,7 @@ async def react_to_message(message: Message, possible_reactions: list[ReactEvent
             if possible_reaction.react_with_all: # If all of the possible reactions should be added
                 reaction_count = await add_reaction(message, reaction)
                 reaction_count += 1
-            elif possible_reaction.max_react_limit > 0 and reaction_count >= possible_reaction.max_react_limit:
+            elif possible_reaction.max_limit > 0 and reaction_count >= possible_reaction.max_limit:
                 break
             else: # If the reaction should be added with a certain chance
                 if mock_bernoulli(possible_reaction.chance):
@@ -151,7 +151,10 @@ async def reply_to_message(message: Message, possible_replies: list[ReactEventRe
         try:
             if mock_bernoulli(possible_reply.chance):
                 if isinstance(possible_reply.content, list):
+                    reply_count = 0
                     for reply in possible_reply.content:
+                        if possible_reply.max_limit > 0 and reply_count >= possible_reply.max_limit:
+                            break
                         reply_happened = await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author)
                 else:
                     reply_happened = await send_message(message, possible_reply.content, possible_reply.random_multiplier, possible_reply.mention_author)

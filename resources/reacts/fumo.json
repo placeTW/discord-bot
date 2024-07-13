@@ -10,7 +10,7 @@
   "possible_reactions": [
     {
       "chance": 0.25,
-      "max_react_limit": 3,
+      "max_limit": 3,
       "content": [
         "<a:FumoBop:1260215543269560450>",
         "<a:FumoBounce:1258766137366282301>",

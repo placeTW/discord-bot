@@ -142,6 +142,7 @@
     {
       "condition": "any_meows",
       "chance": 0.001,
+      "max_limit": 1,
       "content": [
         "<:CapooDepressed:1198305961203486900>",
         "<:ChisobCat:1157361078452375582>",
