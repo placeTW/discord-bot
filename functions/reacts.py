@@ -90,20 +90,26 @@ def check_resource_match(message_content: str, resource_name: str) -> bool:
     matches = check_matches(message_content, resource.criteria)
     return bool(matches)
 
-def check_matches(message_content: str, criteria: list[ReactCriteria]) -> bool | set[str]:
+def regex_search(message_content: str, possible_match: ReactCriteria) -> bool:
+    if possible_match.match_whole_word:
+        if search(rf"\b(?:{'|'.join(possible_match.keywords)})\b", message_content, flags=IGNORECASE | UNICODE):
+            return True
+    else:
+        if search(rf"{'|'.join(possible_match.keywords)}", message_content, flags=IGNORECASE | UNICODE):
+            return True
+    return False
+
+def check_matches(message_content: str, criteria: list[ReactCriteria], channel_name: str = "") -> bool | set[str]:
     criteria_links = set()
     found_match = False
     for possible_match in criteria:
-        if possible_match.match_whole_word:
-            if search(rf"\b(?:{'|'.join(possible_match.keywords)})\b", message_content, flags=IGNORECASE | UNICODE):
-                found_match = True
-                if possible_match.criteria_link:
-                    criteria_links.add(possible_match.criteria_link)
-        else:
-            if search(rf"{'|'.join(possible_match.keywords)}", message_content, flags=IGNORECASE | UNICODE):
-                found_match = True
-                if possible_match.criteria_link:
-                    criteria_links.add(possible_match.criteria_link)
+        if channel_name and possible_match.channel_name_contains:
+            if not search(rf"{'|'.join(possible_match.channel_name_contains)}", channel_name, flags=IGNORECASE | UNICODE):
+                continue
+        if regex_search(message_content, possible_match):
+            found_match = True
+            if possible_match.criteria_link:
+                criteria_links.add(possible_match.criteria_link)
     # If no link IDs were found, return if there was a match
     return criteria_links if len(criteria_links) > 0 else found_match
 
@@ -178,9 +184,8 @@ def evaluate_event_condition(condition: str, criteria_links: set[str] | None = N
     return eval(compiled_expr, {"__builtins__": {}}, allowed_names | {'link_id_exists': link_id_exists})
 
 
-
-
-async def react_to_message(message: Message, possible_reactions: list[ReactEventReaction], match_id_results: set[str] = None) -> None:
+async def react_to_message(message: Message, possible_reactions: list[ReactEventReaction], match_id_results: set[str] = None) -> bool:
+    reaction_happened = False
     for possible_reaction in possible_reactions:
         # If the matched linked results exists check if the reaction is linked to a match
         if not evaluate_event_condition(possible_reaction.condition, match_id_results):
@@ -190,22 +195,26 @@ async def react_to_message(message: Message, possible_reactions: list[ReactEvent
         reaction_count = 0
         for reaction in reactions_list:
             if possible_reaction.react_with_all: # If all of the possible reactions should be added
-                await add_reaction(message, reaction)
+                reaction_count = await add_reaction(message, reaction)
                 reaction_count += 1
             elif possible_reaction.max_react_limit > 0 and reaction_count >= possible_reaction.max_react_limit:
                 break
             else: # If the reaction should be added with a certain chance
                 if mock_bernoulli(possible_reaction.chance):
-                    await add_reaction(message, reaction)
+                    reaction_count = await add_reaction(message, reaction)
                     reaction_count += 1
+    return reaction_happened
 
-async def add_reaction(message: Message, reaction: str) -> None:
+async def add_reaction(message: Message, reaction: str) -> bool:
     try:
         await message.add_reaction(reaction)
+        return True
     except Exception as e:
         print('Failed to react to message:', e, reaction)
+        return False
 
-async def reply_to_message(message: Message, possible_replies: list[ReactEventReply], match_id_results: set[str] = None) -> None:
+async def reply_to_message(message: Message, possible_replies: list[ReactEventReply], match_id_results: set[str] = None) -> bool:
+    reply_happened = False
     for possible_reply in possible_replies:
         # If the matched linked results exists check if the reply is linked to a match
         if not evaluate_event_condition(possible_reply.condition, match_id_results):
@@ -214,34 +223,39 @@ async def reply_to_message(message: Message, possible_replies: list[ReactEventRe
             if mock_bernoulli(possible_reply.chance):
                 if isinstance(possible_reply.content, list):
                     for reply in possible_reply.content:
-                        await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author)
+                        reply_happened = await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author)
                 else:
-                    await send_message(message, possible_reply.content, possible_reply.random_multiplier, possible_reply.mention_author)
+                    reply_happened = await send_message(message, possible_reply.content, possible_reply.random_multiplier, possible_reply.mention_author)
 
         except Exception as e:
             print('Failed to reply to message:', e, possible_reply)
+    return reply_happened
 
-async def send_message(message: Message, content: str | ReactMessage, multiplier: int = 1, mention_author: bool = False) -> None:
+async def send_message(message: Message, content: str | ReactMessage, multiplier: int = 1, mention_author: bool = False) -> bool:
     try:
         # TODO: Handle different types of replies
-        message = content.message if isinstance(content, ReactMessage) else content
-        await message.reply(message * randint(1, multiplier), mention_author=mention_author)
+        reply = content.message if isinstance(content, ReactMessage) else content
+        await message.reply(reply * randint(1, multiplier), mention_author=mention_author)
+        return True
     except Exception as e:
         print('Failed to send message:', e, content)
+        return False
 
 async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
-        match_results = check_matches(message.content, resource.criteria)
+        match_results = check_matches(message.content, resource.criteria, message.channel.name)
         if bool(match_results):
+            event_happened = False
             # If the match results are not a set, it means that there was a match but no link IDs were found
             # All the possible reactions/replies will be used in this case
             if not isinstance(match_results, set):
                 match_results = None
             if resource.possible_reactions:
-                await react_to_message(message, resource.possible_reactions, match_results)
+                event_happened = await react_to_message(message, resource.possible_reactions, match_results)
             if resource.possible_replies:
-                await reply_to_message(message, resource.possible_replies)
-            events.append(event_name)
+                event_happened = await reply_to_message(message, resource.possible_replies)
+            if event_happened:
+                events.append(event_name)
             
     return events
