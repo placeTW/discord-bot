@@ -2,28 +2,42 @@ name: Run Unit Test via Pytest
   
 on:
     push:
+      paths:
+      - '**/*.py'
+      - .github/workflows/run_test.yml
             
 jobs:  
   build:  
     runs-on: ubuntu-latest  
     strategy:  
       matrix:  
-        python-version: ["3.11"]  
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
   
     steps:  
-      - uses: actions/checkout@v3  
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}  
-        uses: actions/setup-python@v4  
+        uses: actions/setup-python@v5 
         with:  
           python-version: ${{ matrix.python-version }}  
-          cache: 'pip'
-      - name: Install dependencies  
-        run: |  
-          python -m pip install --upgrade pip  
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Poetry Dependencies Caching Step 1, set up a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v3
+        name: Poetry Dependencies Caching Step 2, define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies using Poetry 
+        run: poetry install
       - name: Test with pytest  
         run: |  
-            python -m pytest tests/ -v -s  
+            poetry run python -m pytest tests/ -v -s  
     #   - name: Generate Coverage Report  
     #     run: |  
     #       coverage report -m
