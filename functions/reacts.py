@@ -113,11 +113,11 @@ def check_matches(message_content: str, criteria: list[ReactCriteria], channel_n
     # If no link IDs were found, return if there was a match
     return criteria_links if len(criteria_links) > 0 else found_match
 
-async def react_to_message(message: Message, possible_reactions: list[ReactEventReaction], match_id_results: set[str] = None) -> bool:
+async def react_to_message(message: Message, possible_reactions: list[ReactEventReaction], criteria_links: set[str] = None) -> bool:
     reaction_happened = False
     for possible_reaction in possible_reactions:
         # If the matched linked results exists check if the reaction is linked to a match
-        if not evaluate_event_condition(possible_reaction.condition, match_id_results):
+        if not evaluate_event_condition(possible_reaction.condition, criteria_links):
             continue
         # List of reactions in random order
         reactions_list = sample(possible_reaction.content, len(possible_reaction.content)) if isinstance(possible_reaction.content, list) else [possible_reaction.content]
@@ -144,11 +144,11 @@ async def add_reaction(message: Message, reaction: str) -> bool:
         print('Failed to react to message:', e, reaction)
         return False
 
-async def reply_to_message(message: Message, possible_replies: list[ReactEventReply], match_id_results: set[str] = None) -> bool:
+async def reply_to_message(message: Message, possible_replies: list[ReactEventReply], criteria_links: set[str] = None) -> bool:
     reply_happened = False
     for possible_reply in possible_replies:
         # If the matched linked results exists check if the reply is linked to a match
-        if not evaluate_event_condition(possible_reply.condition, match_id_results):
+        if not evaluate_event_condition(possible_reply.condition, criteria_links):
             continue
         try:
             if mock_bernoulli(possible_reply.chance):
