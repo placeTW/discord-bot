@@ -17,15 +17,22 @@
     },
     {
       "keywords": [
+        "meow",
+        "cat"
+      ],
+      "match_whole_word": false,
+      "criteria_link": "meows"
+    },
+    {
+      "keywords": [
         "喵",
         "貓",
-        "meow",
         "瞄",
         "錨",
         "ㄇㄧㄠ"
       ],
       "match_whole_word": false,
-      "criteria_link": "meows"
+      "criteria_link": "zh_meows"
     },
     {
       "keywords": [
@@ -90,7 +97,7 @@
   ],
   "possible_reactions": [
     {
-      "condition": "meow or traditional_cat or meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
+      "condition": "meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
       "chance": 0.25,
       "content": [
         "<a:catArrive:1161441364869918881>",
@@ -100,7 +107,7 @@
       ]
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
       "chance": 0.75,
       "content": [
         "<:ChisobCat:1157361078452375582>",
@@ -117,25 +124,48 @@
       "mention_author": "true"
     },
     {
-      "condition": "meow or traditional_cat or meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
+      "condition": "meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
       "chance": 0.169,
       "content": "喵",
       "random_multiplier": 5
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
       "chance": 0.1,
       "content": "<:dogekek:1132350110148333718>"
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
       "chance": 0.1,
       "content": "<:CapooDepressed:1198305961203486900>"
     },
     {
       "condition": "any_meows",
       "chance": 0.001,
-      "content": "<:CapooDepressed:1198305961203486900>"
+      "content": [
+        "<:CapooDepressed:1198305961203486900>",
+        "<:ChisobCat:1157361078452375582>",
+        "<:dogekek:1132350110148333718>",
+        "<:wontoncat:1253825661441933454>",
+        "<:KitKat:1261502778673725482>",
+        "<:Capoo:1139357657698938991>",
+        "<a:catArrive:1161441364869918881>",
+        "喵",
+        "貓",
+        "瞄",
+        "錨",
+        "ㄇㄧㄠ",
+        "猫",
+        "ねこ",
+        "ニャン",
+        "ニャー",
+        "にゃー",
+        "mjäu",
+        "mjau",
+        "ņau",
+        "miau",
+        "ᓚᘏᗢ"
+      ]
     }
   ]
 }

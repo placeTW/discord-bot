@@ -174,7 +174,6 @@ async def handle_message_react(message: Message)  -> list[str]:
     events = []
     for event_name, resource in REACT_RESOURCES.items():
         match_results = check_matches(message.content, resource.criteria, message.channel.name)
-        print(match_results)
         if bool(match_results):
             event_happened = False
             # If the match results are not a set, it means that there was a match but no link IDs were found
