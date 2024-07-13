@@ -5,7 +5,7 @@ from pathlib import Path
 from pydantic import BaseModel
 from re import search, IGNORECASE, UNICODE
 from discord import Message
-from random import sample
+from random import randint, sample
 import ast
 
 from modules.probability import mock_bernoulli
@@ -27,29 +27,31 @@ class ReactCriteria(BaseModel):
     # A list of words that the channel name could contain for the message to match the criteria.
     channel_name_contains: list[str] = []
 
+class ReactMessage(BaseModel):
+    # The reply message that can be sent.
+    message: str
+    # The type of the reply message.
+    type: ReactReplyType = "text"
+
 # An event that can be triggered by a message that matches the criteria.
 class ReactEvent(BaseModel):
     # The condition to evaluate if the event should be triggered. A boolean expression that takes criteria links as operands.
     condition: str = "True"
     # The chance that the reaction/reply will be triggered. A float between 0 and 1.
     chance: float
+    # The content of the event
+    content: str | list[str] | ReactMessage | list[ReactMessage]
 
 
 class ReactEventReaction(ReactEvent):
-    # A list of reactions that can be added to the message.
-    reactions: list[str]
     # Whether all of the possible reactions should be added to the message.
     react_with_all: bool = False
     # The maximum number of reactions that can be added to the message. If -1, there is no limit.
     max_react_limit: int = -1
 
 class ReactEventReply(ReactEvent):
-    # The reply message that can be sent.
-    message: str
-    # The type of the reply message.
-    type: ReactReplyType = "text"
-    # How many times the reply message can be sent.
-    multiplier: int = 1
+    # How many times the reply message could be sent.
+    random_multiplier: int = 1
     # Whether the author of the message should be mentioned in the reply.
     mention_author: bool = False
 
@@ -138,6 +140,9 @@ def evaluate_event_condition(condition: str, criteria_links: set[str] | None = N
         without using eval() on raw input. It's designed to prevent arbitrary
         code execution while allowing flexible condition specifications.
     """
+    if criteria_links is None:
+        return True
+
     def link_id_exists(link_id):
         return link_id in criteria_links
     
@@ -181,7 +186,7 @@ async def react_to_message(message: Message, possible_reactions: list[ReactEvent
         if not evaluate_event_condition(possible_reaction.condition, match_id_results):
             continue
         # List of reactions in random order
-        reactions_list = sample(possible_reaction.reactions, len(possible_reaction.reactions))
+        reactions_list = sample(possible_reaction.content, len(possible_reaction.content)) if isinstance(possible_reaction.content, list) else [possible_reaction.content]
         reaction_count = 0
         for reaction in reactions_list:
             if possible_reaction.react_with_all: # If all of the possible reactions should be added
@@ -207,11 +212,22 @@ async def reply_to_message(message: Message, possible_replies: list[ReactEventRe
             continue
         try:
             if mock_bernoulli(possible_reply.chance):
-                # TODO: Handle different types of replies
-                await message.reply(possible_reply.message, mention_author=possible_reply.mention_author)
+                if isinstance(possible_reply.content, list):
+                    for reply in possible_reply.content:
+                        await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author)
+                else:
+                    await send_message(message, possible_reply.content, possible_reply.random_multiplier, possible_reply.mention_author)
+
         except Exception as e:
             print('Failed to reply to message:', e, possible_reply)
 
+async def send_message(message: Message, content: str | ReactMessage, multiplier: int = 1, mention_author: bool = False) -> None:
+    try:
+        # TODO: Handle different types of replies
+        message = content.message if isinstance(content, ReactMessage) else content
+        await message.reply(message * randint(1, multiplier), mention_author=mention_author)
+    except Exception as e:
+        print('Failed to send message:', e, content)
 
 async def handle_message_react(message: Message)  -> list[str]:
     events = []

@@ -49,7 +49,7 @@
     {
       "note": "react_tw_hgs",
       "chance": 0.69,
-      "reactions": [
+      "content": [
         "<:lt_tw_hgs:1139647918442283038>",
         "<:lv_tw_hgs:1139660598574055514>",
         "<:et_tw_hgs:1139660507167608882>",
@@ -60,7 +60,7 @@
       "note": "react_tw_trolls",
       "max_react_limit": 1,
       "chance": 0.87,
-      "reactions": [
+      "content": [
         "<:roc_troll:1133368648967405610>",
         "<:LVTroll:1121321988854661200>",
         "<:LTTroll:1121321991262183454>",
@@ -72,8 +72,7 @@
   "possible_replies": [
     {
       "chance": 0.169,
-      "message": "hot gay sex",
-      "type": "text"
+      "content": "hot gay sex"
     }
   ]
 }

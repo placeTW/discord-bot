@@ -11,7 +11,7 @@
     {
       "chance": 0.25,
       "max_react_limit": 3,
-      "reactions": [
+      "content": [
         "<a:FumoBop:1260215543269560450>",
         "<a:FumoBounce:1258766137366282301>",
         "<:FumoOk:1260215591126433822>",
@@ -66,8 +66,7 @@
   "possible_replies": [
     {
       "chance": 0.169,
-      "message": "<a:fumo360:1258766152872759388>",
-      "type": "text"
+      "content": "<a:fumo360:1258766152872759388>"
     }
   ]
 }

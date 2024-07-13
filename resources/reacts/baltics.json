@@ -47,7 +47,7 @@
     {
       "condition": "baltics or baltics_lt or baltics_lv or baltics_ee",
       "chance": 0.4,
-      "reactions": [
+      "content": [
         "<:tw_baltics_heart:1132524940587962388>",
         "<:bubblemilktea:1132632348651966596>"
       ]
@@ -55,7 +55,7 @@
     {
       "condition": "baltics_lt",
       "chance": 0.69,
-      "reactions": [
+      "content": [
         "<:lt_tw_hgs:1139647918442283038>",
         "<:LTAmong:1089490466409549844>"
       ]
@@ -63,7 +63,7 @@
     {
       "condition": "baltics_lv",
       "chance": 0.69,
-      "reactions": [
+      "content": [
         "<:lv_tw_hgs:1139660598574055514>",
         "<:LVAmong:1089490467617505433>"
       ]
@@ -71,7 +71,7 @@
     {
       "condition": "baltics_ee",
       "chance": 0.69,
-      "reactions": [
+      "content": [
         "<:et_tw_hgs:1139660507167608882>",
         "<:EEAmong:1089490464102682664>"
       ]

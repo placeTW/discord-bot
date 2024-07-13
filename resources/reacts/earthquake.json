@@ -12,8 +12,7 @@
   "possible_replies": [
     {
       "chance": 0.9,
-      "message": "https://www.youtube.com/watch?v=P24eOUl46k0",
-      "type": "text"
+      "content": "https://www.youtube.com/watch?v=P24eOUl46k0"
     }
   ]
 }
