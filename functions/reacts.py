@@ -124,14 +124,16 @@ async def react_to_message(message: Message, possible_reactions: list[ReactEvent
         reaction_count = 0
         for reaction in reactions_list:
             if possible_reaction.react_with_all: # If all of the possible reactions should be added
-                reaction_count = await add_reaction(message, reaction)
-                reaction_count += 1
+                if await add_reaction(message, reaction):
+                    reaction_happened = True
+                    reaction_count += 1
             elif possible_reaction.max_limit > 0 and reaction_count >= possible_reaction.max_limit:
                 break
             else: # If the reaction should be added with a certain chance
                 if mock_bernoulli(possible_reaction.chance):
-                    reaction_count = await add_reaction(message, reaction)
-                    reaction_count += 1
+                    if await add_reaction(message, reaction):
+                        reaction_happened = True
+                        reaction_count += 1
     return reaction_happened
 
 async def add_reaction(message: Message, reaction: str) -> bool:
@@ -155,9 +157,13 @@ async def reply_to_message(message: Message, possible_replies: list[ReactEventRe
                     for reply in possible_reply.content:
                         if possible_reply.max_limit > 0 and reply_count >= possible_reply.max_limit:
                             break
-                        reply_happened = await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author)
+                        if await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author):
+                            reply_happened = True
+                            reply_count += 1
+                        
                 else:
-                    reply_happened = await send_message(message, possible_reply.content, possible_reply.random_multiplier, possible_reply.mention_author)
+                    if await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author):
+                        reply_happened = True
 
         except Exception as e:
             print('Failed to reply to message:', e, possible_reply)
@@ -185,9 +191,9 @@ async def handle_message_react(message: Message)  -> list[str]:
                 match_results = None
             # Process the events
             if resource.possible_reactions:
-                event_happened = await react_to_message(message, resource.possible_reactions, match_results)
+                event_happened = event_happened or await react_to_message(message, resource.possible_reactions, match_results)
             if resource.possible_replies:
-                event_happened = await reply_to_message(message, resource.possible_replies, match_results)
+                event_happened = event_happened or await reply_to_message(message, resource.possible_replies, match_results)
             # If any event happened, add the event name to the logging list
             if event_happened:
                 events.append(event_name)
