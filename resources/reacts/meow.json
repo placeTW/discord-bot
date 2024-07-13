@@ -111,7 +111,7 @@
     },
     {
       "condition": "from_meow_channel and not (meow or traditional_cat or meows or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
-      "chance": 0.75,
+      "chance": 0.5,
       "content": [
         "<:ChisobCat:1157361078452375582>",
         "<:CapooDepressed:1198305961203486900>"
