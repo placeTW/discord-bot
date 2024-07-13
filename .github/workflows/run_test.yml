@@ -17,7 +17,7 @@ jobs:
     steps:  
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}  
-        uses: actions/setup-python@v4  
+        uses: actions/setup-python@v5 
         with:  
           python-version: ${{ matrix.python-version }}  
           cache: 'poetry'
@@ -25,17 +25,6 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: Poetry Dependencies Caching Step 1, set up a local virtual environment (if no poetry.toml file)
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-      - uses: actions/cache@v3
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
-  
-          
       - name: Install dependencies using Poetry 
         run: poetry install
       - name: Test with pytest  
