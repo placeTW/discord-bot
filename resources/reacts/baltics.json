@@ -32,7 +32,7 @@
       "match_link_id": "baltics_ee",
       "match_whole_word": true,
       "keywords": [
-        "Taiwan(?:l(?:ane|as(?:e|t|te(?:sse|s|st|le|l|lt|ks|ni|na|ta|ga)?|i|se(?:l)|se|e(?:s|l|st|le|lt|ks|ni|na|ta|d)))|i(?:d|sse|s|st|le|l|lt|ks|ni|na|ta|ga||sid|(?:de(?:sse|s|st|le|lt|l|ni|na|ks|e|ta|ga)?))?)"
+        "Taiwan(?:l(?:ane|as(?:e|t|te(?:sse|s|st|le|l|lt|ks|ni|na|ta|ga)?|i|se(?:l)|se|e(?:s|l|st|le|lt|ks|ni|na|ta|d)))|i(?:d|sse|s|st|le|l|lt|ks|ni|na|ta|ga|sid|(?:de(?:sse|s|st|le|lt|l|ni|na|ks|e|ta|ga)?))?)"
       ]
     },
     {
