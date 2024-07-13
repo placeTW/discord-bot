@@ -162,7 +162,7 @@ async def reply_to_message(message: Message, possible_replies: list[ReactEventRe
                             reply_count += 1
                         
                 else:
-                    if await send_message(message, reply, possible_reply.random_multiplier, possible_reply.mention_author):
+                    if await send_message(message, possible_reply, possible_reply.random_multiplier, possible_reply.mention_author):
                         reply_happened = True
 
         except Exception as e:
