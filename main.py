@@ -19,7 +19,6 @@ from modules import logging
 from commands.one_o_one import one_o_one
 from commands import hgs
 from commands.pat import pat
-from commands.hsinchu_wind import hsinchu_wind
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
@@ -145,10 +144,6 @@ async def on_message(message: discord.Message):
 
     react_events = await handle_message_react(message)
     events += react_events
-
-    if hsinchu_wind.is_hsinchu_message(message):
-        await hsinchu_wind.send_hsinchu_msg(message)
-        events.append("hsinchu")
 
     if len(events) > 0:
         await logging.log_message_event(message, events)
