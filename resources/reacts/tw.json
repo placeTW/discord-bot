@@ -59,7 +59,7 @@
   "possible_reactions": [
     {
       "chance": 0.125,
-      "reactions": [
+      "content": [
         "<:flag_twi:1133045891780071436>",
         "<:Black_Bear:1132603463126237244>",
         "<:Urocissacaerulea:1132839946303062086>",
@@ -90,8 +90,7 @@
   "possible_replies": [
     {
       "chance": 0.07,
-      "message": "https://www.youtube.com/watch?v=AN0rQR0RlOM",
-      "type": "text"
+      "content": "https://www.youtube.com/watch?v=AN0rQR0RlOM"
     }
   ]
 }

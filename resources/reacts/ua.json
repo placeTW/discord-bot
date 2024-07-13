@@ -39,7 +39,7 @@
   "possible_reactions": [
     {
       "chance": 0.50,
-      "reactions": [
+      "content": [
         "<:UATroll:1142824293470838854>",
         "<:ua_loves_tw:1145442004940099654>",
         "🇺🇦"
@@ -48,7 +48,7 @@
     {
       "react_with_all": true,
       "chance": 0.50,
-      "reactions": [
+      "content": [
         "💙",
         "💛"
       ]
