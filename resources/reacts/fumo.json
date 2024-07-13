@@ -3,13 +3,17 @@
     {
       "match_whole_word": false,
       "keywords": [
-        "fumo"
+        "fumo",
+        "yon",
+        "touhou",
+        "2hu",
+        "東方"
       ]
     }
   ],
   "possible_reactions": [
     {
-      "chance": 0.25,
+      "chance": 0.125,
       "max_limit": 3,
       "content": [
         "<a:FumoBop:1260215543269560450>",
