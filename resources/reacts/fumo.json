@@ -4,16 +4,21 @@
       "match_whole_word": false,
       "keywords": [
         "fumo",
+        "東方"
+      ]
+    },
+    {
+      "match_whole_word": true,
+      "keywords": [
         "yon",
         "touhou",
-        "2hu",
-        "東方"
+        "2hu"
       ]
     }
   ],
   "possible_reactions": [
     {
-      "chance": 0.125,
+      "chance": 0.1,
       "max_limit": 3,
       "content": [
         "<a:FumoBop:1260215543269560450>",
