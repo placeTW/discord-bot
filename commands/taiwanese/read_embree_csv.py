@@ -35,6 +35,3 @@ def read_embree_csv_raw(
     if cols_to_keep:
         df = df[list(cols_to_keep)]
     return df
-
-def get_random_row(df: pd.DataFrame) -> pd.Series:
-    return df.sample().iloc[0]
