@@ -52,7 +52,7 @@ def _create_word_embed(
         title=poj_unicode,
     )  # ^ add description="desc" for additional info
     embed.add_field(name="Mandarin equivalent", value=hoa_bun, inline=False)
-    embed.add_field(name="English equivalent", value=eng_bun, inline=False)
+    embed.add_field(name="English meaning", value=eng_bun, inline=False)
     embed.add_field(name="POJ input", value=poj_input, inline=False)
     if abbreviation:
         embed.add_field(name="Word Type", value=abbreviation, inline=False)
