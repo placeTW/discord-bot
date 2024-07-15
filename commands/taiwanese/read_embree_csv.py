@@ -34,4 +34,5 @@ def read_embree_csv_raw(
     df = pd.read_csv(filepath, encoding='utf-8', index_col=index_col)
     if cols_to_keep:
         df = df[list(cols_to_keep)]
+    df = df.fillna("") # replace all NaN with empty string
     return df
