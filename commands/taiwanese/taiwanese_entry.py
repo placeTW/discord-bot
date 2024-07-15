@@ -27,19 +27,38 @@ def register_commands(
         interaction: discord.Interaction,
     ):
         random_row = get_random_row(TW_EMBREE_CSV)
-        # testing: just print the random row
-        await interaction.response.send_message(
-            f"Random word from Taiwanese word list: {str(random_row)}"
+        embed = _create_word_embed(
+            random_row["PojUnicode"],
+            random_row["PojInput"],
+            random_row["Abbreviation"],
+            random_row["NounClassifier"],
+            random_row["HoaBun"],
+            random_row["EngBun"],
         )
-        # embed = _create_word_embed(
-        #     random_row["PojUnicode"],
-        #     random_row["Abbreviation"],
-        #     random_row["NounClassifier"],
-        #     random_row["HoaBun"],
-        #     random_row["EngBun"],
-        # )
-        # await interaction.response.send_message(
-        #     f"Random word from Taiwanese word list:", embed=embed
-        # )
+        await interaction.response.send_message(
+            f"Random word from Taiwanese word list:", embed=embed
+        )
     tree.add_command(taigi_group, guild=this_guild)
 
+def _create_word_embed(
+    poj_unicode: str,
+    poj_input: str,
+    abbreviation: str,
+    noun_classifier: str,
+    hoa_bun: str,
+    eng_bun: str,
+):
+    embed = discord.Embed(
+        title=poj_unicode,
+    )  # ^ add description="desc" for additional info
+    embed.add_field(name="Mandarin equivalent", value=hoa_bun, inline=False)
+    embed.add_field(name="English equivalent", value=eng_bun, inline=False)
+    embed.add_field(name="POJ input", value=poj_input, inline=False)
+    if abbreviation:
+        embed.add_field(name="Word Type", value=abbreviation, inline=False)
+    if noun_classifier:
+        embed.add_field(name="Noun classifier", value=noun_classifier, inline=False)
+    reference_link = f"https://chhoe.taigi.info/search?method=basic&searchMethod=equals&spelling={poj_input}&spellingMethod=PojInput"
+    embed.add_field(name=f"Links", value=f"[ChhoeTaigi Search]({reference_link})", inline=False)
+    # embed.set_footer(text="Data from ChhoeTaigi", icon_url="https://chhoe.taigi.info/favicon-light.ico") # not used because there's no suitable icon atm
+    return embed
