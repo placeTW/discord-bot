@@ -20,7 +20,7 @@
         "meow",
         "cat"
       ],
-      "match_whole_word": false,
+      "match_whole_word": true,
       "criteria_link": "meows"
     },
     {
