@@ -29,6 +29,7 @@ from commands.confessions import confession
 from commands.stats import stats
 from commands.tocfl import tocfl
 from commands.formosa_stickers import formosa_stickers
+from commands.taiwanese import taiwanese_entry
 
 from activities import activity
 
@@ -78,6 +79,7 @@ edit_entry_cmd.register_commands(tree, placetw_guild, client)
 restart.register_commands(tree, placetw_guild)
 activity.register_commands(tree, placetw_guild, client)
 tocfl.register_commands(tree, placetw_guild, client)
+taiwanese_entry.register_commands(tree, placetw_guild, client)
 
 # * register commands to the other servers
 guilds = [
