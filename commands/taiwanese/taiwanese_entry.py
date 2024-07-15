@@ -29,7 +29,7 @@ def register_commands(
         random_row = get_random_row(TW_EMBREE_CSV)
         # testing: just print the random row
         await interaction.response.send_message(
-            f"Random word from Taiwanese word list:", content=str(random_row)
+            f"Random word from Taiwanese word list: {str(random_row)}"
         )
         # embed = _create_word_embed(
         #     random_row["PojUnicode"],
@@ -41,3 +41,5 @@ def register_commands(
         # await interaction.response.send_message(
         #     f"Random word from Taiwanese word list:", embed=embed
         # )
+    tree.add_command(taigi_group, guild=this_guild)
+
