@@ -50,7 +50,7 @@ def _create_word_embed(
 ):
     embed = discord.Embed(
         title=poj_unicode,
-        color="#18e240" # TODO: get the correct green color
+        color=discord.Color.green()
     )  # ^ add description="desc" for additional info
     embed.add_field(name="Mandarin equivalent", value=hoa_bun, inline=False)
     embed.add_field(name="English meaning", value=eng_bun, inline=False)
