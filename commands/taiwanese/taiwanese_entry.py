@@ -3,6 +3,7 @@ from pathlib import Path
 import discord
 from discord import app_commands
 from .read_embree_csv import read_embree_csv_raw
+from urllib.parse import quote as url_quote
 
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
 TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)
@@ -48,14 +49,13 @@ def _create_word_embed(
     hoa_bun: str,
     eng_bun: str,
 ):
-    # preprocessing
-    poj_input = poj_input.replace(' ', '%20')
-    poj_unicode = poj_unicode.replace(' ', '%20')
-
     embed = discord.Embed(
         title=poj_unicode,
         color=discord.Color.green()
     )  # ^ add description="desc" for additional info
+    # escape the unicode for the URL
+    poj_unicode = url_quote(poj_unicode)
+    poj_input = url_quote(poj_input)
     embed.add_field(name="Mandarin equivalent", value=hoa_bun, inline=False)
     embed.add_field(name="English meaning", value=eng_bun, inline=False)
     embed.add_field(name="POJ input", value=poj_input, inline=False)
