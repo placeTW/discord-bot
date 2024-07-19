@@ -48,6 +48,10 @@ def _create_word_embed(
     hoa_bun: str,
     eng_bun: str,
 ):
+    # preprocessing
+    poj_input = poj_input.replace(' ', '%20')
+    poj_unicode = poj_unicode.replace(' ', '%20')
+
     embed = discord.Embed(
         title=poj_unicode,
         color=discord.Color.green()
@@ -59,7 +63,7 @@ def _create_word_embed(
         embed.add_field(name="Word Type", value=abbreviation, inline=False)
     if noun_classifier:
         embed.add_field(name="Noun classifier", value=noun_classifier, inline=False)
-    chhoe_taigi_link = f"https://chhoe.taigi.info/search?method=basic&searchMethod=equals&spelling={poj_input.replace(' ', '%20')}&spellingMethod=PojInput"
+    chhoe_taigi_link = f"https://chhoe.taigi.info/search?method=basic&searchMethod=equals&spelling={poj_input}&spellingMethod=PojInput"
     itaigi_link = f"https://itaigi.tw/k/{hoa_bun}/"
     moe_link_definition = f"https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha={poj_unicode}" # ! might need to use the official MOE unicode from the df
     moe_link_examples = f"https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_ku&tsha={poj_unicode}"
@@ -68,5 +72,10 @@ def _create_word_embed(
     embed.add_field(name=f"", value=f"[MOE Dictionary (Definition)]({moe_link_definition})", inline=False)
     embed.add_field(name=f"", value=f"[MOE Dictionary (Examples)]({moe_link_examples})", inline=False)
     embed.add_field(name=f"", value=f"[ChhoeTaigi Search (Source)]({chhoe_taigi_link})", inline=False)
+    # general Taiwanese pronunciation resources
+    embed.add_field(name="台羅 Pronunciation Guides (in Mandarin)", value="", inline=False)
+    embed.add_field(name=f"", value=f"[一個禮拜學好台羅拼音！](https://hackmd.io/@itk1523/1week-kip)", inline=False)
+    embed.add_field(name=f"", value=f"[教育部台羅教學網](https://tailo.moe.edu.tw/)", inline=False)
+    
     # embed.set_footer(text="Data from ChhoeTaigi", icon_url="https://chhoe.taigi.info/favicon-light.ico") # not used because there's no suitable icon atm
     return embed
