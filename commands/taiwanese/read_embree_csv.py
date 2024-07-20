@@ -36,3 +36,6 @@ def read_embree_csv_raw(
         df = df[list(cols_to_keep)]
     df = df.fillna("") # replace all NaN with empty string
     return df
+
+TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
+TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)
