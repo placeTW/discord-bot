@@ -14,7 +14,7 @@ class QuizMultipleChoiceButton(discord.ui.Button["MultipleChoiceButton"]):
 
     async def callback(self, interaction: discord.Interaction):
         assert self.view is not None, "View not found"
-        view: MultipleChoiceButton = self.view
+        view: MultipleChoiceView = self.view
         # if correct, change style to green and disable all buttons
         if self.is_correct:
             self.style = discord.ButtonStyle.success
@@ -26,10 +26,13 @@ class QuizMultipleChoiceButton(discord.ui.Button["MultipleChoiceButton"]):
             self.disabled = True
         await interaction.response.edit_message(view=view)
 
-class MultipleChoiceButton(discord.ui.View):
+class MultipleChoiceView(discord.ui.View):
     def __init__(self, choices: list[QuizChoice]):
         super().__init__()
+        for i, choice in enumerate(choices):
+            self.add_item(QuizMultipleChoiceButton(i, 0, choice.label, choice.is_correct))
 
+# a generic class for a multiple choice question
 class QuizChoice:
     def __init__(self, label: str, is_correct: bool):
         self.label = label
