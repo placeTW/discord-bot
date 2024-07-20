@@ -3,6 +3,7 @@ from pathlib import Path
 import discord
 from discord import app_commands
 from .read_embree_csv import read_embree_csv_raw
+from urllib.parse import quote as url_quote
 
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
 TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)
@@ -52,6 +53,9 @@ def _create_word_embed(
         title=poj_unicode,
         color=discord.Color.green()
     )  # ^ add description="desc" for additional info
+    # escape the unicode for the URL
+    poj_unicode = url_quote(poj_unicode)
+    poj_input = url_quote(poj_input)
     embed.add_field(name="Mandarin equivalent", value=hoa_bun, inline=False)
     embed.add_field(name="English meaning", value=eng_bun, inline=False)
     embed.add_field(name="POJ input", value=poj_input, inline=False)
@@ -59,7 +63,7 @@ def _create_word_embed(
         embed.add_field(name="Word Type", value=abbreviation, inline=False)
     if noun_classifier:
         embed.add_field(name="Noun classifier", value=noun_classifier, inline=False)
-    chhoe_taigi_link = f"https://chhoe.taigi.info/search?method=basic&searchMethod=equals&spelling={poj_input.replace(' ', '%20')}&spellingMethod=PojInput"
+    chhoe_taigi_link = f"https://chhoe.taigi.info/search?method=basic&searchMethod=equals&spelling={poj_input}&spellingMethod=PojInput"
     itaigi_link = f"https://itaigi.tw/k/{hoa_bun}/"
     moe_link_definition = f"https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha={poj_unicode}" # ! might need to use the official MOE unicode from the df
     moe_link_examples = f"https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_ku&tsha={poj_unicode}"
@@ -68,5 +72,10 @@ def _create_word_embed(
     embed.add_field(name=f"", value=f"[MOE Dictionary (Definition)]({moe_link_definition})", inline=False)
     embed.add_field(name=f"", value=f"[MOE Dictionary (Examples)]({moe_link_examples})", inline=False)
     embed.add_field(name=f"", value=f"[ChhoeTaigi Search (Source)]({chhoe_taigi_link})", inline=False)
+    # general Taiwanese pronunciation resources
+    embed.add_field(name="台羅 Pronunciation Guides (in Mandarin)", value="", inline=False)
+    embed.add_field(name=f"", value=f"[一個禮拜學好台羅拼音！](https://hackmd.io/@itk1523/1week-kip)", inline=False)
+    embed.add_field(name=f"", value=f"[教育部台羅教學網](https://tailo.moe.edu.tw/)", inline=False)
+    
     # embed.set_footer(text="Data from ChhoeTaigi", icon_url="https://chhoe.taigi.info/favicon-light.ico") # not used because there's no suitable icon atm
     return embed
