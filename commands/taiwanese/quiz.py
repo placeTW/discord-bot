@@ -48,4 +48,5 @@ def register_quiz_subcommand(
         await interaction.response.send_message(
             f"Choose the correct meaning of the Taiwanese word: {random_rows.loc[correct_row_index, 'PojUnicode']}",
             view=view,
+            ephemeral=is_private,
         )
