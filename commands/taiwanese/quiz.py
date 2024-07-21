@@ -1,6 +1,6 @@
 import discord
 from discord.app_commands import Choice
-import sys
+import sys, re
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
@@ -8,6 +8,7 @@ from .read_embree_csv import TW_EMBREE_CSV
 
 class TaigiQuizChoice(QuizChoice):
     def __init__(self, poj_unicode: str, is_correct: bool, engbun:str="", hoabun:str=""):
+        engbun = re.sub(r"<.*?>", "", engbun) # remove explanation in engbun, which is denoted by <>, since it might contain the answer
         label = f"{engbun}" + f" ({hoabun})" if hoabun else ""
         if len(label) > 80:
             # discord only allows 80 characters for the label, so truncate if necessary
@@ -34,7 +35,7 @@ def register_quiz_subcommand(
     ):
         # get the number of rows to sample
         num_rows = num_rows.value if num_rows else 4
-        # get four random rows and choose one as the correct answer
+        # get num_rows random rows and choose one as the correct answer
         random_rows = TW_EMBREE_CSV.sample(num_rows)
         # convert to TaigiQuizChoice objects
         correct_row_index = random_rows.sample().index[0]
