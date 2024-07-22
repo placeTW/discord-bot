@@ -4,9 +4,8 @@ import discord
 from discord import app_commands
 from .read_embree_csv import read_embree_csv_raw
 from urllib.parse import quote as url_quote
-
-TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
-TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)
+from .quiz import register_quiz_subcommand
+from .read_embree_csv import TW_EMBREE_CSV
 
 def get_random_row(df: pd.DataFrame) -> pd.Series:
     return df.sample().iloc[0]
@@ -39,6 +38,10 @@ def register_commands(
         await interaction.response.send_message(
             f"Random word from Taiwanese word list:", embed=embed
         )
+
+    # register the quiz subcommand
+    register_quiz_subcommand(taigi_group)
+
     tree.add_command(taigi_group, guild=this_guild)
 
 def _create_word_embed(
