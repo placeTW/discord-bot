@@ -25,6 +25,7 @@ The + means to keep the field, - means to discard the field.
 INDEX_COL = 0
 # to save memory, only keep the columns we need
 COLS_TO_KEEP = ("PojUnicode", "PojInput", "Abbreviation", "NounClassifier", "HoaBun", "EngBun")
+NUM_WORDS_COL = "num_words"
 
 def read_embree_csv_raw(
     filepath: Path,
@@ -39,7 +40,7 @@ def read_embree_csv_raw(
 
 def add_pd_columns(tw_csv: pd.DataFrame) -> pd.DataFrame:
     # add the length of each word
-    tw_csv["num_words"] = tw_csv["PojUnicode"].apply(lambda x: x.split("/")[0].count("-")+1)
+    tw_csv[NUM_WORDS_COL] = tw_csv["PojUnicode"].apply(lambda x: x.split("/")[0].count("-")+1)
     return tw_csv
 
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
