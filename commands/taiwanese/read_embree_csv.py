@@ -37,5 +37,11 @@ def read_embree_csv_raw(
     df = df.fillna("") # replace all NaN with empty string
     return df
 
+def add_pd_columns(tw_csv: pd.DataFrame) -> pd.DataFrame:
+    # add the length of each word
+    tw_csv["num_words"] = tw_csv["PojUnicode"].apply(lambda x: x.split("/")[0].count("-")+1)
+    return tw_csv
+
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
 TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)
+TW_EMBREE_CSV = add_pd_columns(TW_EMBREE_CSV)
