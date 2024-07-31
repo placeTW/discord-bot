@@ -1,10 +1,10 @@
 import discord
 from discord.app_commands import Choice
-import sys, re
+import sys, re, random
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
-from .read_embree_csv import TW_EMBREE_CSV
+from .read_embree_csv import TW_EMBREE_CSV, NUM_WORDS_COL
 
 DISCORD_MAX_LABEL_LENGTH = 80
 
@@ -35,16 +35,22 @@ def register_quiz_subcommand(
         num_rows: Choice[int] = None,
         is_private: bool = False,
     ):
-        # get the number of rows to sample
-        num_rows = num_rows.value if num_rows else 4
+        # select a random value from the NUM_WORDS_COL column
+        word_length = TW_EMBREE_CSV[NUM_WORDS_COL].sample().iloc[0]
+        # filter the dataframe based on the word length
+        tw_csv_subset = TW_EMBREE_CSV[TW_EMBREE_CSV[NUM_WORDS_COL] == word_length]
+        # get the number of rows to sample, which is the minimum of 4 and the length of the subset
+        num_rows = min(num_rows.value if num_rows else 4, len(tw_csv_subset))
         # get num_rows random rows and choose one as the correct answer
-        random_rows = TW_EMBREE_CSV.sample(num_rows)
+        random_rows = tw_csv_subset.sample(num_rows)
         # convert to TaigiQuizChoice objects
         correct_row_index = random_rows.sample().index[0]
         choices = [
             TaigiQuizChoice(row["PojUnicode"], correct_row_index == i, row["EngBun"], row["HoaBun"])
             for i, row in random_rows.iterrows()
         ]
+        # shuffle the choices
+        random.shuffle(choices)
         # create the view
         view = MultipleChoiceView(choices)
         # send the message
