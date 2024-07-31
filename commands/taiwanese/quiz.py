@@ -1,6 +1,6 @@
 import discord
 from discord.app_commands import Choice
-import sys, re
+import sys, re, random
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
@@ -49,6 +49,8 @@ def register_quiz_subcommand(
             TaigiQuizChoice(row["PojUnicode"], correct_row_index == i, row["EngBun"], row["HoaBun"])
             for i, row in random_rows.iterrows()
         ]
+        # shuffle the choices
+        random.shuffle(choices)
         # create the view
         view = MultipleChoiceView(choices)
         # send the message
