@@ -59,14 +59,16 @@ def _create_word_embed(
 ):
     try:
         chewing = to_chewing(pinyin)
-    except AssertionError:
-        chewing = "ERROR OCCURRED"
+    except AssertionError as e:
+        print("Error occurred during chewing conversion: ", e)
+        chewing = None
 
     embed = discord.Embed(
         title=word
     )  # ^ add description="desc" for translation
     embed.add_field(name="Pronunciation (Pinyin)", value=pinyin, inline=False)
-    embed.add_field(name="Pronunciation (Zhuyin)", value=chewing, inline=False)
+    if chewing:
+         embed.add_field(name="Pronunciation (Zhuyin)", value=chewing, inline=False)
     embed.add_field(
         name="Dictionary Reference",
         value=f"https://cdict.net/?q={word}",

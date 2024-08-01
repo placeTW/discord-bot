@@ -159,50 +159,51 @@ DIACRITIC_TO_BASE_AND_TONE = {
 }
 
 
+# Matches chewing from substrings
+def match_chewing(string: str, index: int, target: dict[str, str]):
+    global PINYIN_COMBINED, PINYIN_FINALS
+    # Substrings only to the maxium possible character amount
+    for i in range(max([len(i) for i in target.keys()]), 0, -1):
+        target_str = string[index : index + i]
+        result = target.get(target_str)
+        if result:
+            # Resolve duplicates
+            if target == PINYIN_COMBINED:
+                if target_str == "uan" and string[index - 1] in [
+                    "y",
+                    "j",
+                    "q",
+                    "x",
+                ]:
+                    result = "ㄩㄢ"
+                elif target_str == "un" and string[index - 1] in [
+                    "y",
+                    "j",
+                    "q",
+                    "x",
+                ]:
+                    result = "ㄩㄣ"
+            elif target == PINYIN_FINALS:
+                if target_str == "e" and string[index - 1] == "y":
+                    result = "ㄝ"
+
+            return (index + i, result)
+    return (index + 1, None)
+
+
+# Ensure there are no trailing characters unable to form word
+def forms_new_word(pinyin: str, index: int):
+    global PINYIN_INITIALS, PINYIN_ALONE
+    return (
+        match_chewing(pinyin, index, PINYIN_INITIALS | PINYIN_ALONE)[1]
+        or index >= len(pinyin)
+        or not pinyin[index].isalpha()
+    )
+
+
 def to_chewing(pinyin: str) -> str:
     # Remove leading and trailing spaces
     pinyin = pinyin.strip()
-
-    # Matches chewing from substrings
-    def match_chewing(string: str, index: int, target: dict[str, str]):
-        global PINYIN_COMBINED, PINYIN_FINALS
-        # Substrings only to the maxium possible character amount
-        for i in range(max([len(i) for i in target.keys()]), 0, -1):
-            target_str = string[index : index + i]
-            result = target.get(target_str)
-            if result:
-                # Resolve duplicates
-                if target == PINYIN_COMBINED:
-                    if target_str == "uan" and string[index - 1] in [
-                        "y",
-                        "j",
-                        "q",
-                        "x",
-                    ]:
-                        result = "ㄩㄢ"
-                    elif target_str == "un" and string[index - 1] in [
-                        "y",
-                        "j",
-                        "q",
-                        "x",
-                    ]:
-                        result = "ㄩㄣ"
-                elif target == PINYIN_FINALS:
-                    if target_str == "e" and string[index - 1] == "y":
-                        result = "ㄝ"
-
-                return (index + i, result)
-        return (index + 1, None)
-
-    # Ensure there are no trailing characters unable to form word
-    def forms_new_word(index: int):
-        nonlocal pinyin
-        global PINYIN_INITIALS, PINYIN_ALONE
-        return (
-            match_chewing(pinyin, index, PINYIN_INITIALS | PINYIN_ALONE)[1]
-            or index >= len(pinyin)
-            or not pinyin[index].isalpha()
-        )
 
     # Temporarily store the chewing tones and original index
     tones = []
@@ -228,37 +229,33 @@ def to_chewing(pinyin: str) -> str:
             chewing += "ㄦ¯"
             break
 
+		# Check matches for independent words
         res = match_chewing(pinyin, index, PINYIN_ALONE)
-        if res[1] and forms_new_word(res[0]):
-            chewing += res[1]
+        if res[1] and forms_new_word(pinyin, res[0]):
+            chewing += res[1] # ㄧㄚ
             index = res[0]
 
         else:
             initial = match_chewing(pinyin, index, PINYIN_INITIALS)
-            assert initial[1]
+            assert initial[1], f"Failed to match initial in '{pinyin}' at index {index - 1}"
             index = initial[0]
-            chewing += initial[1]
+            chewing += initial[1] # ㄍ
             combined = match_chewing(pinyin, index, PINYIN_COMBINED)
             if combined[1]:
                 index = combined[0]
-                chewing += combined[1]
+                chewing += combined[1] # ㄨㄤ
             else:
                 center = match_chewing(pinyin, index, PINYIN_CENTER)
                 if center[1]:
-                    chewing += center[1]
+                    chewing += center[1] # ㄍㄨ
                     index = center[0]
                 final = match_chewing(pinyin, index, PINYIN_FINALS)
-                safety_ctr = 0
-                while final[1]:
-                    # incase things explode causing infinite loop
-                    assert safety_ctr < 2
-                    chewing += final[1]
+                if final[1]:
+                    chewing += final[1] # ㄍㄨㄛ
                     index = final[0]
-                    final = match_chewing(pinyin, index, PINYIN_FINALS)
-                    safety_ctr += 1
 
         if len(tones) and tones[0][0] < index:
-            chewing += tones.pop(0)[1]
+            chewing += tones.pop(0)[1] # ㄍㄨㄛˊ
         else:
             chewing += "˙"
 
