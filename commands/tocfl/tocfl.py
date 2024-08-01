@@ -6,6 +6,7 @@ from bot import TWPlaceClient
 from modules.supabase import supabaseClient
 from random import randint
 from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
+from .chewing import to_chewing
 
 
 def register_commands(
@@ -56,10 +57,18 @@ def register_commands(
 def _create_word_embed(
     word: str, level: int, part_of_speech: str, pinyin: str
 ):
+    try:
+        chewing = to_chewing(pinyin)
+    except AssertionError as e:
+        print("Error occurred during chewing conversion: ", e)
+        chewing = None
+
     embed = discord.Embed(
         title=word
     )  # ^ add description="desc" for translation
-    embed.add_field(name="Pronunciation", value=pinyin, inline=False)
+    embed.add_field(name="Pronunciation (Pinyin)", value=pinyin, inline=False)
+    if chewing:
+         embed.add_field(name="Pronunciation (Zhuyin)", value=chewing, inline=False)
     embed.add_field(
         name="Dictionary Reference",
         value=f"https://cdict.net/?q={word}",
