@@ -38,9 +38,16 @@ def read_embree_csv_raw(
     df = df.fillna("") # replace all NaN with empty string
     return df
 
+def _count_taigi_words(poj: str) -> int:
+    if poj == "": return 0
+    first_section = poj.split("/")[0]
+    # replace spaces with hyphens
+    first_section = first_section.replace(" ", "-")
+    return first_section.split("/")[0].count("-")+1
+
 def add_pd_columns(tw_csv: pd.DataFrame) -> pd.DataFrame:
     # add the length of each word
-    tw_csv[NUM_WORDS_COL] = tw_csv["PojUnicode"].apply(lambda x: x.split("/")[0].count("-")+1)
+    tw_csv[NUM_WORDS_COL] = tw_csv["PojUnicode"].apply(_count_taigi_words).astype(int)
     return tw_csv
 
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
