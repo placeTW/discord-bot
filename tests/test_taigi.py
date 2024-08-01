@@ -2,7 +2,7 @@ import pytest
 from commands.taiwanese.read_embree_csv import TW_EMBREE_CSV, NUM_WORDS_COL, _count_taigi_words
 
 def test_num_words_col():
-    """Test the integrity of the column."""
+    """Test the integrity of the NUM_WORDS_COL column."""
     # assert that the column exists
     assert NUM_WORDS_COL in TW_EMBREE_CSV.columns
     # assert it contains only integers
@@ -31,8 +31,8 @@ def test__count_taigi_words(poj: str, expected: str):
 @pytest.mark.parametrize(
     "poj,expected", 
     [
-        ("tû-khì + N + í-gōa", 4),
-        ("tû-liáu + N + í-gōa", 4),
+        ("tû-khì + N + í-gōa", 4), # row 34426
+        ("tû-liáu + N + í-gōa", 4), # row 34428
     ]
 )
 def test__count_taigi_words_problematic(poj: str, expected: str):
