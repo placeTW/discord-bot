@@ -13,7 +13,7 @@ def test_num_words_col():
 @pytest.mark.parametrize(
     "poj,expected", 
     [
-        ("", 0),
+        ("", 0), # edge case, should not exist in the dataset
         ("thǹg", 1),
         ("thǹg-bō", 2),
         ("thǹg-chhiah-kha", 3),
