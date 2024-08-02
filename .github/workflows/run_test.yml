@@ -35,9 +35,14 @@ jobs:
           key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies using Poetry 
         run: poetry install
-      - name: Test with pytest  
+      - name: Run unit tests with pytest
         run: |  
-            poetry run python -m pytest tests/ -s --durations=5
+            poetry run python -m pytest tests/ -s --durations=5 -m "not deployment"
+      - name: Run deployment tests with pytest
+        run: |  
+            poetry run python -m pytest tests/ -s --durations=5 -m deployment
+            
+
     #   - name: Generate Coverage Report  
     #     run: |  
     #       coverage report -m
