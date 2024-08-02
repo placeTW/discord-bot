@@ -36,6 +36,8 @@ def read_embree_csv_raw(
     if cols_to_keep:
         df = df[list(cols_to_keep)]
     df = df.fillna("") # replace all NaN with empty string
+    # drop all rows where PojUnicode is empty
+    df = df[df["PojUnicode"] != ""]
     return df
 
 def _count_taigi_words(poj: str) -> int:
