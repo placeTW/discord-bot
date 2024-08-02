@@ -1,22 +1,26 @@
 import pytest
-from main import BotInitialiser
 import supabase
 
 @pytest.mark.deployment
 def test_BotInitialiser(monkeypatch):
-    # patch the register_commands command to do nothing
-    def mock_register_commands(*args, **kwargs):
-        pass
-    monkeypatch.setattr(BotInitialiser, "register_commands", mock_register_commands)
-    # patch the run command to do nothing (just in case)
-    def mock_run(*args, **kwargs):
-        pass
-    monkeypatch.setattr(BotInitialiser, "run", mock_run)
-    # patch supabase.create_client to do nothing
-    def mock_create_client(*args, **kwargs):
-        pass
+    # patch the create_client command to do nothing
+    def mock_create_client(url: str, private_key: str):
+        return None
     monkeypatch.setattr(supabase, "create_client", mock_create_client)
+    assert supabase.create_client("url", "private_key") is None # test the mock
 
+    # patch the modules.config module, which uses supabaseClient
+    import modules.config
+    # patch the module.config.fetch_config to return a dict instead of fetching from supabase
+    def mock_fetch_config(*args, **kwargs):
+        return {0: {"key": "value"}}
+    monkeypatch.setattr(modules.config, "fetch_config", mock_fetch_config)
+    # patch the module.config.set_config to do nothing instead of setting the config in supabase
+    def mock_set_config(*args, **kwargs):
+        pass
+    monkeypatch.setattr(modules.config, "set_config", mock_set_config)
+
+    from main import BotInitialiser # ! only import after patching, because it uses the modules.config module
     # create a BotInitialiser object
     bot = BotInitialiser()
     # assert that the BotInitialiser object is created
