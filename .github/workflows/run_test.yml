@@ -38,6 +38,9 @@ jobs:
       - name: Run unit tests with pytest
         run: |  
             poetry run python -m pytest tests/ -m 'not deployment' --durations=5 
+      - name: Debugging, see markers
+        run: |  
+            poetry run python -m pytest --markers
       - name: Run deployment tests with pytest
         run: |  
             poetry run python -m pytest tests/ -m deployment --durations=0 
