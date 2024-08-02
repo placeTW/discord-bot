@@ -1,5 +1,6 @@
 import pytest
 from main import BotInitialiser
+import supabase
 
 @pytest.mark.deployment
 def test_BotInitialiser(monkeypatch):
@@ -11,6 +12,10 @@ def test_BotInitialiser(monkeypatch):
     def mock_run(*args, **kwargs):
         pass
     monkeypatch.setattr(BotInitialiser, "run", mock_run)
+    # patch supabase.create_client to do nothing
+    def mock_create_client(*args, **kwargs):
+        pass
+    monkeypatch.setattr(supabase, "create_client", mock_create_client)
 
     # create a BotInitialiser object
     bot = BotInitialiser()
