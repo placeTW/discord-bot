@@ -1,14 +1,8 @@
 import commands.fetch_entry.fetch_entry_main as fetch
 import pytest
 
+LANGS_TO_TEST = ["cz", "en", "et", "fr", "lt", "lv", "ua", "zh"]
 
-# @pytest.mark.parametrize(
-#     "entry,lang,field",
-#     [
-#         ("capoo", "en", "title"),
-#         ("taipei_101", "lt", "title"),
-#     ],
-# )
 @pytest.mark.parametrize("entry", ["capoo"])
 @pytest.mark.parametrize("lang", ["en", "lt", "et"])
 @pytest.mark.parametrize("field", ["title", "blurb", "desc", None])
@@ -26,7 +20,7 @@ async def test__fetch_entry_with_json_valid_input_returns_str(
 
 
 @pytest.mark.parametrize("entry", ["capoo"])
-@pytest.mark.parametrize("lang", ["en", "lt", "et"])
+@pytest.mark.parametrize("lang", LANGS_TO_TEST)
 async def test__fetch_entry_with_json_valid_input_links_returns_list(
     entry, lang
 ):
