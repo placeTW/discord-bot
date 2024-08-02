@@ -7,8 +7,8 @@ def test_num_words_col():
     assert NUM_WORDS_COL in TW_EMBREE_CSV.columns
     # assert it contains only integers
     assert TW_EMBREE_CSV[NUM_WORDS_COL].dtype == int
-    # assert that there are no negative values
-    assert (TW_EMBREE_CSV[NUM_WORDS_COL] >= 0).all()
+    # assert that there all values are > 0
+    assert (TW_EMBREE_CSV[NUM_WORDS_COL] > 0).all()
 
 @pytest.mark.parametrize(
     "poj,expected", 
