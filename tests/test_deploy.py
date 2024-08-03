@@ -1,8 +1,12 @@
 import pytest
 import supabase
+import github
 
 @pytest.mark.deployment
 def test_BotInitialiser(monkeypatch):
+    # | Note: the order of the imports is important since some modules depend on others being patched first
+
+    # * PATCH SUPABASE MODULE
     # patch the create_client command to do nothing
     def mock_create_client(url: str, private_key: str):
         return None
@@ -20,6 +24,31 @@ def test_BotInitialiser(monkeypatch):
         pass
     monkeypatch.setattr(modules.config, "set_config", mock_set_config)
 
+    # * PATCH GITHUB MODULE
+    # patch the github.Auth.Token to return a dummy object
+    class DummyAuth:
+        def __init__(self, *args, **kwargs): pass
+    monkeypatch.setattr(github.Auth, "Token", DummyAuth)
+    assert github.Auth.Token("token") is not None
+
+    # patch the github.Github module so that it returns a dummy object with get_repo() method that does nothing
+    class DummyGithub:
+        def __init__(self, *args, **kwargs): pass
+        @staticmethod
+        def get_repo(repo_name):
+            return None
+    monkeypatch.setattr(github, "Github", DummyGithub)
+    assert github.Github("token").get_repo("repo_name") is None
+
+    # * PATCH BOT_GIT_UTILS MODULE
+    from commands.restart import bot_git_utils
+    # patch bot_git_utils.list_of_branches to return ['main']
+    def mock_list_of_branches():
+        return ['main']
+    monkeypatch.setattr(bot_git_utils, "list_of_branches", mock_list_of_branches)
+    assert bot_git_utils.list_of_branches() == ['main']
+
+    # * PATCH RESTART MODULE
     from main import BotInitialiser # ! only import after patching, because it uses the modules.config module
     # create a BotInitialiser object
     bot = BotInitialiser()
