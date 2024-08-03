@@ -6,6 +6,9 @@ import github
 def test_BotInitialiser(monkeypatch):
     # | Note: the order of the imports is important since some modules depend on others being patched first
 
+    # * PATCH ENVIRONMENT VARIABLES
+    monkeypatch.setenv("PLACETW_SERVER_ID", "999") # set the environment variable for the placetw server id
+
     # * PATCH SUPABASE MODULE
     # patch the create_client command to do nothing
     def mock_create_client(url: str, private_key: str):
