@@ -11,7 +11,8 @@ DISCORD_MAX_LABEL_LENGTH = 80
 class TaigiQuizChoice(QuizChoice):
     def __init__(self, poj_unicode: str, is_correct: bool, engbun:str="", hoabun:str=""):
         engbun = re.sub(r"<.*?>", "", engbun) # remove explanation in engbun, which is denoted by <>, since it might contain the answer
-        label = f"{engbun}" + f" ({hoabun})" if hoabun else ""
+        labels = (bun for bun in [hoabun, engbun] if bun) # only include non-empty labels
+        label = " | ".join(labels)
         if len(label) > DISCORD_MAX_LABEL_LENGTH:
             # discord only allows 80 characters for the label, so truncate if necessary
             label = label[:DISCORD_MAX_LABEL_LENGTH]
