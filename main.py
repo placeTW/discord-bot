@@ -162,7 +162,7 @@ class BotInitialiser:
                     "server_name": guild.name,
                 }
             ).execute()
-            register_commands(self.tree, self.client, [guild])
+            self.register_commands(self.tree, self.client, [guild])
             await self.tree.sync(guild=guild)
     
 
