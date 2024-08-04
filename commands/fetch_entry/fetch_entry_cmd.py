@@ -48,9 +48,7 @@ def register_commands(tree, guilds: list[discord.Object]):
         # field may not exist
         selected_field = field.value if field is not None else None
 
-        res = await _fetch_entry_with_json(
-            interaction, selected_entry, selected_lang, selected_field
-        )
+        res = await _fetch_entry_with_json(interaction, selected_entry, selected_lang, selected_field)
 
         if not res:
             await interaction.response.send_message("Failed to fetch entry.", ephemeral=True)

@@ -12,9 +12,7 @@ SELF_PAT_GIFS = Path(Path(__file__).parent, "self_pat_gifs")
 BOT_PAT_GIFS = Path(Path(__file__).parent, "bot_pat_gifs")
 
 
-def register_commands(
-    tree, client: TWPlaceClient, guilds: list[discord.Object]
-):
+def register_commands(tree, client: TWPlaceClient, guilds: list[discord.Object]):
     @tree.command(
         name="pat",
         description="Pat",
@@ -33,28 +31,20 @@ def register_commands(
         # ** Case: user pats themselves
         if user_to_pat.id == current_user_id:
             random_gif = choice(list(SELF_PAT_GIFS.iterdir()))
-            pat_embed_title = (
-                f"{interaction.user.display_name} pats themselves"
-            )
-            pat_content = (
-                f"<@{current_user_id}> pats themselves for some reason"
-            )
+            pat_embed_title = f"{interaction.user.display_name} pats themselves"
+            pat_content = f"<@{current_user_id}> pats themselves for some reason"
         # ^ Future case: user pats (this) bot
         elif user_to_pat.id == client.user.id:
             random_gif = choice(list(BOT_PAT_GIFS.iterdir()))
             pat_embed_title = f"{interaction.user.display_name} pats {client.user.display_name}! Good bot!"
-            pat_content = (
-                f"<@{current_user_id}> pats the bot <:uwu:1161126694762061825>"
-            )
+            pat_content = f"<@{current_user_id}> pats the bot <:uwu:1161126694762061825>"
 
         # ** Default: user pats another user
         else:  # i.e. user_to_pat.id != current_user_id:
             # random file from the directory
             random_gif = choice(list(PAT_DIR.iterdir()))
             pat_embed_title = f"{interaction.user.display_name} pats {user_to_pat.display_name}"
-            pat_content = (
-                f"<@{user_to_pat.id}> get pat by <@{current_user_id}>"
-            )
+            pat_content = f"<@{user_to_pat.id}> get pat by <@{current_user_id}>"
 
         # create empty embed
         embed = discord.Embed()
@@ -74,9 +64,7 @@ def register_commands(
             "metadata": {"filename": file.filename},
         }
 
-        await logging.log_event(
-            interaction, log_event, content=text, log_to_channel=False
-        )
+        await logging.log_event(interaction, log_event, content=text, log_to_channel=False)
 
         await interaction.response.send_message(
             content=pat_content,

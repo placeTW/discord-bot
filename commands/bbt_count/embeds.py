@@ -36,19 +36,13 @@ def bbt_entry_embed(
     embed.add_field(
         name="Date",
         value=(
-            str(
-                datetime.datetime.fromisoformat(entry.get("created_at"))
-                .astimezone(timezone)
-                .date()
-            )
+            str(datetime.datetime.fromisoformat(entry.get("created_at")).astimezone(timezone).date())
             if entry.get("created_at")
             else date
         ),
         inline=False,
     )
-    embed.add_field(
-        name="Description", value=entry.get("description"), inline=False
-    )
+    embed.add_field(name="Description", value=entry.get("description"), inline=False)
     embed.add_field(name="Location", value=entry.get("location"), inline=False)
     embed.add_field(
         name="Price",
@@ -91,12 +85,7 @@ def bbt_list_default_embed(
         f"For <@{user_id}>: **{len(entries)} total entries**\n{average_year_string(year, len(entries))}"
         + (
             "\n\n__Total costs__:\n"
-            + "\n".join(
-                [
-                    cost_string(prices[currency]["prices"], currency)
-                    for currency in prices
-                ]
-            )
+            + "\n".join([cost_string(prices[currency]["prices"], currency) for currency in prices])
             + "\n\n"
             + "\n".join([entry_string(entry, timezone) for entry in entries])
         )
@@ -121,18 +110,12 @@ def bbt_list_grouped_embed(
     embed.description = f"For <@{user_id}>: **{len(entries)} total entries**"
 
     for group in prices:
-        group_entries = [
-            entry for entry in entries if entry[group_by] == group
-        ]
-        embed.description += (
-            f"\n\n---\n**{group}: {len(group_entries)} entries**"
-        )
+        group_entries = [entry for entry in entries if entry[group_by] == group]
+        embed.description += f"\n\n---\n**{group}: {len(group_entries)} entries**"
         for currency in prices[group]:
             embed.description += f"\n{currency}: {cost_string(prices[group][currency]['prices'], currency)}"
         embed.description += "\n\n"
-        embed.description += "\n".join(
-            [entry_string(entry, timezone) for entry in group_entries]
-        )
+        embed.description += "\n".join([entry_string(entry, timezone) for entry in group_entries])
     return embed
 
 
@@ -150,27 +133,21 @@ def bbt_stats_embed(
         title=f"Bubble tea stats {f'for {year}' if year else 'for the past year'} {'grouped by location ' if group_by_location else ''}🧋",
         color=discord.Color.green(),
     )
-    embed.description = f"For <@{user_id}>: **{total_count} total entries**\n{average_year_string(year, total_count)}\n\n"
+    embed.description = (
+        f"For <@{user_id}>: **{total_count} total entries**\n{average_year_string(year, total_count)}\n\n"
+    )
     if total_count > 0:
         embed.description += f"{'__Total costs__' if not group_by_location else '__Costs by location__'}:\n"
         embed.description += "\n".join(
             [
                 (
                     "- "
-                    + (
-                        f'**{entry.get("location")}**: '
-                        if group_by_location
-                        else ""
-                    )
+                    + (f'**{entry.get("location")}**: ' if group_by_location else "")
                     + cost_string(
                         entry.get("prices_list") or [],
                         entry.get("currency"),
                     )
-                    + (
-                        f'\n  - *{rating_string(entry)}*'
-                        if entry.get("average_rating")
-                        else ""
-                    )
+                    + (f'\n  - *{rating_string(entry)}*' if entry.get("average_rating") else "")
                 )
                 for entry in entries
             ]
@@ -180,11 +157,7 @@ def bbt_stats_embed(
         embed.description += "\n".join(
             [
                 f"**{calendar.month_name[monthly_count.get('month', 0)]}**: {monthly_count.get('entry_count')} entries ({average_month_string(current_year, monthly_count.get('month', 0), monthly_count.get('entry_count'))})"
-                + (
-                    '\n- ' + rating_string(monthly_count)
-                    if monthly_count.get("average_rating")
-                    else ""
-                )
+                + ('\n- ' + rating_string(monthly_count) if monthly_count.get("average_rating") else "")
                 for monthly_count in monthly_counts
             ]
         )

@@ -27,6 +27,7 @@ INDEX_COL = 0
 COLS_TO_KEEP = ("PojUnicode", "PojInput", "Abbreviation", "NounClassifier", "HoaBun", "EngBun")
 NUM_WORDS_COL = "num_words"
 
+
 def read_embree_csv_raw(
     filepath: Path,
     index_col: int = INDEX_COL,
@@ -35,22 +36,26 @@ def read_embree_csv_raw(
     df = pd.read_csv(filepath, encoding='utf-8', index_col=index_col)
     if cols_to_keep:
         df = df[list(cols_to_keep)]
-    df = df.fillna("") # replace all NaN with empty string
+    df = df.fillna("")  # replace all NaN with empty string
     # drop all rows where PojUnicode is empty
     df = df[df["PojUnicode"] != ""]
     return df
 
+
 def _count_taigi_words(poj: str) -> int:
-    if poj == "": return 0
+    if poj == "":
+        return 0
     first_section = poj.split("/")[0]
     # replace spaces with hyphens
     first_section = first_section.replace(" ", "-")
-    return first_section.split("/")[0].count("-")+1
+    return first_section.split("/")[0].count("-") + 1
+
 
 def add_pd_columns(tw_csv: pd.DataFrame) -> pd.DataFrame:
     # add the length of each word
     tw_csv[NUM_WORDS_COL] = tw_csv["PojUnicode"].apply(_count_taigi_words).astype(int)
     return tw_csv
+
 
 TW_EMBREE_CSV_PATH = Path(__file__).parent / "ChhoeTaigi_EmbreeTaiengSutian.csv"
 TW_EMBREE_CSV = read_embree_csv_raw(TW_EMBREE_CSV_PATH)

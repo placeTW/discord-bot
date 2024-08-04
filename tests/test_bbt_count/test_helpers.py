@@ -34,16 +34,14 @@ entries = [
     },
 ]
 
+
 def test_bubble_tea_string():
     description = "Classic Milk Tea"
     location = "ABC Cafe"
     price = 3.5
     currency = "CAD"
     expected_result = "**Classic Milk Tea** at __ABC Cafe__ for CA$3.50"
-    assert (
-        bubble_tea_string(description, location, price, currency)
-        == expected_result
-    )
+    assert bubble_tea_string(description, location, price, currency) == expected_result
 
 
 def test_price_string():

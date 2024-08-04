@@ -14,9 +14,7 @@ def register_commands(
     this_guild: discord.Object,
     client: discord.Client,
 ):
-    tocfl_group = app_commands.Group(
-        name="tocfl", description="TOCFL commands"
-    )
+    tocfl_group = app_commands.Group(name="tocfl", description="TOCFL commands")
 
     @tocfl_group.command(
         name="random",
@@ -31,7 +29,11 @@ def register_commands(
         MAX_ID = 7563  # fixed for now until we can get the max id from the db
         random_id = randint(1, MAX_ID)
         tocfl_table = supabaseClient.table("tocfl")
-        data, count = supabaseClient.rpc('get_random_tocfl', { 'level': level.value }).execute() if level else tocfl_table.select("*").eq("id", random_id).execute()
+        data, count = (
+            supabaseClient.rpc('get_random_tocfl', {'level': level.value}).execute()
+            if level
+            else tocfl_table.select("*").eq("id", random_id).execute()
+        )
         if count == 0:
             await interaction.response.send_message(
                 f"There was an error getting the random word. Please try again",
@@ -47,28 +49,22 @@ def register_commands(
             data["part_of_speech"],
             data["pinyin"],
         )
-        await interaction.response.send_message(
-            f"Random word from TOCFL word list:", embed=embed
-        )
+        await interaction.response.send_message(f"Random word from TOCFL word list:", embed=embed)
 
     tree.add_command(tocfl_group, guild=this_guild)
 
 
-def _create_word_embed(
-    word: str, level: int, part_of_speech: str, pinyin: str
-):
+def _create_word_embed(word: str, level: int, part_of_speech: str, pinyin: str):
     try:
         chewing = to_chewing(pinyin)
     except AssertionError as e:
         print("Error occurred during chewing conversion: ", e)
         chewing = None
 
-    embed = discord.Embed(
-        title=word
-    )  # ^ add description="desc" for translation
+    embed = discord.Embed(title=word)  # ^ add description="desc" for translation
     embed.add_field(name="Pronunciation (Pinyin)", value=pinyin, inline=False)
     if chewing:
-         embed.add_field(name="Pronunciation (Zhuyin)", value=chewing, inline=False)
+        embed.add_field(name="Pronunciation (Zhuyin)", value=chewing, inline=False)
     embed.add_field(
         name="Dictionary Reference",
         value=f"https://cdict.net/?q={word}",

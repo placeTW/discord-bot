@@ -9,7 +9,6 @@ from commands.entry_consts.consts import I18N_JSON_URL
 from modules import async_utils
 from . import postprocess
 from commands.entry_consts.consts import (
-
     SUPPORTED_LANGUAGE_CODES,
 )
 
@@ -94,9 +93,7 @@ async def send_fetch_response(
         return
 
     if field is None:  # * return entire entry
-        await interaction.response.send_message(
-            fetched_result, suppress_embeds=True, ephemeral=is_ephermeral
-        )
+        await interaction.response.send_message(fetched_result, suppress_embeds=True, ephemeral=is_ephermeral)
 
     else:  # * return only specific field
         await interaction.response.send_message(

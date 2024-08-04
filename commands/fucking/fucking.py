@@ -23,10 +23,11 @@ def register_commands(tree, guilds: list[discord.Object]):
     async def go_the_fuck_to_sleep(interaction: discord.Interaction, user_to_ping: discord.Member):
         current_user_id = interaction.user.id
         current_time = time.time()
-        time_difference = current_time - \
-            (user_timestamps.get(current_user_id, {}).get("gothefucktosleep", 0))
+        time_difference = current_time - (user_timestamps.get(current_user_id, {}).get("gothefucktosleep", 0))
         if time_difference < COOLDOWN_DURATION:
-            await interaction.response.send_message(f"<@{current_user_id}> {GO_THE_FUCK_TO_SLEEP_URL} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)")
+            await interaction.response.send_message(
+                f"<@{current_user_id}> {GO_THE_FUCK_TO_SLEEP_URL} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)"
+            )
             return
 
         await interaction.response.send_message(f"<@{user_to_ping.id}> {GO_THE_FUCK_TO_SLEEP_URL}")
@@ -36,7 +37,7 @@ def register_commands(tree, guilds: list[discord.Object]):
             "author_id": current_user_id,
             "mentioned_id": user_to_ping.id,
         }
-        
+
         await logging.log_event(interaction, log_event, log_to_channel=False)
         user_timestamps.setdefault(current_user_id, {}).update({"gothefucktosleep": current_time})
 
@@ -48,10 +49,11 @@ def register_commands(tree, guilds: list[discord.Object]):
     async def you_have_to_fucking_eat(interaction: discord.Interaction, user_to_ping: discord.Member):
         current_user_id = interaction.user.id
         current_time = time.time()
-        time_difference = current_time - \
-            (user_timestamps.get(current_user_id, {}).get("youhavetofuckingeat", 0))
+        time_difference = current_time - (user_timestamps.get(current_user_id, {}).get("youhavetofuckingeat", 0))
         if time_difference < COOLDOWN_DURATION:
-            await interaction.response.send_message(f"<@{current_user_id}> {YOU_HAVE_TO_FUCKING_EAT_URL} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)")
+            await interaction.response.send_message(
+                f"<@{current_user_id}> {YOU_HAVE_TO_FUCKING_EAT_URL} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)"
+            )
             return
 
         await interaction.response.send_message(f"<@{user_to_ping.id}> {YOU_HAVE_TO_FUCKING_EAT_URL}")
@@ -61,7 +63,7 @@ def register_commands(tree, guilds: list[discord.Object]):
             "author_id": current_user_id,
             "mentioned_id": user_to_ping.id,
         }
-        
+
         await logging.log_event(interaction, log_event, log_to_channel=False)
         user_timestamps.setdefault(current_user_id, {}).update({"youhavetofuckingeat": current_time})
 

@@ -39,10 +39,7 @@ def register_commands(tree, guilds: list[discord.Object]):
         print("Model not found, attempting download.")
         download_model(model_path)
         if not model_path.is_file():
-            print(
-                "Model still doesn't exist for some reason,"
-                " not registering this command."
-            )
+            print("Model still doesn't exist for some reason," " not registering this command.")
             return
     model = Model.load(str(model_path), classes)
 
@@ -90,27 +87,20 @@ def register_commands(tree, guilds: list[discord.Object]):
             predictions = model.predict(rgba_background)
 
             # Add pfp on predicted bounding boxes
-            composite_image = add_pfp_on_prediction_boxes(
-                rgba_background, round_pfp, predictions
-            )
+            composite_image = add_pfp_on_prediction_boxes(rgba_background, round_pfp, predictions)
 
             # Save the composite image
             composite_path = str(BOBA_DIR / "boba_with_pfp.png")
             composite_image.save(composite_path)
 
             # Send the message
-            await interaction.followup.send(
-                f"<@{user.id}>'s boba tea is ready"
-            )
+            await interaction.followup.send(f"<@{user.id}>'s boba tea is ready")
 
             # Send the composite image as a response
             await interaction.followup.send(file=discord.File(composite_path))
         except Exception as ex:
             tb = traceback.format_exc()
-            await interaction.followup.send(
-                f"Your command went wrong who wrote this shit: {ex}\n"
-                f"```\n{tb}\n```"
-            )
+            await interaction.followup.send(f"Your command went wrong who wrote this shit: {ex}\n" f"```\n{tb}\n```")
 
 
 def load_images_under_directory(directory: Path) -> list[Path]:
@@ -118,16 +108,10 @@ def load_images_under_directory(directory: Path) -> list[Path]:
     image_extensions: Final[list[str]] = [".jpg", ".jpeg", ".png", ".gif"]
 
     # Get a list of image files in the directory with the specified extensions
-    return [
-        file
-        for file in directory.glob("*")
-        if file.suffix.lower() in image_extensions
-    ]
+    return [file for file in directory.glob("*") if file.suffix.lower() in image_extensions]
 
 
-def add_pfp_on_prediction_boxes(
-    background: Image.Image, pfp: Image.Image, predictions
-) -> Image.Image:
+def add_pfp_on_prediction_boxes(background: Image.Image, pfp: Image.Image, predictions) -> Image.Image:
     max_num_pfp: Final[int] = 10
     min_score: Final[float] = 0.3
     cancel_chance: Final[float] = 0.5
@@ -167,12 +151,7 @@ def add_pfp_on_prediction_boxes(
             continue
 
         # Check if the pasting location is valid
-        if (
-            paste_x < 0
-            or paste_y < 0
-            or paste_x + width > background.width
-            or paste_y + height > background.height
-        ):
+        if paste_x < 0 or paste_y < 0 or paste_x + width > background.width or paste_y + height > background.height:
             continue
 
         # Randomly select a rotation angle

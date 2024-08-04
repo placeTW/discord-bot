@@ -52,15 +52,10 @@ DEPLOYMENT_DATE = datetime.datetime.now()
 class BotInitialiser:
     def __init__(self):
         self.client = bot.get_bot(IS_PROD)
-        self.guilds = [
-            discord.Object(id=int(server_id))
-            for server_id in self.client.guilds_dict.keys()
-        ]
+        self.guilds = [discord.Object(id=int(server_id)) for server_id in self.client.guilds_dict.keys()]
         # CommandTree is where all our defined commands are stored
         self.tree = discord.app_commands.CommandTree(self.client)
-        self.placetw_guild = discord.Object(
-            id=os.getenv("PLACETW_SERVER_ID")
-        )  # basically refers to this server
+        self.placetw_guild = discord.Object(id=os.getenv("PLACETW_SERVER_ID"))  # basically refers to this server
         self.register_commands()
 
     def register_commands(self):
@@ -128,19 +123,13 @@ class BotInitialiser:
         async def on_message(message: discord.Message):
             message_reacts_enabled = True
             try:
-                message_reacts_enabled = self.client.guilds_dict[message.guild.id][
-                    "message_reacts_enabled"
-                ]
+                message_reacts_enabled = self.client.guilds_dict[message.guild.id]["message_reacts_enabled"]
             except:
                 # default true
                 pass
 
             # don't respond to bots, bot's own posts or if message reacts are disabled
-            if (
-                message.author == self.client.user
-                or not message_reacts_enabled
-                or message.author.bot
-            ):
+            if message.author == self.client.user or not message_reacts_enabled or message.author.bot:
                 return
 
             events = []
