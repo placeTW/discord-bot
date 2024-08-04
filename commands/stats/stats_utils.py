@@ -1,2 +1,2 @@
 def generate_graph():
-  pass
+    pass

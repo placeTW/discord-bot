@@ -2,16 +2,20 @@ import discord
 from discord.app_commands import Choice
 import sys, re, random
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
+
+sys.path.append(str(Path(__file__).parent.parent.parent))  # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
 from .read_embree_csv import TW_EMBREE_CSV, NUM_WORDS_COL
 
 DISCORD_MAX_LABEL_LENGTH = 80
 
+
 class TaigiQuizChoice(QuizChoice):
-    def __init__(self, poj_unicode: str, is_correct: bool, engbun:str="", hoabun:str=""):
-        engbun = re.sub(r"<.*?>", "", engbun) # remove explanation in engbun, which is denoted by <>, since it might contain the answer
-        labels = (bun for bun in [hoabun, engbun] if bun) # only include non-empty labels
+    def __init__(self, poj_unicode: str, is_correct: bool, engbun: str = "", hoabun: str = ""):
+        engbun = re.sub(
+            r"<.*?>", "", engbun
+        )  # remove explanation in engbun, which is denoted by <>, since it might contain the answer
+        labels = (bun for bun in [hoabun, engbun] if bun)  # only include non-empty labels
         label = " | ".join(labels)
         if len(label) > DISCORD_MAX_LABEL_LENGTH:
             # discord only allows 80 characters for the label, so truncate if necessary
@@ -20,7 +24,9 @@ class TaigiQuizChoice(QuizChoice):
             label = label[:-3] + "..."
         super().__init__(label, is_correct)
 
-NUM_ROWS_CHOICES = [Choice(name=i, value=i) for i in range(2, 5+1)] # multiple choice options are from 2 to 5
+
+NUM_ROWS_CHOICES = [Choice(name=i, value=i) for i in range(2, 5 + 1)]  # multiple choice options are from 2 to 5
+
 
 def register_quiz_subcommand(
     taigi_group: discord.app_commands.Group,

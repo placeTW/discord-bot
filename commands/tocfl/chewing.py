@@ -229,33 +229,33 @@ def to_chewing(pinyin: str) -> str:
             chewing += "ㄦ¯"
             break
 
-		# Check matches for independent words
+        # Check matches for independent words
         res = match_chewing(pinyin, index, PINYIN_ALONE)
         if res[1] and forms_new_word(pinyin, res[0]):
-            chewing += res[1] # ㄧㄚ
+            chewing += res[1]  # ㄧㄚ
             index = res[0]
 
         else:
             initial = match_chewing(pinyin, index, PINYIN_INITIALS)
             assert initial[1], f"Failed to match initial in '{pinyin}' at index {index - 1}"
             index = initial[0]
-            chewing += initial[1] # ㄍ
+            chewing += initial[1]  # ㄍ
             combined = match_chewing(pinyin, index, PINYIN_COMBINED)
             if combined[1]:
                 index = combined[0]
-                chewing += combined[1] # ㄨㄤ
+                chewing += combined[1]  # ㄨㄤ
             else:
                 center = match_chewing(pinyin, index, PINYIN_CENTER)
                 if center[1]:
-                    chewing += center[1] # ㄍㄨ
+                    chewing += center[1]  # ㄍㄨ
                     index = center[0]
                 final = match_chewing(pinyin, index, PINYIN_FINALS)
                 if final[1]:
-                    chewing += final[1] # ㄍㄨㄛ
+                    chewing += final[1]  # ㄍㄨㄛ
                     index = final[0]
 
         if len(tones) and tones[0][0] < index:
-            chewing += tones.pop(0)[1] # ㄍㄨㄛˊ
+            chewing += tones.pop(0)[1]  # ㄍㄨㄛˊ
         else:
             chewing += "˙"
 

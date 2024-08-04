@@ -7,9 +7,7 @@ from commands.one_o_one.one_o_one import BuildingTypes, OneOOne
 
 @patch.object(random, "randint")
 @patch.object(OneOOne, "_get_random_building_type")
-def test_normal_roof(
-    mock_get_random_building_type: MagicMock, mock_randint: MagicMock
-) -> None:
+def test_normal_roof(mock_get_random_building_type: MagicMock, mock_randint: MagicMock) -> None:
     # Set the return values for the mocked functions
     mock_get_random_building_type.return_value = BuildingTypes.NORMAL_ROOF
     mock_randint.return_value = 3
@@ -28,9 +26,7 @@ def test_normal_roof(
 
 @patch.object(random, "randint")
 @patch.object(OneOOne, "_get_random_building_type")
-def test_no_roof(
-    mock_get_random_building_type: MagicMock, mock_randint: MagicMock
-) -> None:
+def test_no_roof(mock_get_random_building_type: MagicMock, mock_randint: MagicMock) -> None:
     # Set the return values for the mocked functions
     mock_get_random_building_type.return_value = BuildingTypes.NO_ROOF
     mock_randint.return_value = 3

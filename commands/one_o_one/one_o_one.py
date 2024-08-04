@@ -105,10 +105,7 @@ class OneOOne:
 
         # Remove older timestamps from the deque that are outside the cool down
         # window
-        while (
-            timestamps
-            and current_time - timestamps[0] > self.COOL_DOWN_DURATION
-        ):
+        while timestamps and current_time - timestamps[0] > self.COOL_DOWN_DURATION:
             timestamps.popleft()
 
         # Don't rate limit until user has many timestamps

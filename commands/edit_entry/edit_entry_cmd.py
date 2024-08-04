@@ -15,9 +15,7 @@ from ..entry_consts.consts import (
 )
 
 
-def register_commands(
-    tree, this_guild: discord.Object, client: discord.Client
-):
+def register_commands(tree, this_guild: discord.Object, client: discord.Client):
     @tree.command(
         name="edit-entry",
         description="Changes an entry for an art piece.",

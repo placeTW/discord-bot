@@ -1,4 +1,3 @@
-
 from discord import app_commands
 from discord.app_commands import Choice
 from modules import logging
@@ -8,6 +7,7 @@ from bot import TWPlaceClient
 from commands.config.consts import POSSIBLE_CHANNEL_CONFIG_FIELDS
 from modules.supabase import supabaseClient
 from modules.config import set_config
+
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -22,8 +22,12 @@ def register_commands(
     )
     @app_commands.default_permissions(manage_guild=True)
     @app_commands.choices(channel_config=POSSIBLE_CHANNEL_CONFIG_FIELDS)
-    @app_commands.describe(channel="The channel to set the config value for (defaults to current channel) (requires manage server permissions)")
-    async def set_channel(interaction: discord.Interaction, channel_config: Choice[str], channel: discord.TextChannel = None):
+    @app_commands.describe(
+        channel="The channel to set the config value for (defaults to current channel) (requires manage server permissions)"
+    )
+    async def set_channel(
+        interaction: discord.Interaction, channel_config: Choice[str], channel: discord.TextChannel = None
+    ):
         if not interaction.permissions.manage_guild:
             await interaction.response.send_message(
                 "You do not have the required permissions to use this command.", ephemeral=True
@@ -41,7 +45,10 @@ def register_commands(
             log_event,
             f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}",
         )
-        await interaction.response.send_message(f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}", ephemeral=True)
+        await interaction.response.send_message(
+            f"Set {channel_config.name} to <#{config_value}> for this server {'(in dev config)' if not client.is_prod else ''}",
+            ephemeral=True,
+        )
 
     tree.add_command(config_group, guilds=guilds)
 
@@ -57,4 +64,6 @@ def register_commands(
             )
             return
         client.fetch_config()
-        await interaction.response.send_message(f"Config updated from database {'(in dev config)' if not client.is_prod else ''}", ephemeral=True)
+        await interaction.response.send_message(
+            f"Config updated from database {'(in dev config)' if not client.is_prod else ''}", ephemeral=True
+        )

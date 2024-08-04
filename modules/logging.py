@@ -20,13 +20,9 @@ class Logging:
         self.log_channel = channel
         self.log_file_path = log_file
 
-    async def log_to_channel(
-        self, log_data: dict, color: discord.Color = None
-    ):
+    async def log_to_channel(self, log_data: dict, color: discord.Color = None):
         if not self.log_channel is None:
-            embed = discord.Embed(
-                color=color if color else discord.Color.default()
-            )
+            embed = discord.Embed(color=color if color else discord.Color.default())
             for param in log_data.items():
                 embed.add_field(name=param[0], value=param[1], inline=False)
             await self.log_channel.send(embed=embed)
@@ -48,7 +44,11 @@ def init(client: discord.Client, deployment_date: datetime):
 
 
 async def log_event(
-    message: discord.Message | discord.Interaction, data: dict = {}, content: str = None, color: discord.Color = None, log_to_channel = True
+    message: discord.Message | discord.Interaction,
+    data: dict = {},
+    content: str = None,
+    color: discord.Color = None,
+    log_to_channel=True,
 ):
     supabaseClient.table("event_logs").insert(
         {
@@ -56,15 +56,11 @@ async def log_event(
             "event": data["event"] if "event" in data else None,
             "created_at": str(message.created_at),
             "content": content if content else message.content if hasattr(message, 'content') else None,
-            "author_id": data["author_id"]
-            if "author_id" in data
-            else message.author.id,
+            "author_id": data["author_id"] if "author_id" in data else message.author.id,
             "mentioned_id": data["mentioned_id"] if "mentioned_id" in data else None,
             "channel_id": message.channel.id if message.channel else None,
             "guild_id": message.guild.id if message.guild else None,
-            "generated_id": data["generated_id"]
-            if "generated_id" in data
-            else None,
+            "generated_id": data["generated_id"] if "generated_id" in data else None,
             "metadata": data["metadata"] if "metadata" in data else None,
         }
     ).execute()
@@ -82,9 +78,7 @@ async def log_message_event(message: discord.Message, events: list[str]):
                     "author_id": message.author.id,
                     "event": event,
                     "created_at": str(message.created_at),
-                    "channel_id": message.channel.id
-                    if message.channel
-                    else None,
+                    "channel_id": message.channel.id if message.channel else None,
                     "guild_id": message.guild.id if message.guild else None,
                 }
                 for event in events

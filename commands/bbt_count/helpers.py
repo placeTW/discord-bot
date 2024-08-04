@@ -39,9 +39,7 @@ def bubble_tea_data(
     return data
 
 
-def bubble_tea_string(
-    description: str, location: str, price: float, currency: str
-):
+def bubble_tea_string(description: str, location: str, price: float, currency: str):
     return f"**{description}**{f' at __{location}__' if location else ''}{f' for {price_string(price, currency)}' if price else ''}"
 
 
@@ -77,9 +75,7 @@ def calculate_prices(entries: list[dict], group_by: str):
     prices = dict(
         sorted(
             prices.items(),
-            key=lambda item: sum(
-                len(currency["prices"]) for currency in item[1].values()
-            ),
+            key=lambda item: sum(len(currency["prices"]) for currency in item[1].values()),
             reverse=True,
         )
     )
@@ -94,13 +90,13 @@ def cost_string(prices: list[float], currency: str):
 
 
 def entry_string(entry: dict, timezone: datetime.tzinfo):
-    entry_string = f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}`"
+    entry_string = (
+        f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}`"
+    )
     entry_string += f" - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}"
     entry_string += f"{' (no image)' if not entry.get('image') else ''}"
     entry_string += f"{' *rating: ' + str(entry.get('rating')) + '*' if entry.get('rating') else ''}"
-    entry_string += (
-        f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
-    )
+    entry_string += f" {'notes: ' + entry.get('notes') if entry.get('notes') else ''}"
     return entry_string.strip()
 
 
@@ -114,11 +110,7 @@ def average_string(days: int, entry_count: int, is_current: bool):
 
 def average_year_string(year: int, entry_count: int):
     days = (
-        (
-            datetime.date.today()
-            if not year or year == datetime.date.today().year
-            else datetime.date(year, 12, 31)
-        )
+        (datetime.date.today() if not year or year == datetime.date.today().year else datetime.date(year, 12, 31))
         - datetime.date(year or datetime.date.today().year, 1, 1)
     ).days + 1
     is_current = not year or year == datetime.date.today().year
@@ -130,30 +122,19 @@ def average_month_string(year: int, month: int, entry_count: int):
     days = (
         (
             datetime.date.today()
-            if (not year or year == datetime.date.today().year)
-            and month == datetime.date.today().month
-            else datetime.date(
-                year, month, calendar.monthrange(year, month)[1]
-            )
+            if (not year or year == datetime.date.today().year) and month == datetime.date.today().month
+            else datetime.date(year, month, calendar.monthrange(year, month)[1])
         )
         - datetime.date(year or datetime.date.today().year, month, 1)
     ).days + 1
-    is_current = (
-        not year or year == datetime.date.today().year
-    ) and month == datetime.date.today().month
+    is_current = (not year or year == datetime.date.today().year) and month == datetime.date.today().month
     return average_string(days, entry_count, is_current)
 
+
 def rating_string(entry: dict):
-    return 'ratings: ' + (
-        f"min: {entry.get('minimum_rating'):.3f}, "
-        if entry.get("minimum_rating")
-        else ""
-    ) + (
-        f"avg: {entry.get('average_rating'):.3f}, "
-        if entry.get("average_rating")
-        else ""
-    ) + (
-        f"max: {entry.get('maximum_rating'):.3f}"
-        if entry.get("maximum_rating")
-        else ""
+    return (
+        'ratings: '
+        + (f"min: {entry.get('minimum_rating'):.3f}, " if entry.get("minimum_rating") else "")
+        + (f"avg: {entry.get('average_rating'):.3f}, " if entry.get("average_rating") else "")
+        + (f"max: {entry.get('maximum_rating'):.3f}" if entry.get("maximum_rating") else "")
     )

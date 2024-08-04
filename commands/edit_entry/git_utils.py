@@ -39,9 +39,7 @@ def get_json_file_from_repo(file_path: str, branch_name: str = BRANCH_NAME):
         return None
 
 
-def create_pull_request(
-    lang: str, new_json_contents: dict, entry_id: str, field: str
-):
+def create_pull_request(lang: str, new_json_contents: dict, entry_id: str, field: str):
     # ! new_json_contents is the ENTIRE json, not just one entry or field
     global GITHUB_OBJECT, BRANCH_NAME
     file_path = determine_file_path_on_repo(lang)
@@ -51,9 +49,7 @@ def create_pull_request(
     # *   exception is that the art-pieces file doesn't.
 
     # ! Convert JSON to string.
-    new_json_contents_str = json.dumps(
-        new_json_contents, indent=2, ensure_ascii=False
-    )
+    new_json_contents_str = json.dumps(new_json_contents, indent=2, ensure_ascii=False)
     # * The idea is: if file exists, replace it with new version.
     # * The idea is: if file doesn't exist, create it and place new json.
     try:

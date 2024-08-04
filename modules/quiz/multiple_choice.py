@@ -1,12 +1,9 @@
 import discord
 
+
 class QuizMultipleChoiceButton(discord.ui.Button["MultipleChoiceButton"]):
     def __init__(self, x: int, y: int, label: str, is_correct: bool):
-        super().__init__(
-            style=discord.ButtonStyle.secondary, # need to change this?
-            label=label,
-            row=x
-        )
+        super().__init__(style=discord.ButtonStyle.secondary, label=label, row=x)  # need to change this?
         self.x = x
         self.y = y
         self.label = label
@@ -26,11 +23,13 @@ class QuizMultipleChoiceButton(discord.ui.Button["MultipleChoiceButton"]):
             self.disabled = True
         await interaction.response.edit_message(view=view)
 
+
 # a generic class for a multiple choice question
 class QuizChoice:
     def __init__(self, label: str, is_correct: bool):
         self.label = label
         self.is_correct = is_correct
+
 
 class MultipleChoiceView(discord.ui.View):
     def __init__(self, choices: list[QuizChoice]):

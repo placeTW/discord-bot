@@ -7,6 +7,7 @@ NOTE: This file was created before I realised that you could
       which would be a giant pain.
 ! basically: don't use this file!
 """
+
 from typing import Optional
 from ..entry_consts.consts import SUPPORTED_ART2023_IDS
 import discord
@@ -36,18 +37,12 @@ class Questionnaire(ui.Modal):
         self.approval_channel = client.get_channel(WAITING_APPROVAL_CHANNEL_ID)
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(
-            f"Thanks for your response!", ephemeral=True
-        )
+        await interaction.response.send_message(f"Thanks for your response!", ephemeral=True)
         user_name = interaction.user.name
-        await self.approval_channel.send(
-            f"x`user {user_name} sent `{self.proposed_entry}`"
-        )
+        await self.approval_channel.send(f"x`user {user_name} sent `{self.proposed_entry}`")
 
 
-def register_commands(
-    tree, this_guild: discord.Object, client: discord.Client
-):
+def register_commands(tree, this_guild: discord.Object, client: discord.Client):
     @tree.command(
         name="edit-entry",
         description="Edits an entry via form",

@@ -1,7 +1,7 @@
-
 from discord import app_commands
 
 import discord
+
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -15,14 +15,15 @@ def register_commands(
     async def website(interaction: discord.Interaction):
         await interaction.response.send_message("https://placetw.com/")
 
-
     @tree.command(
         name="invite",
         description="Invite this bot to your server!",
         guilds=guilds,
     )
     async def invite_link(interaction: discord.Interaction):
-        await interaction.response.send_message("https://discord.com/oauth2/authorize?client_id=1134650883637006407&&permissions=2147484672&scope=bot")
+        await interaction.response.send_message(
+            "https://discord.com/oauth2/authorize?client_id=1134650883637006407&&permissions=2147484672&scope=bot"
+        )
 
     @tree.command(
         name="echo",

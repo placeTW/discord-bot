@@ -5,6 +5,4 @@ BBT_LIST_GROUP_BY = {
     "currency": "Currency",
 }
 
-BBT_LIST_GROUP_BY_CHOICES = [
-    Choice(name=desc, value=field) for field, desc in BBT_LIST_GROUP_BY.items()
-]
+BBT_LIST_GROUP_BY_CHOICES = [Choice(name=desc, value=field) for field, desc in BBT_LIST_GROUP_BY.items()]

@@ -11,10 +11,9 @@ from commands.restart.bot_git_utils import list_of_branches
 
 GIFS_DIR = Path(Path(__file__).parent, "gifs")
 
+
 def register_commands(tree, this_guild: discord.Object):
-    BRANCHES = [
-        Choice(name=branch, value=branch) for branch in list_of_branches()
-    ]
+    BRANCHES = [Choice(name=branch, value=branch) for branch in list_of_branches()]
 
     @tree.command(
         name="restart",

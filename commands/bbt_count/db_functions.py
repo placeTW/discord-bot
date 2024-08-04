@@ -124,9 +124,7 @@ def get_bbt_leaderboard(guild_id: int, date: datetime):
 
 
 # Gets the bubble tea stats for a user in a given year
-def get_bubble_tea_stats(
-    user_id: int, date: datetime, group_by_location=False
-):
+def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
     data, c = supabaseClient.rpc(
         "get_bubble_tea_stats",
         {

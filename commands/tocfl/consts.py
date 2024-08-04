@@ -10,7 +10,4 @@ TOCFL_LEVELS = {
     6: "Level 4 (高階級)",
 }
 
-TOCFL_LEVELS_CHOICES = [
-    Choice(name=level_name, value=level_num)
-    for level_num, level_name in TOCFL_LEVELS.items()
-]
+TOCFL_LEVELS_CHOICES = [Choice(name=level_name, value=level_num) for level_num, level_name in TOCFL_LEVELS.items()]

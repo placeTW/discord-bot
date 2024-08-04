@@ -7,20 +7,14 @@ class HGSButtonView(discord.ui.View):
         self.msg: discord.Message = None
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
-    async def hgs_button_yes(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def hgs_button_yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         user_id = interaction.user.id
         await interaction.response.send_message(f"<@{user_id}> is correct")
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.blurple)
-    async def hgs_button_no(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def hgs_button_no(self, interaction: discord.Interaction, button: discord.ui.Button):
         user_id = interaction.user.id
-        await interaction.response.send_message(
-            f"<@{user_id}>'s opinion has been ignored"
-        )
+        await interaction.response.send_message(f"<@{user_id}>'s opinion has been ignored")
 
     async def on_timeout(self) -> None:
         """Delete message upon timeout."""

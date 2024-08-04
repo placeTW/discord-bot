@@ -33,32 +33,18 @@ def register_commands(
     client: TWPlaceClient,
     guilds: list[discord.Object],
 ):
-    bbt_count = app_commands.Group(
-        name="bbt_count", description="Bubble tea counts"
-    )
+    bbt_count = app_commands.Group(name="bbt_count", description="Bubble tea counts")
 
     # add
     @bbt_count.command(name="add", description="Add a new bubble tea entry")
-    @app_commands.describe(
-        description="Short description of the bubble tea that you got"
-    )
-    @app_commands.describe(
-        date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)"
-    )
-    @app_commands.describe(
-        location="Where you got the bubble tea from (optional)"
-    )
-    @app_commands.describe(
-        image="Image of the bubble tea (optional, not saved in database)"
-    )
+    @app_commands.describe(description="Short description of the bubble tea that you got")
+    @app_commands.describe(date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)")
+    @app_commands.describe(location="Where you got the bubble tea from (optional)")
+    @app_commands.describe(image="Image of the bubble tea (optional, not saved in database)")
     @app_commands.describe(price="Price of the bubble tea (optional)")
-    @app_commands.describe(
-        currency="Currency of the price (optional, Taiwan dollar = TWD, US dollar = USD, etc.)"
-    )
+    @app_commands.describe(currency="Currency of the price (optional, Taiwan dollar = TWD, US dollar = USD, etc.)")
     @app_commands.describe(notes="Additional notes (optional)")
-    @app_commands.describe(
-        rating="Personal rating of the bubble tea (optional)"
-    )
+    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
     async def bbt_count_add(
         interaction: discord.Interaction,
         description: str,
@@ -114,9 +100,7 @@ def register_commands(
             "generated_id": str(id),
             "metadata": add_data,
         }
-        await logging.log_event(
-            interaction, log_event, content=description, log_to_channel=False
-        )
+        await logging.log_event(interaction, log_event, content=description, log_to_channel=False)
 
         embed = bbt_entry_embed(
             id,
@@ -162,16 +146,8 @@ def register_commands(
             id,
             None,
             None,
-            (
-                interaction.user.display_name
-                if interaction.user.id == entry.get("user_id")
-                else None
-            ),
-            (
-                interaction.user.avatar.url
-                if interaction.user.id == entry.get("user_id")
-                else None
-            ),
+            (interaction.user.display_name if interaction.user.id == entry.get("user_id") else None),
+            (interaction.user.avatar.url if interaction.user.id == entry.get("user_id") else None),
             entry,
             interaction.created_at.astimezone().tzinfo,
         )
@@ -180,27 +156,15 @@ def register_commands(
     # edit
     @bbt_count.command(name="edit", description="Edit a bubble tea entry")
     @app_commands.describe(id="ID of the bubble tea entry to edit")
-    @app_commands.describe(
-        date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)"
-    )
-    @app_commands.describe(
-        description="Short description of the bubble tea that you got (optional)"
-    )
-    @app_commands.describe(
-        location="Where you got the bubble tea from (optional)"
-    )
-    @app_commands.describe(
-        image="Image of the bubble tea (optional, not saved in database)"
-    )
+    @app_commands.describe(date="Date of the bubble tea (optional, must be in the format YYYY-MM-DD, e.g. 2021-12-31)")
+    @app_commands.describe(description="Short description of the bubble tea that you got (optional)")
+    @app_commands.describe(location="Where you got the bubble tea from (optional)")
+    @app_commands.describe(image="Image of the bubble tea (optional, not saved in database)")
     @app_commands.describe(price="Price of the bubble tea (optional)")
     @app_commands.describe(currency="Currency of the price (optional)")
     @app_commands.describe(notes="Additional notes (optional)")
-    @app_commands.describe(
-        rating="Personal rating of the bubble tea (optional)"
-    )
-    @app_commands.describe(
-        transfer_user="Transfer the entry to another user (optional)"
-    )
+    @app_commands.describe(rating="Personal rating of the bubble tea (optional)")
+    @app_commands.describe(transfer_user="Transfer the entry to another user (optional)")
     async def bbt_count_edit(
         interaction: discord.Interaction,
         id: int,
@@ -295,9 +259,7 @@ def register_commands(
                     super().__init__()
                     self.msg: discord.Message = None
 
-                @discord.ui.button(
-                    label="Yes", style=discord.ButtonStyle.green
-                )
+                @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
                 async def transfer_button_yes(
                     self,
                     interaction: discord.Interaction,
@@ -317,9 +279,7 @@ def register_commands(
                     interaction: discord.Interaction,
                     button: discord.ui.Button,
                 ):
-                    await self.msg.edit(
-                        content="Transfer cancelled", embed=None, view=None
-                    )
+                    await self.msg.edit(content="Transfer cancelled", embed=None, view=None)
                     # Cancel the transfer and edit the entry normally
                     await edit()
 
@@ -339,12 +299,8 @@ def register_commands(
         name="list",
         description="List the bubble tea entries for a user in a given year",
     )
-    @app_commands.describe(
-        user="User to list entries for (optional, default to self)"
-    )
-    @app_commands.describe(
-        year="Year to list entries for (optional, default to current year)"
-    )
+    @app_commands.describe(user="User to list entries for (optional, default to self)")
+    @app_commands.describe(year="Year to list entries for (optional, default to current year)")
     @app_commands.describe(group_by="Field to group by (optional)")
     @app_commands.choices(group_by=BBT_LIST_GROUP_BY_CHOICES)
     async def bbt_count_list(
@@ -354,9 +310,7 @@ def register_commands(
         group_by: app_commands.Choice[str] = None,
     ):
         await interaction.response.defer()
-        entries = get_bbt_entries(
-            user.id if user else interaction.user.id, year
-        )
+        entries = get_bbt_entries(user.id if user else interaction.user.id, year)
         embed = (
             bbt_list_default_embed(
                 user.id if user else interaction.user.id,
@@ -380,20 +334,12 @@ def register_commands(
         name="leaderboard",
         description="List the top bubble tea drinkers in a given year",
     )
-    @app_commands.describe(
-        year="Year to list leaderboard for (optional, default to current year)"
-    )
-    async def bbt_count_leaderboard(
-        interaction: discord.Interaction, year: int = None
-    ):
+    @app_commands.describe(year="Year to list leaderboard for (optional, default to current year)")
+    async def bbt_count_leaderboard(interaction: discord.Interaction, year: int = None):
         await interaction.response.defer()
         leaderboard = get_bbt_leaderboard(
             interaction.guild.id,
-            (
-                datetime.datetime(year=year, month=1, day=1)
-                if year
-                else interaction.created_at
-            ),
+            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
         )
         embed = discord.Embed(
             title=f"Top bubble tea drinkers of {year if year else interaction.created_at.year} in {client.guilds_dict[interaction.guild.id]['server_name']}",
@@ -412,18 +358,10 @@ def register_commands(
         )
         await interaction.followup.send(embed=embed)
 
-    @bbt_count.command(
-        name="stats", description="Get the stats for a user for a given year"
-    )
-    @app_commands.describe(
-        user="User to get stats for (optional, default to self)"
-    )
-    @app_commands.describe(
-        year="Year to get stats for (optional, default to current year)"
-    )
-    @app_commands.describe(
-        group_by_location="Group the stats by location (optional)"
-    )
+    @bbt_count.command(name="stats", description="Get the stats for a user for a given year")
+    @app_commands.describe(user="User to get stats for (optional, default to self)")
+    @app_commands.describe(year="Year to get stats for (optional, default to current year)")
+    @app_commands.describe(group_by_location="Group the stats by location (optional)")
     async def bbt_count_stats(
         interaction: discord.Interaction,
         user: discord.User = None,
@@ -434,20 +372,12 @@ def register_commands(
         user_id = user.id if user else interaction.user.id
         stats = get_bubble_tea_stats(
             user_id,
-            (
-                datetime.datetime(year=year, month=1, day=1)
-                if year
-                else interaction.created_at
-            ),
+            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
             group_by_location,
         )
         monthly_counts = get_bubble_tea_monthly_counts(
             user_id,
-            (
-                datetime.datetime(year=year, month=1, day=1)
-                if year
-                else interaction.created_at
-            ),
+            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
         )
 
         latest = (

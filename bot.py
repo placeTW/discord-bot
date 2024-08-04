@@ -16,9 +16,7 @@ class TWPlaceClient(discord.Client):
         # config
         self.is_prod = is_prod
         self.guilds_dict = fetch_config(is_prod)
-        super().__init__(
-            intents=intents, activity=movie_activity, *args, **kwargs
-        )
+        super().__init__(intents=intents, activity=movie_activity, *args, **kwargs)
 
     @tasks.loop(hours=CHANGE_STATUS_INTERVAL_HOURS)
     async def set_activity(self):
