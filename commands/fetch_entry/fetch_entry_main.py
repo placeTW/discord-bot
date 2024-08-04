@@ -6,7 +6,11 @@ so that both fetch_entry and fetch_entry_ui can use it
 import discord
 
 from commands.entry_consts.consts import I18N_JSON_URL
-from modules import async_utils, postprocess
+from modules import async_utils
+from . import postprocess
+from ..entry_consts.consts import (
+    SUPPORTED_LANGUAGE_CODES,
+)
 
 
 async def get_json(how="url", json_url="") -> dict:
@@ -51,7 +55,17 @@ async def _fetch_entry_with_json(
     )
     # * if some error happens, notify user and stop
     if result_json is None:
-        return
+        print("Failed to fetch JSON.")
+        return None
+    if entry not in result_json:
+        print("Entry not found.")
+        return None
+    if lang not in SUPPORTED_LANGUAGE_CODES.keys():
+        print("Language not found.")
+        return None
+    if field is not None and field not in result_json[entry]:
+        print("Field not found.")
+        return None
 
     if field is None:  # * return entire entry
         result = result_json[entry]

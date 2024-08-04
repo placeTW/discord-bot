@@ -1,7 +1,8 @@
 import asyncio
 import discord
 from discord import app_commands
-from modules import async_utils, postprocess
+from modules import async_utils
+from . import postprocess
 import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
@@ -127,7 +128,7 @@ class FetchEntryView(discord.ui.View):
 def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
         name="ui-fetch",
-        description="Eady-to-use entry selector",
+        description="Easy-to-use entry selector",
         guilds=guilds,
     )
     async def ui_fetch(interaction: discord.Interaction):
