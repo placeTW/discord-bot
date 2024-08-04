@@ -9,6 +9,7 @@ ENTRIES_TO_TEST = list(SUPPORTED_ART2023_IDS.keys())
 
 @pytest.mark.parametrize("lang", LANGS_TO_TEST)
 async def test_placetw_art_schema(lang: str):
+    """Tests that the API can be fetched and that the schema is correct."""
     url = f"https://placetw.com/locales/{lang}/art-pieces.json"
     result = await _async_get_json(url)
     assert type(result) is dict
