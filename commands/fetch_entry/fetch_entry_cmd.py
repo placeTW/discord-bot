@@ -1,7 +1,8 @@
 import aiohttp
 import discord
 from discord import app_commands
-from modules import async_utils, postprocess
+from modules import async_utils
+from . import postprocess
 import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
@@ -27,6 +28,7 @@ def register_commands(tree, guilds: list[discord.Object]):
         entry: Choice[str],
         lang: Choice[str],
         field: Choice[str] = None,
+        is_ephemeral: bool = True,
     ):
         """This function fetches an entry's field as needed.
         If field is empty, the entire entry is returned.
@@ -36,8 +38,9 @@ def register_commands(tree, guilds: list[discord.Object]):
             entry (str): The entry to fetch.
             lang (str): The language of the entry to fetch.
             field (str, optional): Field to fetch: title, blurb, description,
-                or links.
-                If not passed, return the entire entry.
+            or links. If not passed, return the entire entry.
+            is_ephemeral (bool, optional): Whether the response should be ephemeral
+            (only visible to the user who triggered the command). Defaults to True.
         """
         # * assemble values
         selected_lang = lang.value  # lang always exists
@@ -49,12 +52,17 @@ def register_commands(tree, guilds: list[discord.Object]):
             interaction, selected_entry, selected_lang, selected_field
         )
 
+        if not res:
+            await interaction.response.send_message("Failed to fetch entry.", ephemeral=True)
+            return
+
         await send_fetch_response(
             interaction,
             res,
             selected_entry,
             selected_lang,
             selected_field,
+            is_ephermeral=is_ephemeral,
         )
 
 
