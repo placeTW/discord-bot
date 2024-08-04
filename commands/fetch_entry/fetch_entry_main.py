@@ -8,7 +8,8 @@ import discord
 from commands.entry_consts.consts import I18N_JSON_URL
 from modules import async_utils
 from . import postprocess
-from ..entry_consts.consts import (
+from commands.entry_consts.consts import (
+
     SUPPORTED_LANGUAGE_CODES,
 )
 
