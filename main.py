@@ -138,7 +138,7 @@ class BotInitialiser:
                 pass
 
             # don't respond to bot's own posts or if message reacts are disabled
-            if message.author == self.client.user or not message_reacts_enabled:
+            if message.author == self.client.user or not message_reacts_enabled or message.author.bot:
                 return
 
             events = []
