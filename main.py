@@ -48,6 +48,7 @@ TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN")
 
 DEPLOYMENT_DATE = datetime.datetime.now()
 
+
 class BotInitialiser:
     def __init__(self):
         self.client = bot.get_bot(IS_PROD)
@@ -67,7 +68,6 @@ class BotInitialiser:
         self.register_commands_in_all_servers()
         self.register_event_callbacks()
 
-
     def register_placetw_commands(self):
         @self.tree.command(
             name="deployment-info",
@@ -86,7 +86,6 @@ class BotInitialiser:
             ]
             msg = "\n".join(msg_list)
             await interaction.response.send_message(msg)
-
 
         # * register commands the just the placetw server
         edit_entry_cmd.register_commands(self.tree, self.placetw_guild, self.client)
@@ -124,7 +123,6 @@ class BotInitialiser:
             logging.init(self.client, DEPLOYMENT_DATE)
             print("Bot is ready.")
 
-
         # when someone sends any message
         @self.client.event
         async def on_message(message: discord.Message):
@@ -138,7 +136,11 @@ class BotInitialiser:
                 pass
 
             # don't respond to bots, bot's own posts or if message reacts are disabled
-            if message.author == self.client.user or not message_reacts_enabled or message.author.bot:
+            if (
+                message.author == self.client.user
+                or not message_reacts_enabled
+                or message.author.bot
+            ):
                 return
 
             events = []
@@ -153,7 +155,6 @@ class BotInitialiser:
             if len(events) > 0:
                 await logging.log_message_event(message, events)
 
-
         @self.client.event
         async def on_guild_join(guild):
             supabaseClient.table("server_config").insert(
@@ -164,10 +165,10 @@ class BotInitialiser:
             ).execute()
             self.register_commands(self.tree, self.client, [guild])
             await self.tree.sync(guild=guild)
-    
 
     def run(self):
         self.client.run(TOKEN)
+
 
 if __name__ == "__main__":
     discord_bot = BotInitialiser()
