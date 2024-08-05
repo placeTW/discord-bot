@@ -203,7 +203,7 @@ def forms_new_word(pinyin: str, index: int):
 
 def to_chewing(pinyin: str) -> str:
     # Remove leading and trailing spaces
-    pinyin = pinyin.strip()
+    pinyin = pinyin.strip().lower()
 
     # Temporarily store the chewing tones and original index
     tones = []
