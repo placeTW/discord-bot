@@ -7,6 +7,8 @@ from .chewing import to_chewing
 
 # sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
+from discord.app_commands import Choice
+NUM_ROWS_CHOICES = [Choice(name=i, value=i) for i in range(2, 5+1)] # multiple choice options are from 2 to 5
 
 
 def _db_results_to_df(results: List[dict]) -> pd.DataFrame:
@@ -39,6 +41,37 @@ def df_results_to_choices(df: pd.DataFrame,
     choices = [correct_choice] + incorrect_choices
     shuffle(choices)
     return choices, vocab_to_display
+
+def register_quiz_subcommand(
+    tocfl_group: discord.app_commands.Group,
+):
+    @tocfl_group.command(
+        name="quiz-pronunciation",
+        description="Guess the pronunciation of the given TOCFL word",
+    )
+    @discord.app_commands.describe(is_private="Whether the quiz should be private")
+    @discord.app_commands.choices(num_rows=NUM_ROWS_CHOICES)
+    async def tocfl_quiz_pronunciation(
+        interaction: discord.Interaction,
+        num_rows: Choice[int] = None,
+        is_private: bool = False,
+    ):
+        pass
+
+    @tocfl_group.command(
+        name="quiz-vocab",
+        description="Guess the character of the given TOCFL pronunciation",
+    )
+    @discord.app_commands.describe(is_private="Whether the quiz should be private")
+    @discord.app_commands.choices(num_rows=NUM_ROWS_CHOICES)
+    async def tocfl_quiz_pronunciation(
+        interaction: discord.Interaction,
+        num_rows: Choice[int] = None,
+        is_private: bool = False,
+    ):
+        pass
+
+
 
 
 if __name__ == "__main__":
