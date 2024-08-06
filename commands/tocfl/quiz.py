@@ -53,10 +53,24 @@ def register_quiz_subcommand(
     @discord.app_commands.choices(num_rows=NUM_ROWS_CHOICES)
     async def tocfl_quiz_pronunciation(
         interaction: discord.Interaction,
-        num_rows: Choice[int] = None,
+        num_rows: Choice[int] = 4,
         is_private: bool = False,
     ):
-        pass
+        # get random choices from the database
+        choices = get_random_tocfl_choices_from_db(num_choices=num_rows)
+        # convert to DataFrame
+        df = _db_results_to_df(choices)
+        # convert to QuizChoice objects
+        choices, vocab_to_ask = df_results_to_choices(df, num_rows, is_ask_pronunciation=True)
+        # create the view
+        view = MultipleChoiceView(choices=choices)
+        # send the message
+        await interaction.response.send_message(
+            f"Choose the correct pronunciation for: {vocab_to_ask}",
+            view=view,
+            ephemeral=is_private,
+        )
+
 
     @tocfl_group.command(
         name="quiz-vocab",
@@ -64,12 +78,25 @@ def register_quiz_subcommand(
     )
     @discord.app_commands.describe(is_private="Whether the quiz should be private")
     @discord.app_commands.choices(num_rows=NUM_ROWS_CHOICES)
-    async def tocfl_quiz_pronunciation(
+    async def tocfl_quiz_vocab(
         interaction: discord.Interaction,
-        num_rows: Choice[int] = None,
+        num_rows: Choice[int] = 4,
         is_private: bool = False,
     ):
-        pass
+        # get random choices from the database
+        choices = get_random_tocfl_choices_from_db(num_choices=num_rows)
+        # convert to DataFrame
+        df = _db_results_to_df(choices)
+        # convert to QuizChoice objects
+        choices, vocab_to_ask = df_results_to_choices(df, num_rows, is_ask_pronunciation=False)
+        # create the view
+        view = MultipleChoiceView(choices=choices)
+        # send the message
+        await interaction.response.send_message(
+            f"Choose the correct answer for: {vocab_to_ask}",
+            view=view,
+            ephemeral=is_private,
+        )
 
 
 
