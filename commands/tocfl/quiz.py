@@ -107,4 +107,5 @@ if __name__ == "__main__":
     df = _db_results_to_df(choices)
     choices, vocab_to_ask = df_results_to_choices(df, num_choices, is_ask_pronunciation=False)
     print(f"Choose the correct answer for: {vocab_to_ask}")
-    print(f"Choices:\n{'\n'.join(['* ' + choice.label for choice in choices])}")
+    print("Choices:")
+    print('\n'.join(['* ' + choice.label for choice in choices]))
