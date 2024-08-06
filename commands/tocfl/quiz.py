@@ -17,11 +17,15 @@ def _db_results_to_df(results: List[dict]) -> pd.DataFrame:
     df["vocab"] = df["vocab"].apply(lambda x: x.split("/")[0])
     df["pinyin"] = df["pinyin"].apply(lambda x: x.split("/")[0])
     # add zhuyin column
-    df["zhuyin"] = df["pinyin"].apply(to_chewing).str.replace("\u3000", " ") # replace full-width space with half-width space for now
-    # add "pronunciation" column as a combination of pinyin and zhuyin
-    df["pronunciation"] = df["pinyin"] + " / " + df["zhuyin"]
-    # drop the "pinyin" and "zhuyin" columns
-    df.drop(columns=["pinyin", "zhuyin"], inplace=True)
+    try:
+        df["zhuyin"] = df["pinyin"].apply(to_chewing).str.replace("\u3000", " ") # replace full-width space with half-width space for now
+        # add "pronunciation" column as a combination of pinyin and zhuyin
+        df["pronunciation"] = df["pinyin"] + " / " + df["zhuyin"]
+        # drop the "pinyin" and "zhuyin" columns
+        df.drop(columns=["pinyin", "zhuyin"], inplace=True)
+    except Exception as e:
+        df["pronunciation"] = df["pinyin"]
+        df.drop(columns=["pinyin"], inplace=True)
     return df.set_index("id")
 
 def df_results_to_choices(df: pd.DataFrame,
