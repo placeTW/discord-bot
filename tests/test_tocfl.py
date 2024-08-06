@@ -8,6 +8,7 @@ import pytest
         ("duìwŭ", "ㄉㄨㄟˋㄨˇ"),
         ("nóng", "ㄋㄨㄥˊ"),
         ("mínzhŭ", "ㄇㄧㄣˊㄓㄨˇ"),
+        ("jiēnà", "ㄐㄧㄝ¯ㄋㄚˋ"),
     ]
 )
 def test_to_chewing(pinyin, expected_chewing):
