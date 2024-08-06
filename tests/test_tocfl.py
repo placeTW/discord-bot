@@ -4,6 +4,7 @@ import pytest
 @pytest.mark.parametrize(
     "pinyin, expected_chewing",
     [
+        # test instances go here (be sure to remove spaces)
         ("duìwŭ", "ㄉㄨㄟˋㄨˇ"),
         ("nóng", "ㄋㄨㄥˊ"),
         ("mínzhŭ", "ㄇㄧㄣˊㄓㄨˇ"),
