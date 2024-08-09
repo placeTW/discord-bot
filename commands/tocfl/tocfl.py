@@ -7,7 +7,7 @@ from modules.supabase import supabaseClient
 from random import randint
 from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
 from .chewing import to_chewing
-
+from .quiz import register_quiz_subcommand
 
 def register_commands(
     tree: discord.app_commands.CommandTree,
@@ -17,6 +17,8 @@ def register_commands(
     tocfl_group = app_commands.Group(
         name="tocfl", description="TOCFL commands"
     )
+
+    register_quiz_subcommand(tocfl_group)
 
     @tocfl_group.command(
         name="random",
