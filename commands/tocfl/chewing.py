@@ -72,18 +72,12 @@ PINYIN_ALONE = {
     "yuan": "ㄩㄢ",
     "yun": "ㄩㄣ",
     "yong": "ㄩㄥ",
-    # v is used to replace ü in typing
-    "nü": "ㄋㄩ",
-    "lü": "ㄌㄩ",
-    "nv": "ㄋㄩ",
-    "lv": "ㄌㄩ",
 }
 
 PINYIN_CENTER = {
     "i": "ㄧ",
-    "u": "ㄨ",
+    "u": "ㄨ",  # also ㄩ
     "ü": "ㄩ",
-    "v": "ㄩ",
 }
 
 # The designer of Hanyu Pinyin used e to represent both 「ㄜ」 and 「ㄝ」.
@@ -170,24 +164,36 @@ def match_chewing(string: str, index: int, target: dict[str, str]):
             # Resolve duplicates
             if target == PINYIN_COMBINED:
                 if target_str == "uan" and string[index - 1] in [
-                    "y",
                     "j",
                     "q",
                     "x",
                 ]:
                     result = "ㄩㄢ"
                 elif target_str == "un" and string[index - 1] in [
-                    "y",
                     "j",
                     "q",
                     "x",
                 ]:
                     result = "ㄩㄣ"
+            elif target == PINYIN_CENTER:
+                if target_str == "u" and string[index - 1] in ["j", "q", "x"]:
+                    result = "ㄩ"
             elif target == PINYIN_FINALS:
-                if target_str == "e" and string[index - 1] == "y":
+                if target_str == "e" and string[index - 1] in "iü":
                     result = "ㄝ"
+                # TODO separate those which can have j, q, x as the initial constant
+                # FIXME ugly bad code
+                elif target_str == "en" and (
+                    string[index - 1] in ["j", "q", "x"]
+                    or string[index - 2] in ["j", "q", "x"]
+                ):
+                    continue
 
-            return (index + i, result)
+            if target == PINYIN_COMBINED:
+                if forms_new_word(string, index + i):
+                    return (index + i, result)
+            else:
+                return (index + i, result)
     return (index + 1, None)
 
 
@@ -204,6 +210,8 @@ def forms_new_word(pinyin: str, index: int):
 def to_chewing(pinyin: str) -> str:
     # Remove leading and trailing spaces
     pinyin = pinyin.strip()
+    # Handle all capital letters and lower-case letters
+    pinyin = pinyin.lower()
 
     # Temporarily store the chewing tones and original index
     tones = []
@@ -237,7 +245,9 @@ def to_chewing(pinyin: str) -> str:
 
         else:
             initial = match_chewing(pinyin, index, PINYIN_INITIALS)
-            assert initial[1], f"Failed to match initial in '{pinyin}' at index {index - 1}"
+            assert initial[
+                1
+            ], f"Failed to match initial in '{pinyin}' at index {index - 1}"
             index = initial[0]
             chewing += initial[1]  # ㄍ
             combined = match_chewing(pinyin, index, PINYIN_COMBINED)
