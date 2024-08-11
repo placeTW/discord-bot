@@ -12,14 +12,14 @@ ACTIVITIES_DICT = {
     # "streaming", # ! not supported yet
 }
 ACTIVITY_TYPES = list(ACTIVITIES_DICT.keys())
-ACTIVITY_CHOICES = [
-    Choice(name=activity_type, value=activity_type) for activity_type in ACTIVITY_TYPES
-]
+ACTIVITY_CHOICES = [Choice(name=activity_type, value=activity_type) for activity_type in ACTIVITY_TYPES]
+
 
 def get_random_activity_type():
     return choice(ACTIVITY_TYPES)
 
-def get_activity_item(activity_type: str, index:int = None):
+
+def get_activity_item(activity_type: str, index: int = None):
     """
     Returns a random activity item based on the activity type.
     If index is provided, returns the item at that index.
@@ -31,6 +31,7 @@ def get_activity_item(activity_type: str, index:int = None):
     elif activity_type == "playing":
         return LIST_OF_GAMES[index] if index is not None else choice(LIST_OF_GAMES)
 
+
 def get_random_activity_as_discordpy_activity():
     # get random activity type, then get random item from that activity type, then return it as a discord.Activity object
     activity_type = get_random_activity_type()
@@ -40,9 +41,8 @@ def get_random_activity_as_discordpy_activity():
     elif activity_type == "playing":
         return discord.Activity(name=activity_name, type=discord.ActivityType.playing)
 
-def register_commands(
-    tree, this_guild: discord.Object, client: discord.Client
-):
+
+def register_commands(tree, this_guild: discord.Object, client: discord.Client):
     @tree.command(
         name="set_activity",
         description=f"Sets the bot's status to an activity type (see: `/list_activities` and `/list_activity_items`).",
@@ -51,7 +51,9 @@ def register_commands(
     @app_commands.checks.has_permissions(administrator=True)
     @app_commands.choices(activity_choice=ACTIVITY_CHOICES)
     @app_commands.describe(activity_choice="The activity type to set the bot's status to (random if not specified)")
-    @app_commands.describe(activity_index="The index of the activity item to set the bot's status to (random if not specified)")
+    @app_commands.describe(
+        activity_index="The index of the activity item to set the bot's status to (random if not specified)"
+    )
     async def set_activity(
         interaction: discord.Interaction, activity_choice: Choice[str] = None, activity_index: int = None
     ):
@@ -64,20 +66,18 @@ def register_commands(
         activity_type = get_random_activity_type() if activity_choice is None else activity_choice.value
         activity_list_to_use = ACTIVITIES_DICT[activity_type]
         if activity_index is not None and activity_index < 0 and activity_index >= len(activity_list_to_use):
-            await interaction.response.send_message(
-                "Invalid activity index. Please try again.", ephemeral=True
-            )
+            await interaction.response.send_message("Invalid activity index. Please try again.", ephemeral=True)
             return
-        activity_name = activity_list_to_use[activity_index] if activity_index is not None else get_activity_item(activity_type)
-        await interaction.response.send_message(f"Set bot status to '{activity_type}' with value '{activity_name}' (index: {activity_index})")
+        activity_name = (
+            activity_list_to_use[activity_index] if activity_index is not None else get_activity_item(activity_type)
+        )
+        await interaction.response.send_message(
+            f"Set bot status to '{activity_type}' with value '{activity_name}' (index: {activity_index})"
+        )
         if activity_type == "watching":
-            activity = discord.Activity(
-                name=activity_name, type=discord.ActivityType.watching
-            )
+            activity = discord.Activity(name=activity_name, type=discord.ActivityType.watching)
         elif activity_type == "playing":
-            activity = discord.Activity(
-                name=activity_name, type=discord.ActivityType.playing
-            )
+            activity = discord.Activity(name=activity_name, type=discord.ActivityType.playing)
         await client.change_presence(activity=activity)
 
     @tree.command(

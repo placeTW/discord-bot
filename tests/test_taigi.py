@@ -1,6 +1,7 @@
 import pytest
 from commands.taiwanese.read_embree_csv import TW_EMBREE_CSV, NUM_WORDS_COL, _count_taigi_words
 
+
 def test_num_words_col():
     """Test the integrity of the NUM_WORDS_COL column."""
     # assert that the column exists
@@ -10,10 +11,11 @@ def test_num_words_col():
     # assert that there all values are > 0
     assert (TW_EMBREE_CSV[NUM_WORDS_COL] > 0).all()
 
+
 @pytest.mark.parametrize(
-    "poj,expected", 
+    "poj,expected",
     [
-        ("", 0), # edge case, should not exist in the dataset
+        ("", 0),  # edge case, should not exist in the dataset
         ("thǹg", 1),
         ("thǹg-bō", 2),
         ("thǹg-chhiah-kha", 3),
@@ -21,19 +23,21 @@ def test_num_words_col():
         ("àm-hông-lián-ong-eng", 5),
         ("Tâi-oân-tài-bùn-siông-chhú", 6),
         ("lêng-géng-bo̍k-ia̍p-kài-khak-thâng", 7),
-    ])
+    ],
+)
 def test__count_taigi_words(poj: str, expected: str):
     """Test the _count_taigi_words function."""
     assert _count_taigi_words(poj) == expected
 
+
 # these are problematic cases, but we write the cases first but skip them
 @pytest.mark.skip(reason="These cases are problematic")
 @pytest.mark.parametrize(
-    "poj,expected", 
+    "poj,expected",
     [
-        ("tû-khì + N + í-gōa", 4), # row 34426
-        ("tû-liáu + N + í-gōa", 4), # row 34428
-    ]
+        ("tû-khì + N + í-gōa", 4),  # row 34426
+        ("tû-liáu + N + í-gōa", 4),  # row 34428
+    ],
 )
 def test__count_taigi_words_problematic(poj: str, expected: str):
     """Test the _count_taigi_words function."""
