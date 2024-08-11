@@ -47,7 +47,7 @@ def register_commands(tree, this_guild: discord.Object):
             subprocess.call(["git", "checkout", branch.value])
         subprocess.call(["git", "pull"])
         if reinstall_requirements:
-            subprocess.call(["poetry", "install"])
+            subprocess.call(["poetry", "install", "--sync"])
 
         print("restart: Restarting...")
 
