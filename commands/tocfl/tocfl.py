@@ -9,6 +9,7 @@ from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
 from .chewing import to_chewing
 from .quiz import register_quiz_subcommand
 
+
 def register_commands(
     tree: discord.app_commands.CommandTree,
     this_guild: discord.Object,

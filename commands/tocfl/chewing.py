@@ -184,8 +184,7 @@ def match_chewing(string: str, index: int, target: dict[str, str]):
                 # TODO separate those which can have j, q, x as the initial constant
                 # FIXME ugly bad code
                 elif target_str == "en" and (
-                    string[index - 1] in ["j", "q", "x"]
-                    or string[index - 2] in ["j", "q", "x"]
+                    string[index - 1] in ["j", "q", "x"] or string[index - 2] in ["j", "q", "x"]
                 ):
                     continue
 
@@ -245,9 +244,7 @@ def to_chewing(pinyin: str) -> str:
 
         else:
             initial = match_chewing(pinyin, index, PINYIN_INITIALS)
-            assert initial[
-                1
-            ], f"Failed to match initial in '{pinyin}' at index {index - 1}"
+            assert initial[1], f"Failed to match initial in '{pinyin}' at index {index - 1}"
             index = initial[0]
             chewing += initial[1]  # ㄍ
             combined = match_chewing(pinyin, index, PINYIN_COMBINED)

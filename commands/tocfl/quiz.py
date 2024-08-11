@@ -8,7 +8,8 @@ from .chewing import to_chewing
 # sys.path.append(str(Path(__file__).parent.parent.parent)) # I hate python imports
 from modules.quiz.multiple_choice import MultipleChoiceView, QuizChoice
 from discord.app_commands import Choice
-NUM_ROWS_CHOICES = [Choice(name=i, value=i) for i in range(2, 5+1)] # multiple choice options are from 2 to 5
+
+NUM_ROWS_CHOICES = [Choice(name=i, value=i) for i in range(2, 5 + 1)]  # multiple choice options are from 2 to 5
 
 
 def _db_results_to_df(results: List[dict]) -> pd.DataFrame:
@@ -18,7 +19,9 @@ def _db_results_to_df(results: List[dict]) -> pd.DataFrame:
     df["pinyin"] = df["pinyin"].apply(lambda x: x.split("/")[0])
     # add zhuyin column
     try:
-        df["zhuyin"] = df["pinyin"].apply(to_chewing).str.replace("\u3000", " ") # replace full-width space with half-width space for now
+        df["zhuyin"] = (
+            df["pinyin"].apply(to_chewing).str.replace("\u3000", " ")
+        )  # replace full-width space with half-width space for now
         # add "pronunciation" column as a combination of pinyin and zhuyin
         df["pronunciation"] = df["pinyin"] + " / " + df["zhuyin"]
         # drop the "pinyin" and "zhuyin" columns
@@ -28,9 +31,9 @@ def _db_results_to_df(results: List[dict]) -> pd.DataFrame:
         df.drop(columns=["pinyin"], inplace=True)
     return df.set_index("id")
 
-def df_results_to_choices(df: pd.DataFrame,
-    num_choices:int,
-    is_ask_pronunciation:bool=True
+
+def df_results_to_choices(
+    df: pd.DataFrame, num_choices: int, is_ask_pronunciation: bool = True
 ) -> Tuple[List[QuizChoice], str]:
     col_to_display, col_to_ask = ("pronunciation", "vocab") if is_ask_pronunciation else ("vocab", "pronunciation")
     # select one row as the correct answer
@@ -39,12 +42,13 @@ def df_results_to_choices(df: pd.DataFrame,
     # convert to QuizChoice object
     correct_choice = QuizChoice(df.loc[correct_row_index, col_to_display], is_correct=True)
     # select incorrect choices as rows that do not have the same pronunciation as the correct answer
-    incorrect_rows = df[df[col_to_display] != correct_choice.label].sample(num_choices-1)
+    incorrect_rows = df[df[col_to_display] != correct_choice.label].sample(num_choices - 1)
     incorrect_choices = [QuizChoice(row[col_to_display], is_correct=False) for _, row in incorrect_rows.iterrows()]
     # shuffle the choices
     choices = [correct_choice] + incorrect_choices
     shuffle(choices)
     return choices, vocab_to_display
+
 
 def register_quiz_subcommand(
     tocfl_group: discord.app_commands.Group,
@@ -75,7 +79,6 @@ def register_quiz_subcommand(
             ephemeral=is_private,
         )
 
-
     @tocfl_group.command(
         name="quiz-vocab",
         description="Guess the character of the given TOCFL pronunciation",
@@ -101,8 +104,6 @@ def register_quiz_subcommand(
             view=view,
             ephemeral=is_private,
         )
-
-
 
 
 if __name__ == "__main__":
