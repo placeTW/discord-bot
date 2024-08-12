@@ -32,7 +32,7 @@ class QuizChoice:
 
 
 class MultipleChoiceView(discord.ui.View):
-    def __init__(self, choices: list[QuizChoice]):
-        super().__init__()
+    def __init__(self, choices: list[QuizChoice], timeout: int = 300):
+        super().__init__(timeout=timeout)
         for i, choice in enumerate(choices):
             self.add_item(QuizMultipleChoiceButton(i, 0, choice.label, choice.is_correct))
