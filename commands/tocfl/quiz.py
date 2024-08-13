@@ -64,6 +64,7 @@ def register_quiz_subcommand(
         num_rows: Choice[int] = 4,
         is_private: bool = False,
     ):
+        num_rows = num_rows.value if isinstance(num_rows, Choice) else num_rows
         # get random choices from the database
         choices = get_random_tocfl_choices_from_db(num_choices=num_rows)
         # convert to DataFrame
@@ -90,6 +91,7 @@ def register_quiz_subcommand(
         num_rows: Choice[int] = 4,
         is_private: bool = False,
     ):
+        num_rows = num_rows.value if isinstance(num_rows, Choice) else num_rows
         # get random choices from the database
         choices = get_random_tocfl_choices_from_db(num_choices=num_rows)
         # convert to DataFrame
