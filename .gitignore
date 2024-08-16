@@ -184,3 +184,5 @@ guilds.env.hjson
 *.ipynb
 *.xlsx
 tocfl_8000.csv
+commands/tocfl/*.csv
+commands/tocfl/*.ipynb
