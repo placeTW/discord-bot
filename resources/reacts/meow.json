@@ -64,6 +64,14 @@
     },
     {
       "keywords": [
+        "няв",
+        "мяв"
+      ],
+      "match_whole_word": true,
+      "criteria_link": "ua_meows"
+    },
+    {
+      "keywords": [
         "mňau"
       ],
       "match_whole_word": true,
@@ -97,7 +105,7 @@
   ],
   "possible_reactions": [
     {
-      "condition": "meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
+      "condition": "meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or ua_meows or czech_meows or misc_meows",
       "chance": 0.25,
       "content": [
         "<a:catArrive:1161441364869918881>",
@@ -110,7 +118,7 @@
       ]
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or ua_meows or czech_meows or misc_meows)",
       "chance": 0.5,
       "content": [
         "<:ChisobCat:1157361078452375582>",
@@ -127,18 +135,18 @@
       "mention_author": "true"
     },
     {
-      "condition": "meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows",
+      "condition": "meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or ua_meows or czech_meows or misc_meows",
       "chance": 0.169,
       "content": "喵",
       "random_multiplier": 5
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or ua_meows or czech_meows or misc_meows)",
       "chance": 0.1,
       "content": "<:dogekek:1132350110148333718>"
     },
     {
-      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or czech_meows or misc_meows)",
+      "condition": "from_meow_channel and not (meow or traditional_cat or cat or zh_meows or jp_cat or jp_meows or baltic_meows or ua_meows or czech_meows or misc_meows)",
       "chance": 0.1,
       "content": "<:CapooDepressed:1198305961203486900>"
     },
