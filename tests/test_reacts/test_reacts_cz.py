@@ -88,14 +88,12 @@ POSTITIVE_TEST_CASES = (
     "Tajwanka",
 )
 
-
 @pytest.mark.parametrize(
     "test_str",
     POSTITIVE_TEST_CASES,
 )
 def test_react_czech_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
-    # assert False  # ! add the remaining test cases!!
     # * isolated string
     assert check_resource_match(test_str, resource_name='czech')
     # * surrounded by spaces
@@ -104,7 +102,6 @@ def test_react_czech_regex_yes_match(test_str: str):
     assert check_resource_match(test_str.lower(), resource_name='czech')
     # * to title case
     assert check_resource_match(test_str.title(), resource_name='czech')
-
 
 @pytest.mark.parametrize(
     "test_str",
