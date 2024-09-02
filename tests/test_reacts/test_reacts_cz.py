@@ -1,8 +1,8 @@
 import pytest
 from functions.reacts import check_resource_match
 
-POSTITIVE_TEST_CASES = (
-    # variant
+POSITIVE_TEST_CASES = (
+    # Czech variants (existing test cases)
     "Tchaj-wan",
     "Tchaj-wany",
     "Tchaj-wanu",
@@ -16,7 +16,7 @@ POSTITIVE_TEST_CASES = (
     "Tchaj-wansky",
     "Tchaj-wanec",
     "Tchaj-wanka",
-    # variant
+    # Czech variants without hyphen (existing test cases)
     "Tchajwan",
     "Tchajwany",
     "Tchajwanu",
@@ -30,7 +30,7 @@ POSTITIVE_TEST_CASES = (
     "Tchajwansky",
     "Tchajwanec",
     "Tchajwanka",
-    # variant
+    # Other existing Czech variants...
     "Tchaj-van",
     "Tchaj-vany",
     "Tchaj-vanu",
@@ -44,7 +44,6 @@ POSTITIVE_TEST_CASES = (
     "Tchaj-vansky",
     "Tchaj-vanec",
     "Tchaj-vanka",
-    # variant
     "Tchajvan",
     "Tchajvany",
     "Tchajvanu",
@@ -58,7 +57,6 @@ POSTITIVE_TEST_CASES = (
     "Tchajvansky",
     "Tchajvanec",
     "Tchajvanka",
-    # variant
     "Tajvan",
     "Tajvany",
     "Tajvanu",
@@ -72,7 +70,6 @@ POSTITIVE_TEST_CASES = (
     "Tajvansky",
     "Tajvanec",
     "Tajvanka",
-    # variant
     "Tajwan",
     "Tajwany",
     "Tajwanu",
@@ -86,11 +83,13 @@ POSTITIVE_TEST_CASES = (
     "Tajwansky",
     "Tajwanec",
     "Tajwanka",
+    # Added Mandarin variant
+    "捷克"
 )
 
 @pytest.mark.parametrize(
     "test_str",
-    POSTITIVE_TEST_CASES,
+    POSITIVE_TEST_CASES,
 )
 def test_react_czech_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
@@ -105,9 +104,13 @@ def test_react_czech_regex_yes_match(test_str: str):
 
 @pytest.mark.parametrize(
     "test_str",
-    POSTITIVE_TEST_CASES,
+    POSITIVE_TEST_CASES,
 )
 def test_react_czech_regex_no_match(test_str: str):
     """Tests that these strings return FALSE."""
-    # * surrounded by text
-    assert not check_resource_match(f"a{test_str}b", resource_name='czech')
+    if test_str == "捷克":
+        # Special handling for Mandarin - it should match even if surrounded by other text
+        assert check_resource_match(f"a{test_str}b", resource_name='czech')
+    else:
+        # * surrounded by text
+        assert not check_resource_match(f"a{test_str}b", resource_name='czech')
