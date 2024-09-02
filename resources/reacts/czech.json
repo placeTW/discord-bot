@@ -3,7 +3,8 @@
     {
       "match_whole_word": true,
       "keywords": [
-        "T(?:ch)?aj-?[wv]an(?:y|u|ů|ům|e|ě|ech|em|ský|sky|ské|ec|ka)?"
+        "T(?:ch)?aj-?[wv]an(?:y|u|ů|ům|e|ě|ech|em|ský|sky|ské|ec|ka)?",
+        "捷克"
       ]
     }
   ],
