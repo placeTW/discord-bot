@@ -1,8 +1,8 @@
 import pytest
 from functions.reacts import check_resource_match
 
-POSTITIVE_TEST_CASES = (
-    # variant
+# Original Czech test cases (all retained)
+POSITIVE_TEST_CASES = (
     "Tchaj-wan",
     "Tchaj-wany",
     "Tchaj-wanu",
@@ -16,7 +16,6 @@ POSTITIVE_TEST_CASES = (
     "Tchaj-wansky",
     "Tchaj-wanec",
     "Tchaj-wanka",
-    # variant
     "Tchajwan",
     "Tchajwany",
     "Tchajwanu",
@@ -30,7 +29,6 @@ POSTITIVE_TEST_CASES = (
     "Tchajwansky",
     "Tchajwanec",
     "Tchajwanka",
-    # variant
     "Tchaj-van",
     "Tchaj-vany",
     "Tchaj-vanu",
@@ -44,7 +42,6 @@ POSTITIVE_TEST_CASES = (
     "Tchaj-vansky",
     "Tchaj-vanec",
     "Tchaj-vanka",
-    # variant
     "Tchajvan",
     "Tchajvany",
     "Tchajvanu",
@@ -58,7 +55,6 @@ POSTITIVE_TEST_CASES = (
     "Tchajvansky",
     "Tchajvanec",
     "Tchajvanka",
-    # variant
     "Tajvan",
     "Tajvany",
     "Tajvanu",
@@ -72,7 +68,6 @@ POSTITIVE_TEST_CASES = (
     "Tajvansky",
     "Tajvanec",
     "Tajvanka",
-    # variant
     "Tajwan",
     "Tajwany",
     "Tajwanu",
@@ -86,11 +81,17 @@ POSTITIVE_TEST_CASES = (
     "Tajwansky",
     "Tajwanec",
     "Tajwanka",
+    # Add more original test cases here as needed
+)
+
+# Adding Mandarin test cases for Czechia
+POSITIVE_TEST_CASES_MANDARIN = (
+    "捷克",  # Mandarin for Czechia
 )
 
 @pytest.mark.parametrize(
     "test_str",
-    POSTITIVE_TEST_CASES,
+    POSITIVE_TEST_CASES + POSITIVE_TEST_CASES_MANDARIN,  # Combine all test cases
 )
 def test_react_czech_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
@@ -105,9 +106,23 @@ def test_react_czech_regex_yes_match(test_str: str):
 
 @pytest.mark.parametrize(
     "test_str",
-    POSTITIVE_TEST_CASES,
+    POSITIVE_TEST_CASES,
 )
 def test_react_czech_regex_no_match(test_str: str):
-    """Tests that these strings return FALSE."""
+    """Tests that these strings return FALSE when surrounded by text."""
     # * surrounded by text
     assert not check_resource_match(f"a{test_str}b", resource_name='czech')
+
+@pytest.mark.parametrize(
+    "test_str",
+    POSITIVE_TEST_CASES_MANDARIN,
+)
+def test_react_czech_mandarin_yes_match(test_str: str):
+    """Tests that these Mandarin strings return TRUE."""
+    # * isolated string
+    assert check_resource_match(test_str, resource_name='czech')
+    # * surrounded by spaces
+    assert check_resource_match(f" {test_str} ", resource_name='czech')
+    # * surrounded by text (ok for Mandarin)
+    assert check_resource_match(f"a{test_str}b", resource_name='czech')
+    assert check_resource_match(f"哈{test_str}囉", resource_name='czech')
