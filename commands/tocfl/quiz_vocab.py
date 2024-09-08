@@ -50,7 +50,7 @@ def df_results_to_choices(
     return choices, vocab_to_display
 
 
-def register_quiz_subcommand(
+def register_vocab_quiz_subcommand(
     tocfl_group: discord.app_commands.Group,
 ):
     @tocfl_group.command(
