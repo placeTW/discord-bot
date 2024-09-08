@@ -8,6 +8,7 @@ from random import randint
 from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
 from .chewing import to_chewing
 from .quiz_vocab import register_vocab_quiz_subcommand
+from .quiz_bopomofo import register_bopomofo_quiz_subcommand
 
 
 def register_commands(
@@ -18,6 +19,7 @@ def register_commands(
     tocfl_group = app_commands.Group(name="tocfl", description="TOCFL commands")
 
     register_vocab_quiz_subcommand(tocfl_group)
+    register_bopomofo_quiz_subcommand(tocfl_group)
 
     @tocfl_group.command(
         name="random",
