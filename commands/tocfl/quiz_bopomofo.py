@@ -61,8 +61,8 @@ def register_bopomofo_quiz_subcommand(
     )
     @discord.app_commands.describe(is_private="Whether the quiz should be private")
     @discord.app_commands.choices(num_rows=NUM_ROWS_CHOICES)
-    @discord.app_commands.rename(num_rows="number-of-choices")
-    @discord.app_commands.rename(is_private="make-quiz-private")
+    # @discord.app_commands.rename(num_rows="number-of-choices")
+    # @discord.app_commands.rename(is_private="make-quiz-private")
     async def tocfl_quiz_pronunciation(
         interaction: discord.Interaction,
         num_rows: Choice[int] = 4,
