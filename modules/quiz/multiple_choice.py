@@ -30,6 +30,9 @@ class QuizChoice:
         self.label = label
         self.is_correct = is_correct
 
+    def __repr__(self):
+        return f"QuizChoice(label={self.label}, is_correct={self.is_correct})"
+
 
 class MultipleChoiceView(discord.ui.View):
     def __init__(self, choices: list[QuizChoice], timeout: int = 300):
