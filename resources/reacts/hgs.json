@@ -19,7 +19,7 @@
       "note": "match_hgs_lv",
       "match_whole_word": true,
       "keywords": [
-        "(?:Dedzīgs|Kaislīgs)\\s+geju\\s+sekss"
+        "(?:Dedzīgs|Kaislīgs|Karsts)\\s+geju\\s+sekss"
       ]
     },
     {
