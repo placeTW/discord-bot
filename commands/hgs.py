@@ -17,9 +17,8 @@ class HGSButtonView(discord.ui.View):
         await interaction.response.send_message(f"<@{user_id}>'s opinion has been ignored")
 
     async def on_timeout(self) -> None:
-        """Delete message upon timeout."""
-        await self.msg.delete()
-
+        # set self.msg text to "hgs?"
+        await self.msg.edit(content="hgs?", view=None)
 
 def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
