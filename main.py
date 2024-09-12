@@ -10,6 +10,7 @@ import datetime
 # user commands
 from commands.basic import basic_commands
 from commands.bbt_count import bbt_count
+from commands.cat import cat
 from commands.config import config_commands
 from commands.fetch_entry import fetch_entry_cmd
 from commands.fetch_entry import fetch_entry_ui
@@ -93,6 +94,7 @@ class BotInitialiser:
     def register_commands_in_all_servers(self):
         # * register commands to the other servers
         bbt_count.register_commands(self.tree, self.client, self.guilds)
+        cat.register_commands(self.tree, self.guilds)
         fetch_entry_cmd.register_commands(self.tree, self.guilds)
         fetch_entry_ui.register_commands(self.tree, self.guilds)
         one_o_one.register_commands(self.tree, self.guilds)
