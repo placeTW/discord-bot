@@ -26,6 +26,11 @@ def _extract_html(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     return soup
 
+def _htmlsoup_is_valid(soup: BeautifulSoup) -> bool:
+    # checks to see if <div style="error_message"> is present
+    search = soup.find("div", style="error_message")
+    return search is None
+
 def _startswith_in_set(text: str, list_of_interest: set[str]) -> bool:
     for item in list_of_interest:
         if text.startswith(item):
@@ -62,17 +67,26 @@ def _extract_cost_comparision_table(soup):
             if (td := tds[0]) and (num_tds > 3): # probably an awful way to write this
                 item_name = td.text
                 if _startswith_in_set(item_name, COSTS_OF_INTEREST_LIST):
-                    costs_to_return.append([item_name, tds[1].get_text(strip=True), tds[2].get_text(strip=True)])
-    print(costs_to_return)
-    # postprocessing
-    
+                    costs_to_return.append([
+                        item_name,
+                        tds[1].get_text(strip=True).replace("\xa0", " "),
+                        tds[2].get_text(strip=True).replace("\xa0", " "),
+                    ])
+    # postprocessing goes here
+
     return costs_to_return
         
 
 if __name__ == "__main__":
     url = "https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1=Taiwan&country2=Taiwan&city1=Taipei&city2=Kaohsiung"
+    # url = "https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1=Canada&city1=Ottawa&country2=Germany&city2=Basdadserlin&displayCurrency=EUR"
     html = asyncio.run(_async_get_html(url))
     soup = _extract_html(html)
-    summaries = _extract_summary_table(soup)
-    print(summaries)
-    _extract_cost_comparision_table(soup)
+    if _htmlsoup_is_valid(soup):
+        summary = _extract_summary_table(soup)
+        costs = _extract_cost_comparision_table(soup)
+        print(summary)
+        print(costs)
+    else:
+        print("Error: invalid html")
+        sys.exit(1)
