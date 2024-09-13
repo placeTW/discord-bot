@@ -33,4 +33,7 @@ async def _async_get_html(url: str) -> str:
     """
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
+            # if response returns 404, return None
+            if response.status == 404:
+                return None
             return await response.text()
