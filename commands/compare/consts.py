@@ -9,6 +9,26 @@ CITIES_DICT = {
         "city_name": "Kaohsiung",
         "country": "Taiwan",
     },
+    "CA, Ottawa": {
+        "city_name": "Ottawa",
+        "country": "Canada",
+    },
+    # "JP, Tokyo": {
+    #     "city_name": "Tokyo",
+    #     "country": "Japan",
+    # },
+    # "LT, Vilnius": {
+    #     "city_name": "Vilnius",
+    #     "country": "Lithuania",
+    # },
+    # "LV, Riga": {
+    #     "city_name": "Riga",
+    #     "country": "Latvia",
+    # },
+    # "EE, Tallinn": {
+    #     "city_name": "Tallinn",
+    #     "country": "Estonia",
+    # },
 }
 
 CITIES_CHOICES = [Choice(name=city_choice, value=city_choice) for city_choice in CITIES_DICT.keys()]
