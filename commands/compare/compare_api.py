@@ -7,6 +7,8 @@ import os
 from modules.async_utils import _async_get_html
 import asyncio
 from .consts import CITIES_DICT
+from urllib.parse import quote as url_quote
+
 
 SUMMARIES_OF_INTEREST_LIST = set([
     "Cost of Living in",
@@ -15,12 +17,14 @@ SUMMARIES_OF_INTEREST_LIST = set([
 ])
 
 COSTS_OF_INTEREST_LIST = set([
-    "Coke/Pepsi",
+    # "Coke/Pepsi",
     "Milk",
     "Rice",
     "Apples",
-    "Onion"
-    "Potato",
+    # "Onion"
+    # "Potato",
+    "Apartment (1 bedroom) in City",
+    "One-way Ticket (Local",
 ])
 
 def _extract_html(html: str) -> str:
@@ -98,7 +102,7 @@ async def compare_two_cities(city_choice1: str, city_choice2: str):
         summary = _extract_summary_table(soup)
         costs = _extract_cost_comparision_table(soup)
         message = _assemble_message(city1_name, city2_name, summary, costs)
-        message += f"-# Source: [Numbeo]({url})"
+        message += f"-# Source: [Numbeo]({url.replace(' ', '+')})" # numbeo uses + instead of %20 for some reason
         return message
     else:
         raise Exception("Error occurred during scraping, e.g., invalid city, country or URL")
@@ -107,5 +111,5 @@ async def compare_two_cities(city_choice1: str, city_choice2: str):
 if __name__ == "__main__":
     city_choice1 = "CA, Toronto"
     city_choice2 = "TW, Taipei"
-    message = compare_two_cities(city_choice1, city_choice2)
+    message = asyncio.run(compare_two_cities(city_choice1, city_choice2))
     print(message)
