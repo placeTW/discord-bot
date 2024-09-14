@@ -70,8 +70,8 @@ def _extract_cost_comparision_table(soup):
                 if _startswith_in_set(item_name, COSTS_OF_INTEREST_LIST):
                     costs_to_return.append([
                         item_name,
-                        tds[1].get_text(strip=True).replace("\xa0", " "),
-                        tds[2].get_text(strip=True).replace("\xa0", " "),
+                        tds[1].get_text(strip=True).replace("\xa0", " ").replace("(", " ("), # cost in city1
+                        tds[2].get_text(strip=True).replace("\xa0", " ").replace("(", " ("), # cost in city2
                     ])
     # postprocessing goes here
 
@@ -85,26 +85,27 @@ def _assemble_message(city1, city2, summary: str, costs: list[list[str]]) -> str
     return message
 
 # city_choice{i} looks like this: "TW, Taipei" or "TW, Kaohsiung" or "CA, Toronto"
-def compare_two_cities(city_choice1: str, city_choice2: str):
+async def compare_two_cities(city_choice1: str, city_choice2: str):
     city1_name = CITIES_DICT[city_choice1]["city_name"]
     city2_name = CITIES_DICT[city_choice2]["city_name"]
     city1_country = CITIES_DICT[city_choice1]["country"]
     city2_country = CITIES_DICT[city_choice2]["country"]
 
     url = f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1={city1_country}&country2={city2_country}&city1={city1_name}&city2={city2_name}"
-    html = asyncio.run(_async_get_html(url))
+    html = await _async_get_html(url)
     soup = _extract_html(html)
     if _htmlsoup_is_valid(soup):
         summary = _extract_summary_table(soup)
         costs = _extract_cost_comparision_table(soup)
         message = _assemble_message(city1_name, city2_name, summary, costs)
+        message += f"-# Source: [Numbeo]({url})"
         return message
     else:
-        print("Error: invalid html")
+        raise Exception("Error occurred during scraping, e.g., invalid city, country or URL")
         return None
 
 if __name__ == "__main__":
-    city_choice1 = "TW, Taipei"
-    city_choice2 = "TW, Kaohsiung"
+    city_choice1 = "CA, Toronto"
+    city_choice2 = "TW, Taipei"
     message = compare_two_cities(city_choice1, city_choice2)
     print(message)
