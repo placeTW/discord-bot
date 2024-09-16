@@ -45,6 +45,10 @@ CITIES_DICT = {
         "city_name": "Sydney",
         "country": "Australia",
     },
+    "PH, Manila": {
+        "city_name": "Manila",
+        "country": "Philippines",
+    },
 }
 
 CITIES_CHOICES = [Choice(name=city_choice, value=city_choice) for city_choice in CITIES_DICT.keys()]
