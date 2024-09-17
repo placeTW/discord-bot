@@ -24,4 +24,4 @@ ENV REPO_URL=https://github.com/yourusername/your-repo.git
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Set the default command
-CMD ["poetry", "run", "python", "your_script.py"]
+CMD ["poetry", "run", "python", "main.py", "prod"]
