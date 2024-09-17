@@ -15,9 +15,10 @@ fi
 python3 -m venv /app/.venv
 
 # Activate the virtual environment
-poetry shell
+source /app/.venv/bin/activate
 
 # Install dependencies using Poetry
+poetry config virtualenvs.create false
 poetry install --no-interaction --no-ansi
 
 # Run the command passed to docker run
