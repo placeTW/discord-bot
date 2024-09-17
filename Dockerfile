@@ -2,12 +2,10 @@
 FROM python:3.11-alpine
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     git \
     curl \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    bash
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -32,4 +30,4 @@ ENV APP_MODE=dev
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
-CMD ["/bin/bash", "-c", "python main.py $APP_MODE"]
+CMD ["/bin/bash", "-c", "python main.py
