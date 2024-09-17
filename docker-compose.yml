@@ -1,6 +1,6 @@
 services:
   placetw-discord-bot:
-    image: placetw-discord-bot:latest
+    image: ghcr.io/placetw/discord-bot:main
   restart: unless-stopped
   container_name: placetw-discord-bot
   volumes: 
