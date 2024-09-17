@@ -14,12 +14,11 @@ fi
 # Verify Python version
 python --version
 
-# Allow poetry to create a virtual environment in the project directory
-export POETRY_VIRTUALENVS_IN_PROJECT=true
-export POETRY_VIRTUALENVS_OPTIONS_ALWAYS_COPY=true
+# Verify Poetry version
+poetry --version
 
-# Set the permissions of the virtual environment directory
-chmod -R 777 $(poetry env info --path)
+# Configure Poetry to create virtual environments inside the project directory
+poetry config virtualenvs.in-project true --local
 
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
