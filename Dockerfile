@@ -25,8 +25,11 @@ RUN chmod +x /entrypoint.sh
 # Clone the repository (replace with your repository URL)
 ENV REPO_URL=https://github.com/placeTW/discord-bot.git
 
+# Set an environment variable for the mode (default to 'dev')
+ENV APP_MODE=dev
+
 # Set the entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
-CMD ["python", "main.py", "prod"]
+CMD ["python", "main.py", "$APP_MODE"]
