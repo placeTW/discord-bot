@@ -28,10 +28,6 @@ poetry install --no-interaction --no-ansi
 echo "Activating virtual environment..."
 source $(poetry env info --path)/bin/activate
 
-# Change the permissions of virtual environment scripts
-echo "Changing permissions of virtual environment scripts..."
-chmod -R +x $(poetry env info --path)/bin
-
 # Run the command passed to docker run
 echo "Running command..."
 exec "$@"
