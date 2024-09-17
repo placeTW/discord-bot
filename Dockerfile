@@ -27,4 +27,4 @@ ENV REPO_URL=https://github.com/placeTW/discord-bot.git
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
-CMD ["poetry", "run", "python", "main.py", "prod"]
+CMD ["python", "main.py", "prod"]
