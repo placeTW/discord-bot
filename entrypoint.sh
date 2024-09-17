@@ -20,9 +20,6 @@ poetry config virtualenvs.in-project true
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
 
-# Make the virtual environment executable
-chmod +x $(poetry env info --path)/bin/activate
-
 # Activate the virtual environment
 source $(poetry env info --path)/bin/activate
 

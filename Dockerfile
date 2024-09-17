@@ -32,4 +32,4 @@ ENV APP_MODE=dev
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
-CMD ["python", "main.py", "$APP_MODE"]
+CMD ["/bin/bash", "-c", "python main.py $APP_MODE"]
