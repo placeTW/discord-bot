@@ -10,6 +10,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Add Poetry to PATH
 ENV PATH="${PATH}:/root/.local/bin"
 
+# Check poetry version
+RUN poetry --version
+
 # Set the working directory in the container
 WORKDIR /app
 
