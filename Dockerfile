@@ -1,11 +1,13 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 # Install system dependencies
-RUN apk update && apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     git \
     curl \
-    bash
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -30,4 +32,4 @@ ENV APP_MODE=dev
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
-CMD ["/bin/bash", "-c", "python main.py"]
+CMD ["/bin/bash", "-c", "python main.py $APP_MODE"]
