@@ -11,15 +11,14 @@ else
     git pull
 fi
 
-# Create a virtual environment with venv in the app directory
-python3 -m venv /app/.venv
+# Set Poetry to create the virtual environment inside the project directory
+poetry config virtualenvs.in-project true
+
+# Install dependencies using Poetry
+poetry install --no-interaction --no-ansi
 
 # Activate the virtual environment
 source /app/.venv/bin/activate
-
-# Install dependencies using Poetry
-poetry config virtualenvs.create false
-poetry install --no-interaction --no-ansi
 
 # Run the command passed to docker run
 exec "$@"
