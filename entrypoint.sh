@@ -21,9 +21,11 @@ poetry --version
 poetry config virtualenvs.in-project true --local
 
 # Create/update the virtual environment and install dependencies
+echo "Installing dependencies..."
 poetry install --no-interaction --no-ansi
 
 # Activate the virtual environment
+echo "Activating virtual environment..."
 source $(poetry env info --path)/bin/activate
 
 # Run the command passed to docker run
