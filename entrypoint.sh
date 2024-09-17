@@ -17,11 +17,11 @@ python --version
 # Configure Poetry to create the virtual environment in the project directory
 poetry config virtualenvs.in-project true
 
-# Launch the poetry shell
-poetry shell
-
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
+
+# Make the virtual environment executable
+chmod +x $(poetry env info --path)/bin/activate
 
 # Activate the virtual environment
 source $(poetry env info --path)/bin/activate
