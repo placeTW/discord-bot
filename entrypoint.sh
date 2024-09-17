@@ -14,6 +14,12 @@ fi
 # Verify Python version
 python --version
 
+# Allow poetry to create a virtual environment in the project directory
+export POETRY_VIRTUALENVS_IN_PROJECT=true
+
+# Activate the virtual environment
+source $(poetry env info --path)/bin/activate
+
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
 
