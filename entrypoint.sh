@@ -11,6 +11,12 @@ else
     git pull
 fi
 
+# Create a virtual environment with venv in the app directory
+python3 -m venv /app/.venv
+
+# Activate the virtual environment
+poetry shell
+
 # Install dependencies using Poetry
 poetry install --no-interaction --no-ansi
 
