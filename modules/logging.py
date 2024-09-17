@@ -14,11 +14,11 @@ load_dotenv()
 class Logging:
     def __init__(self):
         self.log_channel: discord.TextChannel = None
-        self.log_file_path = None
+        # self.log_file_path = None
 
     def set_log_params(self, channel, log_file):
         self.log_channel = channel
-        self.log_file_path = log_file
+        # self.log_file_path = log_file
 
     async def log_to_channel(self, log_data: dict, color: discord.Color = None):
         if not self.log_channel is None:
@@ -33,9 +33,10 @@ logging = Logging()
 
 def init(client: discord.Client, deployment_date: datetime):
     log_channel = client.get_channel(int(os.getenv("LOG_CHANNEL")))
-    filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
-    path = f"{sys.path[0]}/logs/{filename}"
-    logging.set_log_params(log_channel, path)
+    # filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
+    # path = f"{sys.path[0]}/logs/{filename}"
+    # logging.set_log_params(log_channel, path)
+    logging.set_log_params(log_channel)
 
 
 """
