@@ -26,5 +26,6 @@ source $(poetry env info --path)/bin/activate
 # Upgrade pip to the latest version
 pip install --upgrade pip
 
+
 # Run the command passed to docker run
 exec "$@"
