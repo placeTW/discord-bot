@@ -14,9 +14,6 @@ fi
 # Verify Python version
 python --version
 
-# Configure Poetry to create the virtual environment in the project directory
-poetry config virtualenvs.in-project true
-
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
 
