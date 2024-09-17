@@ -17,11 +17,11 @@ WORKDIR /app
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Set default environment variables
-ENV REPO_URL=https://github.com/yourusername/your-repo.git
+# Clone the repository (replace with your repository URL)
+ENV REPO_URL=https://github.com/placeTW/discord-bot.git
 
 # Set the entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Set the default command
+# Run the script when the container launches
 CMD ["poetry", "run", "python", "main.py", "prod"]
