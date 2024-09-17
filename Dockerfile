@@ -1,17 +1,19 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12-slim
+FROM python:3.11-slim
 
-# Install git and curl
-RUN apt-get update && apt-get install -y git curl
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # Add Poetry to PATH
 ENV PATH="${PATH}:/root/.local/bin"
-
-# Check poetry version
-RUN poetry --version
 
 # Set the working directory in the container
 WORKDIR /app
