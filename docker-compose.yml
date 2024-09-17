@@ -1,0 +1,9 @@
+services:
+  placetw-discord-bot:
+    image: placetw-discord-bot:latest
+  restart: unless-stopped
+  container_name: placetw-discord-bot
+  volumes: 
+    - ./discord-bot:/app
+  env_file:
+    - .env
