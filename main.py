@@ -30,7 +30,7 @@ from commands.stats import stats
 from commands.tocfl import tocfl
 from commands.formosa_stickers import formosa_stickers
 from commands.taiwanese import taiwanese_entry
-from commands.metro import metro
+from commands.trains import trains
 from commands.compare import compare_cmd
 
 from activities import activity
@@ -110,7 +110,7 @@ class BotInitialiser:
         pat.register_commands(self.tree, self.client, self.guilds)
         formosa_stickers.register_commands(self.tree, self.guilds)
         confession.register_commands(self.tree, self.client)
-        metro.register_commands(self.tree, self.client, self.guilds)
+        trains.register_commands(self.tree, self.client, self.guilds)
         compare_cmd.register_commands(self.tree, self.client, self.guilds)
 
     def register_event_callbacks(self):
