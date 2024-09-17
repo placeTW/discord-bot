@@ -17,11 +17,12 @@ python --version
 # Allow poetry to create a virtual environment in the project directory
 export POETRY_VIRTUALENVS_IN_PROJECT=true
 
-# Activate the virtual environment
-source $(poetry env info --path)/bin/activate
 
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
+
+# Activate the virtual environment
+source $(poetry env info --path)/bin/activate
 
 # Run the command passed to docker run
 exec "$@"
