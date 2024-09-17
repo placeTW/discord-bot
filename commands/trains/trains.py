@@ -14,8 +14,8 @@ def register_commands(tree, client: TWPlaceClient, guilds: list[discord.Object])
         description="Get map of a train system",
         guilds=guilds,
     )
-    @app_commands.choices(city=TRAINS_CHOICES)
-    @app_commands.describe(city="The train system to get the map of")
+    @app_commands.choices(location=TRAINS_CHOICES)
+    @app_commands.describe(location="The train system to get the map of")
     async def get_train_map(
         interaction: discord.Interaction,
         location: Choice[str],
@@ -26,9 +26,9 @@ def register_commands(tree, client: TWPlaceClient, guilds: list[discord.Object])
             interaction (discord.Interaction): required by discord.py
             location (str): The location of the train system to get the map of
         """
-        # get the selected city
-        selected_city = location.value
+        # get the selected location
+        selected_location = location.value
         # get the path to the url
-        img_url = TRAINS_DICT[selected_city]
+        img_url = TRAINS_DICT[selected_location]
         # send the url (not an image)
         await interaction.response.send_message(img_url)
