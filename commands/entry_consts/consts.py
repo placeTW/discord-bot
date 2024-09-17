@@ -40,16 +40,8 @@ SUPPORTED_ART2023_IDS = {
     "tsmc_logo": "TSMC Logo",
 }
 
-POSSIBLE_ART2023_IDS = [
-    Choice(name=desc, value=id) for id, desc in SUPPORTED_ART2023_IDS.items()
-]
+POSSIBLE_ART2023_IDS = [Choice(name=desc, value=id) for id, desc in SUPPORTED_ART2023_IDS.items()]
 
-POSSIBLE_LANGUAGE_CODES = [
-    Choice(name=desc, value=lang)
-    for lang, desc in SUPPORTED_LANGUAGE_CODES.items()
-]
+POSSIBLE_LANGUAGE_CODES = [Choice(name=desc, value=lang) for lang, desc in SUPPORTED_LANGUAGE_CODES.items()]
 
-POSSIBLE_ART_FIELD_CODES = [
-    Choice(name=desc, value=field)
-    for field, desc in SUPPORTED_ART_FIELDS.items()
-]
+POSSIBLE_ART_FIELD_CODES = [Choice(name=desc, value=field) for field, desc in SUPPORTED_ART_FIELDS.items()]

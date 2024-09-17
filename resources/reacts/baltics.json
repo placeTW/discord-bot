@@ -1,0 +1,80 @@
+{
+  "criteria": [
+    {
+      "criteria_link": "baltics_lt",
+      "match_whole_word": true,
+      "keywords": [
+        "Taivan(?:as|a|e|o|ui|ie(?:tiškas|tis|tė|či(?:ų|u|ai|ui|ams)))"
+      ]
+    },
+    {
+      "criteria_link": "baltics_lt",
+      "match_whole_word": false,
+      "keywords": [
+        "立陶宛"
+      ]
+    },
+    {
+      "criteria_link": "baltics_lv",
+      "match_whole_word": true,
+      "keywords": [
+        "Taivān(?:a|ā|ai|as|u|isks|ie(?:tis|te|šu|tim|tei|šiem|ti|te|ši|tes|ši))"
+      ]
+    },
+    {
+      "criteria_link": "baltics_lv",
+      "match_whole_word": false,
+      "keywords": [
+        "拉脫維亞"
+      ]
+    },
+    {
+      "criteria_link": "baltics_ee",
+      "match_whole_word": true,
+      "keywords": [
+        "Taiwan(?:l(?:ane|as(?:e|t|te(?:sse|s|st|le|l|lt|ks|ni|na|ta|ga)?|i|se(?:l)|se|e(?:s|l|st|le|lt|ks|ni|na|ta|d)))|i(?:d|sse|s|st|le|l|lt|ks|ni|na|ta|ga|sid|(?:de(?:sse|s|st|le|lt|l|ni|na|ks|e|ta|ga)?))?)"
+      ]
+    },
+    {
+      "criteria_link": "baltics_ee",
+      "match_whole_word": false,
+      "keywords": [
+        "愛沙尼亞"
+      ]
+    }
+  ],
+  "possible_reactions": [
+    {
+      "condition": "baltics or baltics_lt or baltics_lv or baltics_ee",
+      "chance": 0.4,
+      "content": [
+        "<:tw_baltics_heart:1132524940587962388>",
+        "<:bubblemilktea:1132632348651966596>"
+      ]
+    },
+    {
+      "condition": "baltics_lt",
+      "chance": 0.69,
+      "content": [
+        "<:lt_tw_hgs:1139647918442283038>",
+        "<:LTAmong:1089490466409549844>"
+      ]
+    },
+    {
+      "condition": "baltics_lv",
+      "chance": 0.69,
+      "content": [
+        "<:lv_tw_hgs:1139660598574055514>",
+        "<:LVAmong:1089490467617505433>"
+      ]
+    },
+    {
+      "condition": "baltics_ee",
+      "chance": 0.69,
+      "content": [
+        "<:et_tw_hgs:1139660507167608882>",
+        "<:EEAmong:1089490464102682664>"
+      ]
+    }
+  ]
+}

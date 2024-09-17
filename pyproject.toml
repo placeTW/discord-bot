@@ -8,7 +8,6 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-"discord.py" = "^2.3.2"
 python-dotenv = "^1.0.1"
 supabase = "^2.4.6"
 babel = "^2.15.0"
@@ -21,10 +20,14 @@ validators = "^0.28.2"
 beautifulsoup4 = "^4.12.3"
 gitpython = "^3.1.43"
 pytest = "^8.2.1"
+discord-py = "^2.4.0"
+pytest-asyncio = "^0.23.7"
+black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.scripts]
-bot = "bot:main"
+[tool.black]
+line-length = 120
+skip-string-normalization = true

@@ -1,7 +1,8 @@
 import asyncio
 import discord
 from discord import app_commands
-from modules import async_utils, postprocess
+from modules import async_utils
+from . import postprocess
 import typing
 from discord.app_commands import Choice
 from .fetch_entry_main import _fetch_entry_with_json, send_fetch_response
@@ -35,16 +36,12 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose an entry",
         options=[
-            discord.SelectOption(
-                label=entry_desc, description=entry_id, value=entry_id
-            )
+            discord.SelectOption(label=entry_desc, description=entry_id, value=entry_id)
             for entry_id, entry_desc in SUPPORTED_ART2023_IDS.items()
         ],
         row=1,
     )
-    async def select_entry_callback(
-        self, interaction: discord.Interaction, select: discord.ui.Select
-    ):
+    async def select_entry_callback(self, interaction: discord.Interaction, select: discord.ui.Select):
         # either the chosen value or None
         self.selected_entry = select.values[0]
         return await interaction.response.defer()  # i.e. "do nothing"
@@ -52,16 +49,12 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose a language",
         options=[
-            discord.SelectOption(
-                label=lang_name, description=lang_id, value=lang_id
-            )
+            discord.SelectOption(label=lang_name, description=lang_id, value=lang_id)
             for lang_id, lang_name in SUPPORTED_LANGUAGE_CODES.items()
         ],
         row=2,
     )
-    async def select_lang_callback(
-        self, interaction: discord.Interaction, select: discord.ui.Select
-    ):
+    async def select_lang_callback(self, interaction: discord.Interaction, select: discord.ui.Select):
         # either the chosen value or None
         self.selected_language = select.values[0]
         return await interaction.response.defer()  # i.e. "do nothing"
@@ -69,28 +62,19 @@ class FetchEntryView(discord.ui.View):
     @discord.ui.select(
         placeholder="Choose a field (leave empty to fetch entire entry)",
         options=[
-            discord.SelectOption(
-                label=field_desc, description=field_id, value=field_id
-            )
-            for field_id, field_desc in (
-                SUPPORTED_ART_FIELDS
-                | {"fetch_entire_entry": "Fetch entire entry"}
-            ).items()
+            discord.SelectOption(label=field_desc, description=field_id, value=field_id)
+            for field_id, field_desc in (SUPPORTED_ART_FIELDS | {"fetch_entire_entry": "Fetch entire entry"}).items()
         ],
         row=3,
     )
-    async def select_field_callback(
-        self, interaction: discord.Interaction, select: discord.ui.Select
-    ):
+    async def select_field_callback(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.selected_field = select.values[0]
         if self.selected_field == "fetch_entire_entry":
             self.selected_field = None
         return await interaction.response.defer()
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.gray, row=4)
-    async def fetch_entry_button_submit(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def fetch_entry_button_submit(self, interaction: discord.Interaction, button: discord.ui.Button):
         user_id = interaction.user.id
         if not (self.selected_entry and self.selected_language):
             await interaction.response.send_message(
@@ -127,12 +111,10 @@ class FetchEntryView(discord.ui.View):
 def register_commands(tree, guilds: list[discord.Object]):
     @tree.command(
         name="ui-fetch",
-        description="Eady-to-use entry selector",
+        description="Easy-to-use entry selector",
         guilds=guilds,
     )
     async def ui_fetch(interaction: discord.Interaction):
         button = FetchEntryView()
-        await interaction.response.send_message(
-            "What would you like to see?", view=button
-        )
+        await interaction.response.send_message("What would you like to see?", view=button)
         button.msg = await interaction.original_response()

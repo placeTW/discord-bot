@@ -1,0 +1,23 @@
+{
+  "criteria": [
+    {
+      "match_whole_word": true,
+      "keywords": [
+        "T(?:ch)?aj-?[wv]an(?:y|u|ů|ům|e|ě|ech|em|ský|sky|ské|ec|ka)?"
+      ]
+    }
+  ],
+  "possible_reactions": [
+    {
+      "chance": 0.69,
+      "content": [
+        "❤",
+        "🇨🇿",
+        "<:bubblemilktea:1132632348651966596>",
+        "<:roc_troll:1133368648967405610>",
+        "🍺",
+        "🍻"
+      ]
+    }
+  ]
+}

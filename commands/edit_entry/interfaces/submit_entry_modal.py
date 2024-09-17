@@ -104,15 +104,12 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         await self.the_modal.sent_msg.edit(view=self)
 
     @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
-    async def edit_entry_button_approve(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def edit_entry_button_approve(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.disable_buttons()
         await interaction.response.send_message("Approved change!")
         if self.proposed_channel:
             await self.proposed_channel.send(
-                f"<@{self.proposing_user_id}>' submission has been accepted!"
-                + " Expect to see the changes soon. 🎉"
+                f"<@{self.proposing_user_id}>' submission has been accepted!" + " Expect to see the changes soon. 🎉"
             )
 
         resulting_json = await modify_json_and_create_pull_request(
@@ -149,9 +146,7 @@ class ApproveDenyTranslationEntryView(discord.ui.View):
         # os.unlink(tempfilename)
 
     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
-    async def edit_entry_button_deny(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def edit_entry_button_deny(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.disable_buttons()
         await interaction.response.send_message("Denied change!")
         # await self.proposed_channel.send(

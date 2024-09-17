@@ -1,0 +1,17 @@
+{
+  "criteria": [
+    {
+      "match_whole_word": false,
+      "keywords": [
+        "HSINCHU",
+        "新竹"
+      ]
+    }
+  ],
+  "possible_replies": [
+    {
+      "chance": 0.15,
+      "content": "https://www.youtube.com/watch?v=EtGDGCxq6m8"
+    }
+  ]
+}
