@@ -50,22 +50,26 @@ async def log_event(
     color: discord.Color = None,
     log_to_channel=True,
 ):
-    supabaseClient.table("event_logs").insert(
-        {
-            "message_id": message.id if message.id else None,
-            "event": data["event"] if "event" in data else None,
-            "created_at": str(message.created_at),
-            "content": content if content else message.content if hasattr(message, 'content') else None,
-            "author_id": data["author_id"] if "author_id" in data else message.author.id,
-            "mentioned_id": data["mentioned_id"] if "mentioned_id" in data else None,
-            "channel_id": message.channel.id if message.channel else None,
-            "guild_id": message.guild.id if message.guild else None,
-            "generated_id": data["generated_id"] if "generated_id" in data else None,
-            "metadata": data["metadata"] if "metadata" in data else None,
-        }
-    ).execute()
+    data = (
+        supabaseClient.table("event_logs")
+        .insert(
+            {
+                "message_id": message.id if message.id else None,
+                "event": data["event"] if "event" in data else None,
+                "created_at": str(message.created_at),
+                "content": content if content else message.content if hasattr(message, 'content') else None,
+                "author_id": data["author_id"] if "author_id" in data else message.author.id,
+                "mentioned_id": data["mentioned_id"] if "mentioned_id" in data else None,
+                "channel_id": message.channel.id if message.channel else None,
+                "guild_id": message.guild.id if message.guild else None,
+                "generated_id": data["generated_id"] if "generated_id" in data else None,
+                "metadata": data["metadata"] if "metadata" in data else None,
+            }
+        ).execute()
+    )
     if log_to_channel:
         await logging.log_to_channel(data, color)
+    print(data)
 
 
 async def log_message_event(message: discord.Message, events: list[str]):
