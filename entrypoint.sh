@@ -17,8 +17,5 @@ python --version
 # Create/update the virtual environment and install dependencies
 poetry install --no-interaction --no-ansi
 
-# Activate the virtual environment
-source $(poetry env info --path)/bin/activate
-
 # Run the command passed to docker run
 exec "$@"
