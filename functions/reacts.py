@@ -95,10 +95,14 @@ REACT_RESOURCES: dict[str, ReactResource] = load_react_resources()
 
 
 # For testing in pytest to test a specific resource
-def check_resource_match(message_content: str, resource_name: str) -> bool:
+def check_resource_match(message_content: str, resource_name: str, criteria_link: str | None = None) -> bool:
     resource = REACT_RESOURCES[resource_name]
-    matches = check_matches(message_content, resource.criteria)
-    return bool(matches)
+    if criteria_link:
+        for criteria in resource.criteria:
+            if criteria.criteria_link == criteria_link:
+                return bool(check_matches(message_content, [criteria]))
+    else:
+        return bool(check_matches(message_content, resource.criteria))
 
 
 def regex_search(message_content: str, possible_match: ReactCriteria) -> bool:

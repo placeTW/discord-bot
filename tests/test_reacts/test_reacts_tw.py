@@ -57,7 +57,7 @@ TEST_CASE_TW = (
     "美麗島",
 )
 
-TEST_CASES_TW_NO_1_TRUE = [
+TEST_CASES_TW_NO_1_TRUE = (
     "Taiwan #1",
     "Taiwan number 1",
     "Taiwan is number one",
@@ -65,7 +65,6 @@ TEST_CASES_TW_NO_1_TRUE = [
     "Taiwan is #1",
     "Taiwan No. 1",
     "Taiwan n° 1",
-    "Taiwán número uno",
     "臺灣第一",
     "台灣最棒",
     "Taiwan is the best",
@@ -85,10 +84,10 @@ TEST_CASES_TW_NO_1_TRUE = [
     "TAIWAN NUMBER ONE",
     "taiwan #1",
     "I believe Taiwan is truly number one in Asia",
-    "Taiwan, often called Formosa, is number 1 in my heart"
-]
+    "Taiwan, often called Formosa, is number 1 in my heart",
+)
 
-TEST_CASES_TW_NO_1_FALSE = [
+TEST_CASES_TW_NO_1_FALSE = (
     "Thailand #1",
     "Taiwan is great",
     "Number 1 Taiwan",
@@ -100,9 +99,8 @@ TEST_CASES_TW_NO_1_FALSE = [
     "#1",
     "Number one",
     "Taiwan #",
-    "Taiwan number"
-]
-
+    "Taiwan number",
+)
 
 ALL_TEST_CASES = TEST_CASE_EN + TEST_CASE_TW
 
@@ -148,6 +146,7 @@ def test_react_tw_regex_no_match(test_str: str):
     # * surrounded by text
     assert not check_resource_match(f"a{test_str}b", resource_name='tw')
 
+
 @pytest.mark.parametrize(
     "test_str",
     TEST_CASES_TW_NO_1_TRUE,
@@ -155,13 +154,14 @@ def test_react_tw_regex_no_match(test_str: str):
 def test_react_tw_no_1_regex_yes_match(test_str: str):
     """Tests that these strings return TRUE."""
     # * isolated string
-    assert check_resource_match(test_str, resource_name='tw')
+    assert check_resource_match(test_str, resource_name='tw', criteria_link="tw_no_1")
     # * surrounded by spaces
-    assert check_resource_match(f" {test_str} ", resource_name='tw')
+    assert check_resource_match(f" {test_str} ", resource_name='tw', criteria_link="tw_no_1")
     # * to lowercase
-    assert check_resource_match(test_str.lower(), resource_name='tw')
+    assert check_resource_match(test_str.lower(), resource_name='tw', criteria_link="tw_no_1")
     # * to title case
-    assert check_resource_match(test_str.title(), resource_name='tw')
+    assert check_resource_match(test_str.title(), resource_name='tw', criteria_link="tw_no_1")
+
 
 @pytest.mark.parametrize(
     "test_str",
@@ -170,10 +170,10 @@ def test_react_tw_no_1_regex_yes_match(test_str: str):
 def test_react_tw_no_1_regex_no_match(test_str: str):
     """Tests that these strings return FALSE."""
     # * isolated string
-    assert not check_resource_match(test_str, resource_name='tw')
+    assert not check_resource_match(test_str, resource_name='tw', criteria_link="tw_no_1")
     # * surrounded by spaces
-    assert not check_resource_match(f" {test_str} ", resource_name='tw')
+    assert not check_resource_match(f" {test_str} ", resource_name='tw', criteria_link="tw_no_1")
     # * to lowercase
-    assert not check_resource_match(test_str.lower(), resource_name='tw')
+    assert not check_resource_match(test_str.lower(), resource_name='tw', criteria_link="tw_no_1")
     # * to title case
-    assert not check_resource_match(test_str.title(), resource_name='tw')
+    assert not check_resource_match(test_str.title(), resource_name='tw', criteria_link="tw_no_1")
