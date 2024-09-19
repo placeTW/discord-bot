@@ -187,4 +187,3 @@ tocfl_8000.csv
 commands/tocfl/*.csv
 commands/tocfl/*.ipynb
 .devcontainer/devcontainer.json
-Dockerfile
