@@ -33,4 +33,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the script when the container launches
 CMD ["/bin/bash", "-c", "python main.py $APP_MODE"]
- 
