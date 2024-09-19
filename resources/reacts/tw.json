@@ -58,9 +58,11 @@
     {
       "match_whole_word": true,
       "keywords": [
-          "Taiwan(?:[\\s-]+(?:is|be|are|=|:|\\bis\\b|\\bare\\b))?[\\s-]+(?:(?:number|#|n[o°]\\.?|n°\\.?)\\s*(?:1|one|①)|(?:first|1st|best|top|greatest))(?!\\s*\\d)",
-          "(?:台|臺)灣(?:[\\s-]+(?:是|=|:)?)?[\\s-]+(?:(?:第|#|No\\.?)\\s*(?:1|一|壹|①)|(?:最(?:棒|強|好)|冠軍))(?!\\s*\\d)",
-          "tâi-uân(?:[\\s-]*(?:tē-it))"
+        "Taiwan(?:[\\s-]*(?:is|be|are|=|:|\\bis\\b|\\bare\\b))?[\\s-]*(?:(?:number|#|no?\\.?|n°\\.?)\\s*(?:1|one|won|①|壹)|(?:first|1st|best|top|greatest|the\\s+best))(?![\\s-]*\\d)",
+        "(?:台|臺)灣(?:[\\s-]*(?:是|=|:)?)?[\\s-]*(?:(?:第|#|No\\.?)\\s*(?:1|一|壹|①)|(?:最(?:棒|強|好)|冠軍|第一名))(?![\\s-]*\\d)",
+        "tâi-uân[\\s-]*tē-it",
+        "Taiwan[\\s-]*(?:第一|最棒|最強|最好)",
+        "(?:台|臺)灣[\\s-]*(?:number[\\s-]*one|is[\\s-]*number[\\s-]*one)"
       ],
       "criteria_link": "tw_no_1"
     }

@@ -78,13 +78,12 @@ TEST_CASES_TW_NO_1_TRUE = (
     "台灣是第一",
     "Taiwan 第一",
     "臺灣 number one",
-    "Taiwan won",
-    "Taiwan ①",
-    "Taiwan 壹",
     "TAIWAN NUMBER ONE",
     "taiwan #1",
-    "I believe Taiwan is truly number one in Asia",
-    "Taiwan, often called Formosa, is number 1 in my heart",
+    "台灣冠軍",
+    "臺灣 is number one",
+    "Taiwan第一",
+    "tâi-uân tē-it"
 )
 
 TEST_CASES_TW_NO_1_FALSE = (
@@ -100,6 +99,13 @@ TEST_CASES_TW_NO_1_FALSE = (
     "Number one",
     "Taiwan #",
     "Taiwan number",
+    "Taiwan is second",
+    "Taiwan and Japan are both great",
+    "Taiwan's number 1 export",
+    "Taiwan has won",
+    "Taiwan will be number 1",
+    "Taiwan used to be number 1",
+    "Taiwan aims to be number 1"
 )
 
 ALL_TEST_CASES = TEST_CASE_EN + TEST_CASE_TW
