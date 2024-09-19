@@ -3,8 +3,8 @@ name: Docker Build and Publish
 on:
   push:
     paths:
-      - 'Dockerfile'
-      - 'entrypoint.sh'
+      - '/docker/Dockerfile'
+      - '/docker/entrypoint.sh'
 
 env:
   REGISTRY: ghcr.io
@@ -37,7 +37,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: '/docker'
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
