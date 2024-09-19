@@ -7,6 +7,7 @@ from re import search, IGNORECASE, UNICODE
 from discord import Message
 from random import randint, sample
 import ast
+from time import sleep
 
 from modules.probability import mock_bernoulli
 
@@ -52,6 +53,8 @@ class ReactEvent(BaseModel):
 class ReactEventReaction(ReactEvent):
     # Whether all of the possible reactions should be added to the message.
     react_with_all: bool = False
+    # Whether to react the reactions in order
+    react_in_order: bool = False
 
 
 class ReactEventReply(ReactEvent):
@@ -130,17 +133,27 @@ async def react_to_message(
 ) -> bool:
     reaction_happened = False
     for possible_reaction in possible_reactions:
+        sleep(0.05)
         # If the matched linked results exists check if the reaction is linked to a match
         if not evaluate_event_condition(possible_reaction.condition, criteria_links):
             continue
         # List of reactions in random order
         reactions_list = (
-            sample(possible_reaction.content, len(possible_reaction.content))
-            if isinstance(possible_reaction.content, list)
-            else [possible_reaction.content]
+            (
+                sample(possible_reaction.content, len(possible_reaction.content))
+                if isinstance(possible_reaction.content, list)
+                else [possible_reaction.content]
+            )
+            if not possible_reaction.react_in_order
+            else (
+                possible_reaction.content
+                if isinstance(possible_reaction.content, list)
+                else [possible_reaction.content]
+            )
         )
         reaction_count = 0
         for reaction in reactions_list:
+            sleep(0.001)
             if possible_reaction.react_with_all:  # If all of the possible reactions should be added
                 if await add_reaction(message, reaction):
                     reaction_happened = True
@@ -169,6 +182,7 @@ async def reply_to_message(
 ) -> bool:
     reply_happened = False
     for possible_reply in possible_replies:
+        sleep(0.05)
         # If the matched linked results exists check if the reply is linked to a match
         if not evaluate_event_condition(possible_reply.condition, criteria_links):
             continue
@@ -177,6 +191,7 @@ async def reply_to_message(
                 if isinstance(possible_reply.content, list):
                     reply_count = 0
                     for reply in possible_reply.content:
+                        sleep(0.001)
                         if possible_reply.max_limit > 0 and reply_count >= possible_reply.max_limit:
                             break
                         if await send_message(

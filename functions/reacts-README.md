@@ -25,6 +25,7 @@ The JSON file should have the following structure and can have the following fie
       "content": str | list[str],
       "max_limit": int (optional),
       "react_with_all": boolean (optional),
+      "react_in_order": boolean (optional)
     }
   ],
   "possible_replies": [
