@@ -3,8 +3,8 @@ name: Docker Build and Publish
 on:
   push:
     paths:
-      - '/docker/Dockerfile'
-      - '/docker/entrypoint.sh'
+      - './docker/Dockerfile'
+      - './docker/entrypoint.sh'
 
 env:
   REGISTRY: ghcr.io
