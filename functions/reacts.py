@@ -137,7 +137,7 @@ async def react_to_message(
 ) -> bool:
     reaction_happened = False
     for possible_reaction in possible_reactions:
-        sleep(0.05)
+        sleep(0.005)
         # If the matched linked results exists check if the reaction is linked to a match
         if not evaluate_event_condition(possible_reaction.condition, criteria_links):
             continue
@@ -186,7 +186,7 @@ async def reply_to_message(
 ) -> bool:
     reply_happened = False
     for possible_reply in possible_replies:
-        sleep(0.05)
+        sleep(0.005)
         # If the matched linked results exists check if the reply is linked to a match
         if not evaluate_event_condition(possible_reply.condition, criteria_links):
             continue
