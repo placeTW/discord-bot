@@ -3,9 +3,17 @@ import discord
 from modules import logging
 from discord import app_commands
 from pathlib import Path
+from random import randint
 
 
-GO_THE_FUCK_TO_SLEEP_URL = "https://www.youtube.com/watch?v=teIbh8hFQos"
+GO_THE_FUCK_TO_SLEEP_URLS = ["https://www.youtube.com/watch?v=teIbh8hFQos", # original
+                             "https://www.youtube.com/watch?v=U08XWOx3XYM", # jennifer garner
+                             "https://www.youtube.com/watch?v=G61kMUbpljY", # ani difranco
+                             "https://www.youtube.com/watch?v=pgijPsNPbto", # werner herzog
+                            #  "https://www.youtube.com/watch?v=VQ_WzkHRtX8", # age restricted (some old lady)
+                             "https://www.youtube.com/watch?v=p2CHhuOlaH0", # lauren but it has a thanks for watching
+                             "https://www.youtube.com/watch?v=aAGcalD-tNg", # jack sparrow
+                             "https://www.youtube.com/watch?v=O51ZccrFeJQ"] # "That guy with a voice"
 YOU_HAVE_TO_FUCKING_EAT_URL = "https://www.youtube.com/watch?v=ENdNzzJcB7Q"
 MIKA_FUCKING_EAT_DIR = Path(Path(__file__).parent, "fuckingeatmika.png")
 COOLDOWN_DURATION = 60
@@ -24,13 +32,14 @@ def register_commands(tree, guilds: list[discord.Object]):
         current_user_id = interaction.user.id
         current_time = time.time()
         time_difference = current_time - (user_timestamps.get(current_user_id, {}).get("gothefucktosleep", 0))
+        url = GO_THE_FUCK_TO_SLEEP_URLS[randint(0, len(GO_THE_FUCK_TO_SLEEP_URLS)-1)]
         if time_difference < COOLDOWN_DURATION:
             await interaction.response.send_message(
-                f"<@{current_user_id}> {GO_THE_FUCK_TO_SLEEP_URL} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)"
+                f"<@{current_user_id}> {url} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)"
             )
             return
 
-        await interaction.response.send_message(f"<@{user_to_ping.id}> {GO_THE_FUCK_TO_SLEEP_URL}")
+        await interaction.response.send_message(f"<@{user_to_ping.id}> {url}")
 
         log_event = {
             "event": "gothefucktosleep",
