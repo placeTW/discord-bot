@@ -3,7 +3,7 @@ import discord
 from modules import logging
 from discord import app_commands
 from pathlib import Path
-from random import randint
+from random import randint, choice
 
 
 GO_THE_FUCK_TO_SLEEP_URLS = ["https://www.youtube.com/watch?v=teIbh8hFQos", # original
@@ -32,7 +32,7 @@ def register_commands(tree, guilds: list[discord.Object]):
         current_user_id = interaction.user.id
         current_time = time.time()
         time_difference = current_time - (user_timestamps.get(current_user_id, {}).get("gothefucktosleep", 0))
-        url = GO_THE_FUCK_TO_SLEEP_URLS[randint(0, len(GO_THE_FUCK_TO_SLEEP_URLS)-1)]
+        url = choice(GO_THE_FUCK_TO_SLEEP_URLS)
         if time_difference < COOLDOWN_DURATION:
             await interaction.response.send_message(
                 f"<@{current_user_id}> {url} (cooldown: {round(COOLDOWN_DURATION - time_difference)}s)"
