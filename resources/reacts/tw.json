@@ -54,6 +54,17 @@
         "嘉義",
         "美麗島"
       ]
+    },
+    {
+      "match_whole_word": true,
+      "keywords": [
+        "Taiwan(?:[\\s-]*(?:is|be|are|=|:|\\bis\\b|\\bare\\b))?[\\s-]*(?:(?:number|#|no?\\.?|n°\\.?)\\s*(?:1|one|won|①|壹)|(?:first|1st|best|top|greatest|the\\s+best))(?![\\s-]*\\d)",
+        "(?:台|臺)灣(?:[\\s-]*(?:是|=|:)?)?[\\s-]*(?:(?:第|#|No\\.?)\\s*(?:1|一|壹|①)|(?:最(?:棒|強|好)|冠軍|第一名))(?![\\s-]*\\d)",
+        "tâi-uân[\\s-]*tē-it",
+        "Taiwan[\\s-]*(?:第一|最棒|最強|最好)",
+        "(?:台|臺)灣[\\s-]*(?:number[\\s-]*one|is[\\s-]*number[\\s-]*one)"
+      ],
+      "criteria_link": "tw_no_1"
     }
   ],
   "possible_reactions": [
@@ -85,6 +96,17 @@
         "<:PineappleCake:1156373382565212323>",
         "<:StinkyTofu:1156373383643152445>"
       ]
+    },
+    {
+      "condition": "tw_no_1",
+      "chance": 1,
+      "content": [
+        "<:tw_heart:1133045893227102299>",
+        "#️⃣",
+        "1️⃣"
+      ],
+      "react_with_all": true,
+      "react_in_order": true
     }
   ],
   "possible_replies": [
