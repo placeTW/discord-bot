@@ -1,6 +1,6 @@
 # PlaceTW Discord Bot
 
-A bot developed by Taiwan's r/place community for various discord functions
+A bot developed by Taiwan's r/place community for various discord functions.
 
 To get support on this bot, visit the [bot-tech-support](https://discord.com/channels/959467908315111444/1137057312268374199) channel in our server https://discord.gg/8xSQKCHSnT
 
@@ -10,7 +10,7 @@ To get started on developing for this bot, you'll need the following:
 - [Python](https://www.python.org/)
 - A code editor
 
-Start by cloning this project on your computer
+Start by cloning this project on your computer.
 
 ## Setting up a virtual environment
 
@@ -60,11 +60,11 @@ SUPABASE_SECRET_KEY=
 * `/edit-coord <name> <x> <y>`: Update the canvas coordinates for one entry
 * `/update-plan <announcement>`: Update a plan and post English text and translated Mandarin in some channels
 
-## Future Functionalities
+<!-- ## Future Functionalities
 no
 
 ## Non-code-related steps
-no
+no -->
 
 ## Deployment & Testing
 
