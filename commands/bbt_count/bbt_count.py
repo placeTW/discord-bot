@@ -391,7 +391,6 @@ def register_commands(
         paginator = GenericPaginator(embeds)
         await interaction.followup.send(embed=embeds[0], view=paginator)
 
-
     @bbt_count.command(name="stats", description="Get the stats for a user for a given year")
     @app_commands.describe(user="User to get stats for (optional, default to self)")
     @app_commands.describe(year="Year to get stats for (optional, default to current year)")
@@ -409,10 +408,20 @@ def register_commands(
             (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
             group_by_location,
         )
+        
+        if not stats:
+            embed = discord.Embed(
+                title="No stats found",
+                description="No bubble tea entries found for the specified period.",
+                color=discord.Color.red(),
+            )
+            await interaction.followup.send(embed=embed)
+            return
+            
         monthly_counts = get_bubble_tea_monthly_counts(
             user_id,
             (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
-        )
+        ) or []
 
         latest = (
             get_latest_bubble_tea_entry(user_id)
@@ -420,23 +429,24 @@ def register_commands(
             else None
         )
 
-        if group_by_location and stats.get('location_stats'):
-            # Split location stats into chunks of 10
-            location_stats = list(stats['location_stats'].items())
-            chunks = [location_stats[i:i + 10] for i in range(0, len(location_stats), 10)]
+        total_entries = sum([len(entry.get("prices_list", [])) for entry in stats])
+
+        if group_by_location:
+            chunks = [stats[i:i + 10] for i in range(0, len(stats), 10)]
             embeds = []
 
             for i, chunk in enumerate(chunks):
                 embed = bbt_stats_embed(
-                    user_id,
-                    {**stats, 'location_stats': dict(chunk)},
-                    year,
-                    group_by_location,
-                    monthly_counts if i == 0 else None,  # Only show monthly counts on first page
-                    latest if i == 0 else None,  # Only show latest on first page
-                    interaction.created_at.astimezone().tzinfo,
+                    user_id=user_id,
+                    entries=chunk,
+                    year=year,
+                    group_by_location=group_by_location,
+                    monthly_counts=None,
+                    latest=None,
+                    timezone=interaction.created_at.astimezone().tzinfo,
+                    total_entries=total_entries,
                 )
-                embed.set_footer(text=f"Page {i+1} of {len(chunks)} • Total locations: {len(location_stats)}")
+                embed.set_footer(text=f"Page {i+1} of {len(chunks)} • Total locations: {len(stats)}")
                 embeds.append(embed)
 
             paginator = GenericPaginator(embeds)
@@ -450,6 +460,7 @@ def register_commands(
                 monthly_counts,
                 latest,
                 interaction.created_at.astimezone().tzinfo,
+                total_entries=total_entries,
             )
             await interaction.followup.send(embed=embed)
 
