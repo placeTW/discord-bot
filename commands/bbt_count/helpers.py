@@ -82,6 +82,36 @@ def calculate_prices(entries: list[dict], group_by: str):
 
     return prices
 
+def organize_entries_by_group(entries: list[dict], group_by: str = None):
+    """Organize entries into groups and calculate statistics"""
+    if not group_by:
+        return {
+            "default_group": {
+                "entries": entries,
+                "prices": calculate_prices(entries, None)["default_group"]
+            }
+        }
+    
+    groups = {}
+    for entry in entries:
+        group_key = entry.get(group_by, "Unknown")
+        if group_key not in groups:
+            groups[group_key] = {
+                "entries": [],
+                "prices": {}
+            }
+        groups[group_key]["entries"].append(entry)
+    
+    # Calculate prices for each group
+    for group_key, group_data in groups.items():
+        group_data["prices"] = calculate_prices(group_data["entries"], None)["default_group"]
+    
+    # Sort groups by number of entries
+    return dict(sorted(
+        groups.items(),
+        key=lambda x: len(x[1]["entries"]),
+        reverse=True
+    ))
 
 def cost_string(prices: list[float], currency: str):
     p = np.array(prices)

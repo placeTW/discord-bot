@@ -2,7 +2,6 @@ import datetime
 import discord
 from discord import app_commands
 
-
 from bot import TWPlaceClient
 from commands.bbt_count.consts import BBT_LIST_GROUP_BY_CHOICES
 from components.paginator import GenericPaginator
@@ -25,7 +24,7 @@ from .embeds import (
     user_transfer_embed,
     bbt_stats_embed,
 )
-from .helpers import bubble_tea_data
+from .helpers import bubble_tea_data, calculate_prices
 from modules import logging
 
 
@@ -313,9 +312,6 @@ def register_commands(
         await interaction.response.defer()
         entries = get_bbt_entries(user.id if user else interaction.user.id, year)
         
-        # Define items per page
-        items_per_page = 10
-        
         if not entries:
             embed = discord.Embed(
                 title="No bubble tea entries found",
@@ -323,38 +319,30 @@ def register_commands(
             )
             await interaction.followup.send(embed=embed)
             return
+
+        total_prices = calculate_prices(entries, None)["default_group"]
         
-        # Split entries into chunks
-        chunks = [entries[i:i + items_per_page] for i in range(0, len(entries), items_per_page)]
-        total_pages = len(chunks)
-        
-        embeds = []
-        for i, chunk in enumerate(chunks):
-            embed = (
-                bbt_list_default_embed(
-                    user.id if user else interaction.user.id,
-                    chunk,
-                    year,
-                    interaction.created_at.astimezone().tzinfo,
-                )
-                if not group_by
-                else bbt_list_grouped_embed(
-                    user.id if user else interaction.user.id,
-                    chunk,
-                    year,
-                    interaction.created_at.astimezone().tzinfo,
-                    group_by.value,
-                )
+        if group_by:
+            embeds = bbt_list_grouped_embed(
+                user.id if user else interaction.user.id,
+                entries,
+                year,
+                interaction.created_at.astimezone().tzinfo,
+                group_by.value,
+                total_prices,
             )
-            
-            # Add total entries count and page info to title
-            embed.title = f"{embed.title} ({len(entries)} total)"
-            embed.set_footer(text=f"Page {i+1} of {total_pages}")
-            embeds.append(embed)
-        
+        else:
+            embeds = bbt_list_default_embed(
+                user.id if user else interaction.user.id,
+                entries,
+                year,
+                interaction.created_at.astimezone().tzinfo,
+                total_prices,
+                len(entries),
+            )
+
         paginator = GenericPaginator(embeds)
         await interaction.followup.send(embed=embeds[0], view=paginator)
-
 
     # leaderboard
     @bbt_count.command(
