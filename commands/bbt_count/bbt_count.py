@@ -5,6 +5,7 @@ from discord import app_commands
 
 from bot import TWPlaceClient
 from commands.bbt_count.consts import BBT_LIST_GROUP_BY_CHOICES
+from components.paginator import GenericPaginator
 
 from .db_functions import (
     add_bbt_entry,
@@ -26,34 +27,6 @@ from .embeds import (
 )
 from .helpers import bubble_tea_data
 from modules import logging
-
-class BBTListPaginator(discord.ui.View):
-    def __init__(self, embeds: list[discord.Embed], timeout: int = 60):
-        super().__init__(timeout=timeout)
-        self.embeds = embeds
-        self.current_page = 0
-        self.total_pages = len(embeds)
-        
-        # Disable/Enable buttons based on initial state
-        self.update_buttons()
-        
-    def update_buttons(self):
-        self.previous_page.disabled = self.current_page == 0
-        self.next_page.disabled = self.current_page == self.total_pages - 1
-        
-    @discord.ui.button(label="Previous", style=discord.ButtonStyle.blurple)
-    async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page > 0:
-            self.current_page -= 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
-            
-    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple)
-    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page < len(self.embeds) - 1:
-            self.current_page += 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
 
 def register_commands(
@@ -379,7 +352,7 @@ def register_commands(
             embed.set_footer(text=f"Page {i+1} of {total_pages}")
             embeds.append(embed)
         
-        paginator = BBTListPaginator(embeds)
+        paginator = GenericPaginator(embeds)
         await interaction.followup.send(embed=embeds[0], view=paginator)
 
 
@@ -395,22 +368,41 @@ def register_commands(
             interaction.guild.id,
             (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
         )
-        embed = discord.Embed(
-            title=f"Top bubble tea drinkers of {year if year else interaction.created_at.year} in {client.guilds_dict[interaction.guild.id]['server_name']}",
-            color=discord.Color.blue(),
-        )
-        embed.description = "\n".join(
-            [
-                f"{i+1}. <@{user_data.get('user_id')}>: {user_data.get('count')} 🧋"
-                + (
-                    f" *average given rating: {user_data.get('average_rating'):.3f}*"
-                    if user_data.get("average_rating")
-                    else ""
-                )
-                for i, user_data in enumerate(leaderboard)
-            ]
-        )
-        await interaction.followup.send(embed=embed)
+        
+        if not leaderboard:
+            embed = discord.Embed(
+                title="No leaderboard data found",
+                color=discord.Color.red()
+            )
+            await interaction.followup.send(embed=embed)
+            return
+
+        # Split into chunks of 10 entries per page
+        chunks = [leaderboard[i:i + 10] for i in range(0, len(leaderboard), 10)]
+        embeds = []
+        
+        for i, chunk in enumerate(chunks):
+            embed = discord.Embed(
+                title=f"Top bubble tea drinkers of {year if year else interaction.created_at.year} in {client.guilds_dict[interaction.guild.id]['server_name']}",
+                color=discord.Color.blue(),
+            )
+            embed.description = "\n".join(
+                [
+                    f"{j + (i*10) + 1}. <@{user_data.get('user_id')}>: {user_data.get('count')} 🧋"
+                    + (
+                        f" *average given rating: {user_data.get('average_rating'):.3f}*"
+                        if user_data.get("average_rating")
+                        else ""
+                    )
+                    for j, user_data in enumerate(chunk)
+                ]
+            )
+            embed.set_footer(text=f"Page {i+1} of {len(chunks)} • Total entries: {len(leaderboard)}")
+            embeds.append(embed)
+
+        paginator = GenericPaginator(embeds)
+        await interaction.followup.send(embed=embeds[0], view=paginator)
+
 
     @bbt_count.command(name="stats", description="Get the stats for a user for a given year")
     @app_commands.describe(user="User to get stats for (optional, default to self)")
@@ -439,15 +431,39 @@ def register_commands(
             if not year or (year and year == datetime.datetime.now().year)
             else None
         )
-        embed = bbt_stats_embed(
-            user_id,
-            stats,
-            year,
-            group_by_location,
-            monthly_counts,
-            latest,
-            interaction.created_at.astimezone().tzinfo,
-        )
-        await interaction.followup.send(embed=embed)
+
+        if group_by_location and stats.get('location_stats'):
+            # Split location stats into chunks of 10
+            location_stats = list(stats['location_stats'].items())
+            chunks = [location_stats[i:i + 10] for i in range(0, len(location_stats), 10)]
+            embeds = []
+
+            for i, chunk in enumerate(chunks):
+                embed = bbt_stats_embed(
+                    user_id,
+                    {**stats, 'location_stats': dict(chunk)},
+                    year,
+                    group_by_location,
+                    monthly_counts if i == 0 else None,  # Only show monthly counts on first page
+                    latest if i == 0 else None,  # Only show latest on first page
+                    interaction.created_at.astimezone().tzinfo,
+                )
+                embed.set_footer(text=f"Page {i+1} of {len(chunks)} • Total locations: {len(location_stats)}")
+                embeds.append(embed)
+
+            paginator = GenericPaginator(embeds)
+            await interaction.followup.send(embed=embeds[0], view=paginator)
+        else:
+            embed = bbt_stats_embed(
+                user_id,
+                stats,
+                year,
+                group_by_location,
+                monthly_counts,
+                latest,
+                interaction.created_at.astimezone().tzinfo,
+            )
+            await interaction.followup.send(embed=embed)
+
 
     tree.add_command(bbt_count, guilds=guilds)
