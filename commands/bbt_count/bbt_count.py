@@ -25,7 +25,35 @@ from .embeds import (
     bbt_stats_embed,
 )
 from .helpers import bubble_tea_data
-from modules import logging, content_moderation
+from modules import logging
+
+class BBTListPaginator(discord.ui.View):
+    def __init__(self, embeds: list[discord.Embed], timeout: int = 60):
+        super().__init__(timeout=timeout)
+        self.embeds = embeds
+        self.current_page = 0
+        self.total_pages = len(embeds)
+        
+        # Disable/Enable buttons based on initial state
+        self.update_buttons()
+        
+    def update_buttons(self):
+        self.previous_page.disabled = self.current_page == 0
+        self.next_page.disabled = self.current_page == self.total_pages - 1
+        
+    @discord.ui.button(label="Previous", style=discord.ButtonStyle.blurple)
+    async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+            
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple)
+    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page < len(self.embeds) - 1:
+            self.current_page += 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
 
 def register_commands(
@@ -311,23 +339,49 @@ def register_commands(
     ):
         await interaction.response.defer()
         entries = get_bbt_entries(user.id if user else interaction.user.id, year)
-        embed = (
-            bbt_list_default_embed(
-                user.id if user else interaction.user.id,
-                entries,
-                year,
-                interaction.created_at.astimezone().tzinfo,
+        
+        # Define items per page
+        items_per_page = 10
+        
+        if not entries:
+            embed = discord.Embed(
+                title="No bubble tea entries found",
+                color=discord.Color.red()
             )
-            if not group_by
-            else bbt_list_grouped_embed(
-                user.id if user else interaction.user.id,
-                entries,
-                year,
-                interaction.created_at.astimezone().tzinfo,
-                group_by.value,
+            await interaction.followup.send(embed=embed)
+            return
+        
+        # Split entries into chunks
+        chunks = [entries[i:i + items_per_page] for i in range(0, len(entries), items_per_page)]
+        total_pages = len(chunks)
+        
+        embeds = []
+        for i, chunk in enumerate(chunks):
+            embed = (
+                bbt_list_default_embed(
+                    user.id if user else interaction.user.id,
+                    chunk,
+                    year,
+                    interaction.created_at.astimezone().tzinfo,
+                )
+                if not group_by
+                else bbt_list_grouped_embed(
+                    user.id if user else interaction.user.id,
+                    chunk,
+                    year,
+                    interaction.created_at.astimezone().tzinfo,
+                    group_by.value,
+                )
             )
-        )
-        await interaction.followup.send(embed=embed)
+            
+            # Add total entries count and page info to title
+            embed.title = f"{embed.title} ({len(entries)} total)"
+            embed.set_footer(text=f"Page {i+1} of {total_pages}")
+            embeds.append(embed)
+        
+        paginator = BBTListPaginator(embeds)
+        await interaction.followup.send(embed=embeds[0], view=paginator)
+
 
     # leaderboard
     @bbt_count.command(
