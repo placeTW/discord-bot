@@ -45,5 +45,5 @@ def read_naer_csv_raw(
 NAER_PATH = Path(__file__).parent / "naer.csv" # not actually tocfl
 NAER_CSV = read_naer_csv_raw(NAER_PATH)
 
-if __name__ == "__main__":
-    print(NAER_CSV.sample(5))
+# if __name__ == "__main__":
+#     print(NAER_CSV.sample(5))

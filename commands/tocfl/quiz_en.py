@@ -71,5 +71,5 @@ def register_EN_quiz_subcommand(
             ephemeral=is_private,
         )
 
-if __name__ == "__main__":
-    print(get_n_random_rows(NAER_CSV, 5))
+# if __name__ == "__main__":
+#     print(get_n_random_rows(NAER_CSV, 5))
