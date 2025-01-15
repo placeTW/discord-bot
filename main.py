@@ -152,12 +152,13 @@ class BotInitialiser:
 
         @self.client.event
         async def on_guild_join(guild: discord.Guild):
+            print(f"Guild {guild.name} ({guild.id}) joined")
             config.create_new_config(guild.id, guild.name, IS_PROD)
             await self.tree.sync(guild=guild)        
             
         @self.client.event
         async def on_guild_remove(guild: discord.Guild):
-            print(f"Guild {guild.name} removed")
+            print(f"Guild {guild.name} ({guild.id}) removed")
             self.guilds.remove(discord.Object(id=guild.id))
             del self.client.guilds_dict[guild.id]
             config.remove_config(guild.id, IS_PROD)
