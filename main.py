@@ -1,7 +1,6 @@
 import os
 
 import discord
-from discord import app_commands
 
 # from discord.ext import commands
 from dotenv import load_dotenv
@@ -37,7 +36,6 @@ from activities import activity
 
 from mentioned import mention_responses
 
-from modules.supabase import supabaseClient
 from modules import config
 import bot
 import sys
@@ -154,18 +152,15 @@ class BotInitialiser:
 
         @self.client.event
         async def on_guild_join(guild: discord.Guild):
-            supabaseClient.table("server_config").insert(
-                {
-                    "guild_id": str(guild.id),
-                    "server_name": guild.name,
-                }
-            ).execute()
+            config.create_new_config(guild.id, guild.name, IS_PROD)
             await self.tree.sync(guild=guild)        
             
         @self.client.event
         async def on_guild_remove(guild: discord.Guild):
+            print(f"Guild {guild.name} removed")
             self.guilds.remove(discord.Object(id=guild.id))
             del self.client.guilds_dict[guild.id]
+            config.remove_config(guild.id, IS_PROD)
 
     def run(self):
         self.client.run(TOKEN)
