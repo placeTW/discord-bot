@@ -37,7 +37,7 @@ def register_commands(tree, this_guild: discord.Object, client: discord.Client):
         selected_entry_name = entry.name  # entry always exists
         selected_field = field.value  # field is mandatory here
         initial_value = await _fetch_entry_with_json(
-            interaction, selected_entry_id, selected_lang, selected_field, fromI18n=True
+            interaction, selected_entry_id, selected_lang, selected_field, fromI18n=True, expected_content_type=None
         )
         form = submit_entry_modal.SubmitEntryModal(
             client,
