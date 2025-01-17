@@ -13,7 +13,7 @@ from commands.entry_consts.consts import (
 )
 
 
-async def get_json(how="url", json_url="") -> dict:
+async def get_json(how="url", json_url="", expected_content_type='application/json') -> dict:
     """A multi-purpose function to fetch json.
     Right now, the only source is a json url, but in case
     things cahnge in the future, we can just modify this function.
@@ -27,12 +27,12 @@ async def get_json(how="url", json_url="") -> dict:
     """
     assert how in ("url",)
     if how == "url":
-        result = await async_utils._async_get_json(json_url)
+        result = await async_utils._async_get_json(json_url, expected_content_type)
     return result
 
 
 async def _fetch_entry_with_json(
-    interaction: discord.Interaction, entry: str, lang: str, field: str = None, fromI18n: bool = False
+    interaction: discord.Interaction, entry: str, lang: str, field: str = None, fromI18n: bool = False, expected_content_type='application/json'
 ):
     """Function to fetch entry based on json entries.
     This is called by both the cmd and ui version of fectch_entry,
@@ -52,6 +52,7 @@ async def _fetch_entry_with_json(
     result_json = await get_json(
         how="url",
         json_url=link_to_fetch,
+        expected_content_type=expected_content_type
     )
     # * if some error happens, notify user and stop
     if result_json is None:
