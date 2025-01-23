@@ -21,11 +21,11 @@ def test_BotInitialiser(monkeypatch):
     # patch the modules.config module, which uses supabaseClient
     import modules.config
 
-    # patch the module.config.fetch_config to return a dict instead of fetching from supabase
-    def mock_fetch_config(*args, **kwargs):
+    # patch the module.config.fetch_configs to return a dict instead of fetching from supabase
+    def mock_fetch_configs(*args, **kwargs):
         return {0: {"key": "value"}}
 
-    monkeypatch.setattr(modules.config, "fetch_config", mock_fetch_config)
+    monkeypatch.setattr(modules.config, "fetch_configs", mock_fetch_configs)
 
     # patch the module.config.set_config to do nothing instead of setting the config in supabase
     def mock_set_config(*args, **kwargs):

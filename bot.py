@@ -2,7 +2,7 @@ from typing import Any
 import discord
 from activities import activity
 from discord.ext import tasks
-from modules.config import fetch_config
+from modules.config import fetch_configs
 
 CHANGE_STATUS_INTERVAL_HOURS = 1
 
@@ -15,7 +15,7 @@ class TWPlaceClient(discord.Client):
         movie_activity = activity.get_random_activity_as_discordpy_activity()
         # config
         self.is_prod = is_prod
-        self.guilds_dict = fetch_config(is_prod)
+        self.guilds_dict = fetch_configs(is_prod)
         super().__init__(intents=intents, activity=movie_activity, *args, **kwargs)
 
     @tasks.loop(hours=CHANGE_STATUS_INTERVAL_HOURS)
@@ -32,7 +32,7 @@ class TWPlaceClient(discord.Client):
         self.set_activity.start()
 
     def fetch_config(self):
-        self.guilds_dict = fetch_config(self.is_prod)
+        self.guilds_dict = fetch_configs(self.is_prod)
 
 
 def get_bot(is_prod: bool):
