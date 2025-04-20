@@ -24,7 +24,6 @@ from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
 from commands.fucking import fucking
-from commands.boba import boba
 from commands.confessions import confession
 from commands.stats import stats
 from commands.tocfl import tocfl
@@ -103,7 +102,6 @@ class BotInitialiser:
         random_shiba.register_commands(self.tree, self.guilds)
         random_capoo.register_commands(self.tree, self.guilds)
         fucking.register_commands(self.tree, self.guilds)
-        boba.register_commands(self.tree, self.guilds)
         basic_commands.register_commands(self.tree, self.guilds)
         config_commands.register_commands(self.tree, self.client, self.guilds)
         stats.register_commands(self.tree, self.client, self.guilds)
