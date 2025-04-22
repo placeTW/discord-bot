@@ -1,7 +1,6 @@
 import os
 
 import discord
-from discord import app_commands
 
 # from discord.ext import commands
 from dotenv import load_dotenv
@@ -36,7 +35,6 @@ from activities import activity
 
 from mentioned import mention_responses
 
-from modules.supabase import supabaseClient
 from modules import config
 import bot
 import sys
@@ -54,7 +52,7 @@ DEPLOYMENT_DATE = datetime.datetime.now()
 class BotInitialiser:
     def __init__(self):
         self.client = bot.get_bot(IS_PROD)
-        self.guilds = [discord.Object(id=int(server_id)) for server_id in self.client.guilds_dict.keys()]
+        self.guilds = [discord.Object(id=guild_id) for guild_id, guild_config in self.client.guilds_dict.items() if guild_config.get('prod_config') == IS_PROD]
         # CommandTree is where all our defined commands are stored
         self.tree = discord.app_commands.CommandTree(self.client)
         self.placetw_guild = discord.Object(id=os.getenv("PLACETW_SERVER_ID"))  # basically refers to this server
@@ -115,8 +113,10 @@ class BotInitialiser:
         # sync the slash commands servers when the bot is ready
         @self.client.event
         async def on_ready():
-            for guild_id in self.client.guilds_dict.keys():
-                guild = discord.Object(id=guild_id)
+            self.tree.clear_commands(guild=None)
+            await self.tree.sync()
+
+            for guild in self.guilds:
                 await self.tree.sync(guild=guild)
             # Enable logging
             logging.init(self.client, DEPLOYMENT_DATE)
@@ -149,15 +149,17 @@ class BotInitialiser:
                 await logging.log_message_event(message, events)
 
         @self.client.event
-        async def on_guild_join(guild):
-            supabaseClient.table("server_config").insert(
-                {
-                    "guild_id": str(guild.id),
-                    "server_name": guild.name,
-                }
-            ).execute()
-            self.register_commands(self.tree, self.client, [guild])
-            await self.tree.sync(guild=guild)
+        async def on_guild_join(guild: discord.Guild):
+            print(f"Guild {guild.name} ({guild.id}) joined")
+            config.create_new_config(guild.id, guild.name, IS_PROD)
+            await self.tree.sync(guild=guild)        
+            
+        @self.client.event
+        async def on_guild_remove(guild: discord.Guild):
+            print(f"Guild {guild.name} ({guild.id}) removed")
+            self.guilds.remove(discord.Object(id=guild.id))
+            del self.client.guilds_dict[guild.id]
+            config.remove_config(guild.id, IS_PROD)
 
     def run(self):
         self.client.run(TOKEN)
