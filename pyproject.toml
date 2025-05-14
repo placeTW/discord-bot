@@ -24,6 +24,7 @@ pytest-asyncio = "^0.23.7"
 black = "^24.8.0"
 pydantic = "^2.9.2"
 pandas = "^2.2.3"
+audioop-lts = "*"
 
 [build-system]
 requires = ["poetry-core"]
