@@ -1,12 +1,17 @@
+import aiohttp
+import pytest
 from commands.fetch_entry.fetch_entry_main import get_json
 
 
 async def test_get_json_en():
     link_to_fetch = f"https://placetw.com/locales/en/art-pieces.json"
-    result_json = await get_json(
-        how="url",
-        json_url=link_to_fetch,
-    )
+    try:
+        result_json = await get_json(
+            how="url",
+            json_url=link_to_fetch,
+        )
+    except (aiohttp.ClientError, aiohttp.ContentTypeError) as e:
+        pytest.skip(f"External API unavailable: {e}")
     assert type(result_json) == dict
     assert "capoo" in result_json
     assert "asdf" not in result_json

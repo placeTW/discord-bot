@@ -2,6 +2,7 @@ import commands.fetch_entry.fetch_entry_main as fetch
 from modules.async_utils import _async_get_json
 from commands.fetch_entry import postprocess
 import pytest
+import aiohttp
 from commands.entry_consts.consts import SUPPORTED_LANGUAGE_CODES, SUPPORTED_ART2023_IDS
 
 LANGS_TO_TEST = list(SUPPORTED_LANGUAGE_CODES.keys())
@@ -12,7 +13,10 @@ ENTRIES_TO_TEST = list(SUPPORTED_ART2023_IDS.keys())
 async def test_placetw_art_schema(lang: str):
     """Tests that the API can be fetched and that the schema is correct."""
     url = f"https://placetw.com/locales/{lang}/art-pieces.json"
-    result = await _async_get_json(url)
+    try:
+        result = await _async_get_json(url)
+    except (aiohttp.ClientError, aiohttp.ContentTypeError) as e:
+        pytest.skip(f"External API unavailable: {e}")
     assert type(result) is dict
     # assert that result's values has the following keys and types:
     #   "title" (str), "blurb" (str), "desc" (str), "links" (list)
