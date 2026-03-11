@@ -15,10 +15,8 @@ services:
     image: postgres:17
     restart: unless-stopped
     container_name: placetw-postgres
-    environment:
-      POSTGRES_DB: discord_bot
-      POSTGRES_USER: botuser
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ../schema.sql:/docker-entrypoint-initdb.d/schema.sql

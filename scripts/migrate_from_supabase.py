@@ -5,7 +5,14 @@ The core migration logic lives in commands/migrate/migrate_cmd.py and is shared 
 the /migrate Discord command.
 
 Usage:
-    DATABASE_URL=postgresql://botuser:password@localhost:5432/discord_bot python scripts/migrate_from_supabase.py
+    python scripts/migrate_from_supabase.py
+
+    Requires the following environment variables to be set (via .env file or shell):
+        POSTGRES_HOST=localhost
+        POSTGRES_PORT=5432
+        POSTGRES_DB=discord_bot
+        POSTGRES_USER=botuser
+        POSTGRES_PASSWORD=password
 
 Expects CSV files in the migration/ directory (exported from Supabase):
     migration/server_config_rows.csv
