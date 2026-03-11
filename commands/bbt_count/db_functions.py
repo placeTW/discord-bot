@@ -1,176 +1,139 @@
 import datetime
-from modules.supabase import supabaseClient
+
+from modules.db import get_cursor
 
 TABLE = "bubble_tea_entries"
 
 
 # Adds a new bubble tea entry to the database
 def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, **kwargs):
-    response = (
-        supabaseClient.table(TABLE)
-        .insert(
-            {
-                "created_at": str(created_at),
-                "user_id": user_id,
-                "guild_id": guild_id,
-                **kwargs,
-            }
+    columns = ["created_at", "user_id", "guild_id"] + list(kwargs.keys())
+    values = [str(created_at), user_id, guild_id] + list(kwargs.values())
+    placeholders = ", ".join(["%s"] * len(columns))
+    col_list = ", ".join(columns)
+    with get_cursor() as cur:
+        cur.execute(
+            f"INSERT INTO {TABLE} ({col_list}) VALUES ({placeholders}) RETURNING id",
+            values,
         )
-        .execute()
-    )
-    print(response)
-    return response.data[0]["id"]
+        row = cur.fetchone()
+    print(row)
+    return row["id"]
 
 
 # Removes a bubble tea entry from the database by id
 def remove_bbt_entry(id: int, user_id: int):
-    response = (
-        supabaseClient.table(TABLE)
-        .delete()
-        .match(
-            {
-                "id": id,
-                "user_id": user_id,
-            }
-        )
-        .execute()
-    )
-    print(response)
+    with get_cursor() as cur:
+        cur.execute(f"DELETE FROM {TABLE} WHERE id = %s AND user_id = %s", (id, user_id))
+    print(f"Removed entry {id}")
 
 
 # Gets a bubble tea entry from the database by id
 def get_bbt_entry(id: int) -> dict | None:
-    data, c = (
-        supabaseClient.table(TABLE)
-        .select("*")
-        .match(
-            {
-                "id": id,
-            }
-        )
-        .execute()
-    )
-    if c == 0:
-        return None
-    try:
-        return data[1][0]
-    except IndexError:
-        return None
+    with get_cursor() as cur:
+        cur.execute(f"SELECT * FROM {TABLE} WHERE id = %s", (id,))
+        row = cur.fetchone()
+    return dict(row) if row else None
 
 
 # Edits a bubble tea entry in the database by id
 def edit_bbt_entry(id: int, owner_user_id: int, **kwargs):
-    response = (
-        supabaseClient.table(TABLE)
-        .update(kwargs)
-        .match(
-            {
-                "id": id,
-                "user_id": owner_user_id,
-            }
+    if not kwargs:
+        return
+    set_clause = ", ".join([f"{k} = %s" for k in kwargs.keys()])
+    values = list(kwargs.values()) + [id, owner_user_id]
+    with get_cursor() as cur:
+        cur.execute(
+            f"UPDATE {TABLE} SET {set_clause} WHERE id = %s AND user_id = %s",
+            values,
         )
-        .execute()
-    )
-    print(response)
+    print(f"Updated entry {id}")
 
 
 # Gets all bubble tea entries from the database for a user in a given year
 def get_bbt_entries(user_id: int, year: int = None):
-    data, c = (
-        supabaseClient.table(TABLE)
-        .select("*")
-        .lte(
-            "created_at",
-            str(
-                datetime.datetime.now() + datetime.timedelta(days=1)
-                if year is None
-                else datetime.datetime(year, 12, 31)
-            ),
+    if year is None:
+        date_from = datetime.datetime.now() - datetime.timedelta(days=365)
+        date_to = datetime.datetime.now() + datetime.timedelta(days=1)
+    else:
+        date_from = datetime.datetime(year, 1, 1)
+        date_to = datetime.datetime(year, 12, 31)
+    with get_cursor() as cur:
+        cur.execute(
+            f"SELECT * FROM {TABLE} WHERE user_id = %s AND created_at >= %s AND created_at <= %s ORDER BY created_at DESC",
+            (user_id, str(date_from), str(date_to)),
         )
-        .gte(
-            "created_at",
-            str(
-                datetime.datetime.now() - datetime.timedelta(days=365)
-                if year is None
-                else datetime.datetime(year, 1, 1)
-            ),
-        )
-        .match(
-            {
-                "user_id": user_id,
-            }
-        )
-        .order("created_at", desc=True)
-        .execute()
-    )
-    if c == 0:
-        return []
-    return data[1]
+        return cur.fetchall()
 
 
-# Gets the top bubble tea drinkers in a given year
+# Gets the top bubble tea drinkers up to a given date
 def get_bbt_leaderboard(guild_id: int, date: datetime):
-    data, c = supabaseClient.rpc(
-        "get_bubble_tea_counts",
-        {
-            "guild_id": guild_id,
-            "date": str(date),
-        },
-    ).execute()
-    if c == 0:
-        return []
-    results = data[1]
-    return results
+    with get_cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT user_id, COUNT(*) AS count
+            FROM {TABLE}
+            WHERE guild_id = %s AND created_at <= %s
+            GROUP BY user_id
+            ORDER BY count DESC
+            """,
+            (guild_id, str(date)),
+        )
+        return cur.fetchall()
 
 
 # Gets the bubble tea stats for a user in a given year
 def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
-    data, c = supabaseClient.rpc(
-        "get_bubble_tea_stats",
-        {
-            "user_id": user_id,
-            "date": str(date),
-            "group_by_location": group_by_location,
-        },
-    ).execute()
-    if c == 0:
-        return []
-    results = data[1]
-    return results
+    year_start = datetime.datetime(date.year, 1, 1)
+    if group_by_location:
+        with get_cursor() as cur:
+            cur.execute(
+                f"""
+                SELECT location, COUNT(*) AS count
+                FROM {TABLE}
+                WHERE user_id = %s AND created_at >= %s AND created_at <= %s
+                GROUP BY location
+                ORDER BY count DESC
+                """,
+                (user_id, str(year_start), str(date)),
+            )
+            return cur.fetchall()
+    else:
+        with get_cursor() as cur:
+            cur.execute(
+                f"""
+                SELECT COUNT(*) AS total, AVG(rating) AS avg_rating
+                FROM {TABLE}
+                WHERE user_id = %s AND created_at >= %s AND created_at <= %s
+                """,
+                (user_id, str(year_start), str(date)),
+            )
+            return cur.fetchall()
 
 
-# Gets the bubble tea monthly counts for a user
+# Gets the bubble tea monthly counts for a user in the same year as date
 def get_bubble_tea_monthly_counts(user_id: int, date: datetime):
-    data, c = supabaseClient.rpc(
-        "get_bubble_tea_monthly_counts",
-        {
-            "user_id": user_id,
-            "date": str(date),
-        },
-    ).execute()
-    if c == 0:
-        return []
-    results = data[1]
-    return results
+    year_start = datetime.datetime(date.year, 1, 1)
+    with get_cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT DATE_TRUNC('month', created_at) AS month, COUNT(*) AS count
+            FROM {TABLE}
+            WHERE user_id = %s AND created_at >= %s AND created_at <= %s
+            GROUP BY month
+            ORDER BY month
+            """,
+            (user_id, str(year_start), str(date)),
+        )
+        return cur.fetchall()
 
 
 # Get the user's latest bubble tea entry
 def get_latest_bubble_tea_entry(user_id: int):
-    data, c = (
-        supabaseClient.table(TABLE)
-        .select("*")
-        .match(
-            {
-                "user_id": user_id,
-            }
+    with get_cursor() as cur:
+        cur.execute(
+            f"SELECT * FROM {TABLE} WHERE user_id = %s ORDER BY created_at DESC LIMIT 1",
+            (user_id,),
         )
-        .order("created_at", desc=True)
-        .limit(1)
-        .execute()
-    )
-    if c == 0:
-        return None
-    try:
-        return data[1][0]
-    except IndexError:
-        return None
+        row = cur.fetchone()
+    return dict(row) if row else None

@@ -1,12 +1,11 @@
-from supabase import create_client, Client
 import datetime
+import json
 import os
 import sys
 import discord
-from modules.supabase import supabaseClient
-
 from dotenv import load_dotenv
-from .supabase import supabaseClient
+
+from modules.db import get_cursor
 
 load_dotenv()
 
@@ -38,11 +37,6 @@ def init(client: discord.Client, deployment_date: datetime):
     logging.set_log_params(log_channel, path)
 
 
-"""
-
-"""
-
-
 async def log_event(
     message: discord.Message | discord.Interaction,
     data: dict = {},
@@ -50,56 +44,64 @@ async def log_event(
     color: discord.Color = None,
     log_to_channel=True,
 ):
-    data = (
-        supabaseClient.table("event_logs")
-        .insert(
-            {
-                "message_id": message.id if message.id else None,
-                "event": data["event"] if "event" in data else None,
-                "created_at": str(message.created_at),
-                "content": content if content else message.content if hasattr(message, 'content') else None,
-                "author_id": data["author_id"] if "author_id" in data else message.author.id,
-                "mentioned_id": data["mentioned_id"] if "mentioned_id" in data else None,
-                "channel_id": message.channel.id if message.channel else None,
-                "guild_id": message.guild.id if message.guild else None,
-                "generated_id": data["generated_id"] if "generated_id" in data else None,
-                "metadata": data["metadata"] if "metadata" in data else None,
-            }
-        ).execute()
-    )
+    metadata = data.get("metadata")
+    row = {
+        "message_id": message.id if message.id else None,
+        "event": data.get("event"),
+        "created_at": str(message.created_at),
+        "content": content if content else (message.content if hasattr(message, 'content') else None),
+        "author_id": data.get("author_id", message.author.id if hasattr(message, 'author') else None),
+        "mentioned_id": data.get("mentioned_id"),
+        "channel_id": message.channel.id if message.channel else None,
+        "guild_id": message.guild.id if message.guild else None,
+        "generated_id": data.get("generated_id"),
+        "metadata": json.dumps(metadata) if metadata is not None else None,
+    }
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO event_logs
+                (message_id, event, created_at, content, author_id, mentioned_id,
+                 channel_id, guild_id, generated_id, metadata)
+            VALUES
+                (%(message_id)s, %(event)s, %(created_at)s, %(content)s, %(author_id)s, %(mentioned_id)s,
+                 %(channel_id)s, %(guild_id)s, %(generated_id)s, %(metadata)s)
+            """,
+            row,
+        )
     if log_to_channel:
         await logging.log_to_channel(data, color)
-    print(data)
+    print(row)
 
 
 async def log_message_event(message: discord.Message, events: list[str]):
-    data = (
-        supabaseClient.table("message_logs")
-        .insert(
-            [
-                {
-                    "message_id": message.id,
-                    "author_id": message.author.id,
-                    "event": event,
-                    "created_at": str(message.created_at),
-                    "channel_id": message.channel.id if message.channel else None,
-                    "guild_id": message.guild.id if message.guild else None,
-                }
-                for event in events
-            ]
-        )
-        .execute()
-    )
-    print(data)
+    rows = [
+        {
+            "message_id": message.id,
+            "author_id": message.author.id,
+            "event": event,
+            "created_at": str(message.created_at),
+            "channel_id": message.channel.id if message.channel else None,
+            "guild_id": message.guild.id if message.guild else None,
+        }
+        for event in events
+    ]
+    with get_cursor() as cur:
+        for row in rows:
+            cur.execute(
+                """
+                INSERT INTO message_logs (message_id, author_id, event, created_at, channel_id, guild_id)
+                VALUES (%(message_id)s, %(author_id)s, %(event)s, %(created_at)s, %(channel_id)s, %(guild_id)s)
+                """,
+                row,
+            )
+    print(rows)
 
 
 async def fetch_event_log(guild_id: int, generated_id: str, event: str):
-    return (
-        supabaseClient.table("event_logs")
-        .select("*")
-        .eq("guild_id", guild_id)
-        .eq("generated_id", generated_id)
-        .eq("event", event)
-        .execute()
-        .data
-    )
+    with get_cursor() as cur:
+        cur.execute(
+            "SELECT * FROM event_logs WHERE guild_id = %s AND generated_id = %s AND event = %s",
+            (guild_id, generated_id, event),
+        )
+        return cur.fetchall()

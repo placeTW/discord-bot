@@ -1,5 +1,4 @@
 import pytest
-import supabase
 import github
 
 
@@ -10,24 +9,28 @@ def test_BotInitialiser(monkeypatch):
     # * PATCH ENVIRONMENT VARIABLES
     monkeypatch.setenv("PLACETW_SERVER_ID", "999")  # set the environment variable for the placetw server id
 
-    # * PATCH SUPABASE MODULE
-    # patch the create_client command to do nothing
-    def mock_create_client(url: str, private_key: str):
-        return None
+    # * PATCH DB MODULE
+    # patch the connection pool so no real database connection is made
+    import psycopg2.pool
 
-    monkeypatch.setattr(supabase, "create_client", mock_create_client)
-    assert supabase.create_client("url", "private_key") is None  # test the mock
+    class MockPool:
+        def getconn(self):
+            return None
 
-    # patch the modules.config module, which uses supabaseClient
+        def putconn(self, conn):
+            pass
+
+    monkeypatch.setattr(psycopg2.pool, "ThreadedConnectionPool", lambda **kwargs: MockPool())
+
+    # patch modules.config.fetch_configs to return a dict instead of querying the database
     import modules.config
 
-    # patch the module.config.fetch_configs to return a dict instead of fetching from supabase
     def mock_fetch_configs(*args, **kwargs):
         return {0: {"key": "value"}}
 
     monkeypatch.setattr(modules.config, "fetch_configs", mock_fetch_configs)
 
-    # patch the module.config.set_config to do nothing instead of setting the config in supabase
+    # patch modules.config.set_config to do nothing instead of updating the database
     def mock_set_config(*args, **kwargs):
         pass
 

@@ -22,6 +22,7 @@ from commands.pat import pat
 from commands.shiba import random_shiba
 from commands.capoo import random_capoo
 from commands.restart import restart
+from commands.migrate import migrate_cmd
 from commands.fucking import fucking
 from commands.confessions import confession
 from commands.stats import stats
@@ -85,6 +86,7 @@ class BotInitialiser:
         # * register commands the just the placetw server
         edit_entry_cmd.register_commands(self.tree, self.placetw_guild, self.client)
         restart.register_commands(self.tree, self.placetw_guild)
+        migrate_cmd.register_commands(self.tree, self.placetw_guild)
         activity.register_commands(self.tree, self.placetw_guild, self.client)
         tocfl.register_commands(self.tree, self.placetw_guild, self.client)
         taiwanese_entry.register_commands(self.tree, self.placetw_guild, self.client)

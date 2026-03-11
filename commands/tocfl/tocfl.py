@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 
 from bot import TWPlaceClient
-from modules.supabase import supabaseClient
+from modules.db import get_cursor
 from random import randint
 from .consts import TOCFL_LEVELS_CHOICES, TOCFL_LEVELS
 from .chewing import to_chewing
@@ -35,22 +35,24 @@ def register_commands(
         interaction: discord.Interaction,
         level: discord.app_commands.Choice[int] = None,
     ):
-        MAX_ID = 7563  # fixed for now until we can get the max id from the db
-        random_id = randint(1, MAX_ID)
-        tocfl_table = supabaseClient.table("tocfl")
-        data, count = (
-            supabaseClient.rpc('get_random_tocfl', {'level': level.value}).execute()
-            if level
-            else tocfl_table.select("*").eq("id", random_id).execute()
-        )
-        if count == 0:
+        with get_cursor() as cur:
+            if level:
+                cur.execute(
+                    "SELECT * FROM tocfl WHERE level = %s ORDER BY RANDOM() LIMIT 1",
+                    (level.value,),
+                )
+            else:
+                MAX_ID = 7563  # fixed for now until we can get the max id from the db
+                random_id = randint(1, MAX_ID)
+                cur.execute("SELECT * FROM tocfl WHERE id = %s", (random_id,))
+            data = cur.fetchone()
+        if not data:
             await interaction.response.send_message(
                 f"There was an error getting the random word. Please try again",
                 ephemeral=True,
             )
             return
-        data = data[1]  # the first element is just the string "data"
-        data = data[0]  # rand only has one element
+        data = dict(data)
         # example data: {'id': 112, 'vocab': '找', 'zhuyin': None, 'pinyin': 'zhăo ', 'english': None, 'level': 1, 'part_of_speech': 'V', 'context': '與他人的關係'}
         embed = _create_word_embed(
             data["vocab"],

@@ -3,7 +3,6 @@ from discord import app_commands
 
 from bot import TWPlaceClient
 from commands.stats.pat_stats import pat_stats_commands
-from modules.supabase import supabaseClient
 
 
 def register_commands(
