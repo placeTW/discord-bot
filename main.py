@@ -182,8 +182,9 @@ class BotInitialiser:
         @self.client.event
         async def on_guild_remove(guild: discord.Guild):
             print(f"Guild {guild.name} ({guild.id}) removed")
-            self.guilds.remove(discord.Object(id=guild.id))
-            del self.client.guilds_dict[guild.id]
+            self.guilds = [g for g in self.guilds if g.id != guild.id]
+            if guild.id in self.client.guilds_dict:
+                del self.client.guilds_dict[guild.id]
             config.remove_config(guild.id, IS_PROD)
 
     def run(self):
