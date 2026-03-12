@@ -94,7 +94,7 @@ def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
                 SELECT
                     location,
                     currency,
-                    ARRAY_AGG(COALESCE(price, 0)) AS prices_list,
+                    ARRAY_AGG(COALESCE(price, 0)::float) AS prices_list,
                     AVG(rating)  AS average_rating,
                     MIN(rating)  AS minimum_rating,
                     MAX(rating)  AS maximum_rating
@@ -112,7 +112,7 @@ def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
                 f"""
                 SELECT
                     currency,
-                    ARRAY_AGG(COALESCE(price, 0)) AS prices_list,
+                    ARRAY_AGG(COALESCE(price, 0)::float) AS prices_list,
                     AVG(rating)  AS average_rating,
                     MIN(rating)  AS minimum_rating,
                     MAX(rating)  AS maximum_rating
