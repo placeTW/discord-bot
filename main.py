@@ -84,19 +84,24 @@ class BotInitialiser:
 
         @self.tree.command(
             name="leave-server",
-            description="Make the bot leave a specified server by ID (owner only)",
+            description="Make the bot leave a specified server by ID (admin only)",
             guild=self.placetw_guild,
         )
+        @app_commands.checks.has_permissions(administrator=True)
+        @app_commands.default_permissions(administrator=True)  # hides command from non-admins in Discord UI
         async def leave_server(interaction: discord.Interaction, guild_id: str):
-            if await self.client.is_owner(interaction.user):
-                guild = self.client.get_guild(int(guild_id))
-                if guild is None:
-                    await interaction.response.send_message("❌ Guild not found.", ephemeral=True)
-                    return
-                await interaction.response.send_message(f"✅ Leaving **{guild.name}**...", ephemeral=True)
-                await guild.leave()
-            else:
-                await interaction.response.send_message("❌ You are not authorized to use this command.", ephemeral=True)
+            guild = self.client.get_guild(int(guild_id))
+            if guild is None:
+                await interaction.response.send_message("❌ Guild not found.", ephemeral=True)
+                return
+            await interaction.response.send_message(f"✅ Leaving **{guild.name}**...", ephemeral=True)
+            await guild.leave()
+
+        @leave_server.error
+        async def leave_server_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+            if isinstance(error, app_commands.MissingPermissions):
+                await interaction.response.send_message("❌ You need Administrator permissions to use this command.", ephemeral=True)
+
 
         # * register commands the just the placetw server
         edit_entry_cmd.register_commands(self.tree, self.placetw_guild, self.client)
