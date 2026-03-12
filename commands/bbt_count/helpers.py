@@ -119,6 +119,12 @@ def cost_string(prices: list[float], currency: str):
     return f"{numbers.format_currency(sum, currency, locale='en_US')} ({p.size}, avg {numbers.format_currency(p[p.nonzero()].mean() if sum else 0, currency, locale='en_US')}/🧋)"
 
 
+def _to_datetime(value) -> datetime.datetime:
+    if isinstance(value, datetime.datetime):
+        return value
+    return datetime.datetime.fromisoformat(str(value))
+
+
 def entry_string(entry: dict, timezone: datetime.tzinfo):
     entry_string = (
         f"`{entry['id']}: {str(_to_datetime(entry.get('created_at')).astimezone(timezone).date())}`"
