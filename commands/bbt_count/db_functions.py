@@ -4,9 +4,17 @@ from modules.db import get_cursor
 
 TABLE = "bubble_tea_entries"
 
+ALLOWED_BBT_COLUMNS = frozenset({
+    "created_at", "user_id", "guild_id",
+    "location", "description", "price", "currency", "image", "notes", "rating",
+})
+
 
 # Adds a new bubble tea entry to the database
 def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, **kwargs):
+    invalid = set(kwargs.keys()) - ALLOWED_BBT_COLUMNS
+    if invalid:
+        raise ValueError(f"Invalid column(s) for bubble_tea_entries: {invalid}")
     columns = ["created_at", "user_id", "guild_id"] + list(kwargs.keys())
     values = [str(created_at), user_id, guild_id] + list(kwargs.values())
     placeholders = ", ".join(["%s"] * len(columns))
@@ -40,6 +48,9 @@ def get_bbt_entry(id: int) -> dict | None:
 def edit_bbt_entry(id: int, owner_user_id: int, **kwargs):
     if not kwargs:
         return
+    invalid = set(kwargs.keys()) - ALLOWED_BBT_COLUMNS
+    if invalid:
+        raise ValueError(f"Invalid column(s) for bubble_tea_entries: {invalid}")
     set_clause = ", ".join([f"{k} = %s" for k in kwargs.keys()])
     values = list(kwargs.values()) + [id, owner_user_id]
     with get_cursor() as cur:

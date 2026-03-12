@@ -124,7 +124,8 @@ def register_commands(
                 f"Removed entry {id}",
                 ephemeral=True,
             )
-        except:
+        except Exception as e:
+            print(f"Failed to remove entry {id}: {e}")
             await interaction.response.send_message(
                 f"Failed to remove {id}",
                 ephemeral=True,

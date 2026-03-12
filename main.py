@@ -155,9 +155,9 @@ class BotInitialiser:
             message_reacts_enabled = True
             try:
                 message_reacts_enabled = self.client.guilds_dict[message.guild.id]["message_reacts_enabled"]
-            except:
-                # default true
-                pass
+            except (KeyError, TypeError):
+                # default true - guild config may not be loaded yet
+                message_reacts_enabled = True
 
             # don't respond to bots, bot's own posts or if message reacts are disabled
             if (message.author == self.client.user) or (not message_reacts_enabled) or message.author.bot:

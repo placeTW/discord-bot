@@ -1,4 +1,5 @@
 from modules.db import get_cursor
+from commands.config.consts import SUPPORTED_CHANNEL_CONFIG_FIELDS
 
 
 def fetch_configs(is_prod: bool):
@@ -28,6 +29,8 @@ def create_new_config(guild_id: int, server_name: str, is_prod: bool):
 
 
 def set_config(guild_id: int, key: str, value: str, is_prod: bool) -> list:
+    if key not in SUPPORTED_CHANNEL_CONFIG_FIELDS:
+        raise ValueError(f"Invalid config key: {key}")
     with get_cursor() as cur:
         cur.execute(
             f"UPDATE server_config SET {key} = %s WHERE guild_id = %s AND prod_config = %s RETURNING *",

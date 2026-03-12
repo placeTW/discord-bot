@@ -180,7 +180,11 @@ def register_commands(
                 suppress_embeds=True,
             )
         except Exception as e:
-            await interaction.response.send_message(f"Failed to send confession: {e}", ephemeral=True)
+            print(f"Failed to send confession: {e}")  # Server-side logging
+            await interaction.response.send_message(
+                "Failed to send confession. Please try again later.",
+                ephemeral=True
+            )
 
     @confess_group.command(
         name="report",
@@ -252,6 +256,7 @@ def register_commands(
         name="restore",
         description="Restores a confession (requires manage server permissions)",
     )
+    @app_commands.default_permissions(manage_guild=True)
     async def restore_confession(interaction: discord.Interaction, confession_id: str):
         if not interaction.permissions.manage_guild:
             await interaction.response.send_message(

@@ -40,7 +40,8 @@ def fetch_stickers_list(type: str, style: str, query: str):
         ]
 
         return stickers
-    except:
+    except Exception as e:
+        print(f"Failed to scrape stickers: {e}")
         return []
 
 

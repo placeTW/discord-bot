@@ -3,8 +3,12 @@ from discord import app_commands
 
 from modules.db import get_cursor
 
+_ALLOWED_PAT_TYPES = frozenset({"patted", "patter"})
+
 
 def get_pat_stats(pat_type: str):
+    if pat_type not in _ALLOWED_PAT_TYPES:
+        raise ValueError(f"Invalid pat_type: {pat_type}")
     with get_cursor() as cur:
         cur.execute(f"SELECT id, count FROM total_{pat_type}_counts LIMIT 10")
         rows = cur.fetchall()
