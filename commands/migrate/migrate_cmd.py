@@ -24,7 +24,7 @@ BIGINT_COLUMNS = {
     "user_id", "confession_channel_id", "admin_role_id", "report_channel_id",
 }
 
-NUMERIC_COLUMNS = {"price"}
+NUMERIC_COLUMNS = {"price", "rating"}
 
 
 def _coerce_row(row: dict) -> dict:
