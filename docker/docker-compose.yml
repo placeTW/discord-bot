@@ -8,6 +8,7 @@ services:
         condition: service_healthy
     volumes:
       - ./discord-bot:/app
+      - ../migration:/app/migration:ro
     env_file:
       - .env
 
@@ -21,7 +22,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ../schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U botuser -d discord_bot"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
