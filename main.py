@@ -177,7 +177,12 @@ class BotInitialiser:
         async def on_guild_join(guild: discord.Guild):
             print(f"Guild {guild.name} ({guild.id}) joined")
             config.create_new_config(guild.id, guild.name, IS_PROD)
-            await self.tree.sync(guild=guild)        
+            guild_obj = discord.Object(id=guild.id)
+            self.guilds.append(guild_obj)
+            # Re-register all per-guild commands so the new guild is included
+            self.register_commands_in_all_servers()
+            await self.tree.sync(guild=guild_obj)
+  
             
         @self.client.event
         async def on_guild_remove(guild: discord.Guild):
