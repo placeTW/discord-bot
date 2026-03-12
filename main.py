@@ -111,25 +111,27 @@ class BotInitialiser:
         tocfl.register_commands(self.tree, self.placetw_guild, self.client)
         taiwanese_entry.register_commands(self.tree, self.placetw_guild, self.client)
 
-    def register_commands_in_all_servers(self):
+    def register_commands_in_all_servers(self, guilds: list = None):
         # * register commands to the other servers
-        bbt_count.register_commands(self.tree, self.client, self.guilds)
-        cat.register_commands(self.tree, self.guilds)
-        fetch_entry_cmd.register_commands(self.tree, self.guilds)
-        fetch_entry_ui.register_commands(self.tree, self.guilds)
-        one_o_one.register_commands(self.tree, self.guilds)
-        hgs.register_commands(self.tree, self.guilds)
-        random_shiba.register_commands(self.tree, self.guilds)
-        random_capoo.register_commands(self.tree, self.guilds)
-        fucking.register_commands(self.tree, self.guilds)
-        basic_commands.register_commands(self.tree, self.guilds)
-        config_commands.register_commands(self.tree, self.client, self.guilds)
-        stats.register_commands(self.tree, self.client, self.guilds)
-        pat.register_commands(self.tree, self.client, self.guilds)
-        formosa_stickers.register_commands(self.tree, self.guilds)
+        target_guilds = guilds if guilds is not None else self.guilds
+        
+        bbt_count.register_commands(self.tree, self.client, target_guilds)
+        cat.register_commands(self.tree, target_guilds)
+        fetch_entry_cmd.register_commands(self.tree, target_guilds)
+        fetch_entry_ui.register_commands(self.tree, target_guilds)
+        one_o_one.register_commands(self.tree, target_guilds)
+        hgs.register_commands(self.tree, target_guilds)
+        random_shiba.register_commands(self.tree, target_guilds)
+        random_capoo.register_commands(self.tree, target_guilds)
+        fucking.register_commands(self.tree, target_guilds)
+        basic_commands.register_commands(self.tree, target_guilds)
+        config_commands.register_commands(self.tree, self.client, target_guilds)
+        stats.register_commands(self.tree, self.client, target_guilds)
+        pat.register_commands(self.tree, self.client, target_guilds)
+        formosa_stickers.register_commands(self.tree, target_guilds)
         confession.register_commands(self.tree, self.client)
-        trains.register_commands(self.tree, self.client, self.guilds)
-        compare_cmd.register_commands(self.tree, self.client, self.guilds)
+        trains.register_commands(self.tree, self.client, target_guilds)
+        compare_cmd.register_commands(self.tree, self.client, target_guilds)
 
     def register_event_callbacks(self):
         # sync the slash commands servers when the bot is ready
@@ -179,8 +181,7 @@ class BotInitialiser:
             config.create_new_config(guild.id, guild.name, IS_PROD)
             guild_obj = discord.Object(id=guild.id)
             self.guilds.append(guild_obj)
-            # Re-register all per-guild commands so the new guild is included
-            self.register_commands_in_all_servers()
+            self.register_commands_in_all_servers(guilds=[guild_obj])
             await self.tree.sync(guild=guild_obj)
   
             
