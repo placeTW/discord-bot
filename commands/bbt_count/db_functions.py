@@ -71,7 +71,7 @@ def get_bbt_leaderboard(guild_id: int, date: datetime):
     with get_cursor() as cur:
         cur.execute(
             f"""
-            SELECT user_id, COUNT(*) AS count
+            SELECT user_id, COUNT(*) AS count, AVG(rating) AS average_rating
             FROM {TABLE}
             WHERE guild_id = %s AND created_at <= %s
             GROUP BY user_id
@@ -82,18 +82,26 @@ def get_bbt_leaderboard(guild_id: int, date: datetime):
         return cur.fetchall()
 
 
-# Gets the bubble tea stats for a user in a given year
+# Gets the bubble tea stats for a user in a given year.
+# Returns rows grouped by currency (and optionally location), each with a prices_list array
+# and rating aggregates — matching the shape expected by bbt_stats_embed.
 def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
     year_start = datetime.datetime(date.year, 1, 1)
     if group_by_location:
         with get_cursor() as cur:
             cur.execute(
                 f"""
-                SELECT location, COUNT(*) AS count
+                SELECT
+                    location,
+                    currency,
+                    ARRAY_AGG(COALESCE(price, 0)) AS prices_list,
+                    AVG(rating)  AS average_rating,
+                    MIN(rating)  AS minimum_rating,
+                    MAX(rating)  AS maximum_rating
                 FROM {TABLE}
                 WHERE user_id = %s AND created_at >= %s AND created_at <= %s
-                GROUP BY location
-                ORDER BY count DESC
+                GROUP BY location, currency
+                ORDER BY location, COUNT(*) DESC
                 """,
                 (user_id, str(year_start), str(date)),
             )
@@ -102,22 +110,36 @@ def get_bubble_tea_stats(user_id: int, date: datetime, group_by_location=False):
         with get_cursor() as cur:
             cur.execute(
                 f"""
-                SELECT COUNT(*) AS total, AVG(rating) AS avg_rating
+                SELECT
+                    currency,
+                    ARRAY_AGG(COALESCE(price, 0)) AS prices_list,
+                    AVG(rating)  AS average_rating,
+                    MIN(rating)  AS minimum_rating,
+                    MAX(rating)  AS maximum_rating
                 FROM {TABLE}
                 WHERE user_id = %s AND created_at >= %s AND created_at <= %s
+                GROUP BY currency
+                ORDER BY COUNT(*) DESC
                 """,
                 (user_id, str(year_start), str(date)),
             )
             return cur.fetchall()
 
 
-# Gets the bubble tea monthly counts for a user in the same year as date
+# Gets the bubble tea monthly counts for a user in the same year as date.
+# Returns rows with integer month, entry_count, and rating aggregates
+# matching the shape expected by bbt_stats_embed.
 def get_bubble_tea_monthly_counts(user_id: int, date: datetime):
     year_start = datetime.datetime(date.year, 1, 1)
     with get_cursor() as cur:
         cur.execute(
             f"""
-            SELECT DATE_TRUNC('month', created_at) AS month, COUNT(*) AS count
+            SELECT
+                EXTRACT(MONTH FROM created_at)::int AS month,
+                COUNT(*)        AS entry_count,
+                AVG(rating)     AS average_rating,
+                MIN(rating)     AS minimum_rating,
+                MAX(rating)     AS maximum_rating
             FROM {TABLE}
             WHERE user_id = %s AND created_at >= %s AND created_at <= %s
             GROUP BY month

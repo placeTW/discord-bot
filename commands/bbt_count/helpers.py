@@ -121,7 +121,7 @@ def cost_string(prices: list[float], currency: str):
 
 def entry_string(entry: dict, timezone: datetime.tzinfo):
     entry_string = (
-        f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}`"
+        f"`{entry['id']}: {str(_to_datetime(entry.get('created_at')).astimezone(timezone).date())}`"
     )
     entry_string += f" - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}"
     entry_string += f"{' (no image)' if not entry.get('image') else ''}"
