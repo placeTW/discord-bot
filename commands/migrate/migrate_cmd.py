@@ -24,6 +24,8 @@ BIGINT_COLUMNS = {
     "user_id", "confession_channel_id", "admin_role_id", "report_channel_id",
 }
 
+NUMERIC_COLUMNS = {"price"}
+
 
 def _coerce_row(row: dict) -> dict:
     result = {}
@@ -32,12 +34,17 @@ def _coerce_row(row: dict) -> dict:
             result[k] = None
         elif k in JSONB_COLUMNS:
             try:
-                result[k] = json.loads(v) if v else None
+                result[k] = psycopg2.extras.Json(json.loads(v)) if v else None
             except json.JSONDecodeError:
                 result[k] = v
         elif k in BIGINT_COLUMNS:
             try:
                 result[k] = int(v)
+            except (ValueError, TypeError):
+                result[k] = None
+        elif k in NUMERIC_COLUMNS:
+            try:
+                result[k] = float(v)
             except (ValueError, TypeError):
                 result[k] = None
         else:
