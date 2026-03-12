@@ -118,7 +118,10 @@ class BotInitialiser:
             self.tree.clear_commands(guild=None)
             await self.tree.sync()
 
-            for guild in self.guilds:
+            guilds_to_sync = self.guilds
+            if self.placetw_guild not in self.guilds:
+                guilds_to_sync = self.guilds + [self.placetw_guild]
+            for guild in guilds_to_sync:
                 await self.tree.sync(guild=guild)
             # Enable logging
             logging.init(self.client, DEPLOYMENT_DATE)
