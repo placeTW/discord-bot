@@ -82,6 +82,22 @@ class BotInitialiser:
             msg = "\n".join(msg_list)
             await interaction.response.send_message(msg)
 
+        @self.tree.command(
+            name="leave-server",
+            description="Make the bot leave a specified server by ID (owner only)",
+            guild=self.placetw_guild,
+        )
+        async def leave_server(interaction: discord.Interaction, guild_id: str):
+            if await self.client.is_owner(interaction.user):
+                guild = self.client.get_guild(int(guild_id))
+                if guild is None:
+                    await interaction.response.send_message("❌ Guild not found.", ephemeral=True)
+                    return
+                await interaction.response.send_message(f"✅ Leaving **{guild.name}**...", ephemeral=True)
+                await guild.leave()
+            else:
+                await interaction.response.send_message("❌ You are not authorized to use this command.", ephemeral=True)
+
         # * register commands the just the placetw server
         edit_entry_cmd.register_commands(self.tree, self.placetw_guild, self.client)
         restart.register_commands(self.tree, self.placetw_guild)
