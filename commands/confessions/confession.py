@@ -124,7 +124,14 @@ def register_commands(
                     reply_to_id = int(reply_to)
                 elif validators.url(reply_to):
                     reply_to_type = 'url'
-                    reply_to_id = int(reply_to.split('/')[-1])
+                    try:
+                        reply_to_id = int(reply_to.split('/')[-1])
+                    except ValueError:
+                        await interaction.response.send_message(
+                            "Invalid message URL. Please provide a valid Discord message link.",
+                            ephemeral=True,
+                        )
+                        return
                     reply_to = reply_to_id
                 else:
                     reply_to_type = 'generated_id'

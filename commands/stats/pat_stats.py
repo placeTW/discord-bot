@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from psycopg2 import sql
 
 from modules.db import get_cursor
 
@@ -10,7 +11,11 @@ def get_pat_stats(pat_type: str):
     if pat_type not in _ALLOWED_PAT_TYPES:
         raise ValueError(f"Invalid pat_type: {pat_type}")
     with get_cursor() as cur:
-        cur.execute(f"SELECT id, count FROM total_{pat_type}_counts LIMIT 10")
+        cur.execute(
+            sql.SQL("SELECT id, count FROM {} LIMIT 10").format(
+                sql.Identifier(f"total_{pat_type}_counts")
+            )
+        )
         rows = cur.fetchall()
     if not rows:
         return None

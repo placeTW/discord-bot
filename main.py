@@ -1,10 +1,28 @@
 import os
+import sys
+from dotenv import load_dotenv
+
+# Load env vars before any other imports — several modules read env vars at import time
+load_dotenv()
+
+IS_PROD = len(sys.argv) > 1 and sys.argv[1] == "prod"
+
+_required_vars = [
+    "DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN",
+    "PLACETW_SERVER_ID",
+    "LOG_CHANNEL",
+    "POSTGRES_HOST",
+    "POSTGRES_DB",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "GITHUB_TOKEN",
+]
+_missing = [v for v in _required_vars if not os.getenv(v)]
+if _missing:
+    raise EnvironmentError(f"Missing required environment variables: {', '.join(_missing)}")
 
 import discord
 from discord import app_commands
-
-# from discord.ext import commands
-from dotenv import load_dotenv
 import datetime
 
 # user commands
@@ -38,13 +56,9 @@ from mentioned import mention_responses
 
 from modules import config
 import bot
-import sys
 from git import Repo
 import platform
 
-# load environment vars (from .env)
-load_dotenv()
-IS_PROD = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN")
 
 DEPLOYMENT_DATE = datetime.datetime.now()

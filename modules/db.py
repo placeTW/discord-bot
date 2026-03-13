@@ -3,9 +3,6 @@ import psycopg2
 import psycopg2.pool
 import psycopg2.extras
 from contextlib import contextmanager
-from dotenv import load_dotenv
-
-load_dotenv()
 
 _pool = psycopg2.pool.ThreadedConnectionPool(
     minconn=1,
@@ -30,3 +27,7 @@ def get_cursor():
         raise
     finally:
         _pool.putconn(conn)
+
+
+def close_pool():
+    _pool.closeall()

@@ -1,13 +1,10 @@
 import datetime
 import json
 import os
-import sys
+from pathlib import Path
 import discord
-from dotenv import load_dotenv
 
 from modules.db import get_cursor
-
-load_dotenv()
 
 
 class Logging:
@@ -33,7 +30,7 @@ logging = Logging()
 def init(client: discord.Client, deployment_date: datetime):
     log_channel = client.get_channel(int(os.getenv("LOG_CHANNEL")))
     filename = f"{str(deployment_date).split('.')[0].replace(':', '-')}.log"
-    path = f"{sys.path[0]}/logs/{filename}"
+    path = Path(__file__).parent.parent / "logs" / filename
     logging.set_log_params(log_channel, path)
 
 

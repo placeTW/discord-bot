@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib3
 from io import BytesIO
+from urllib.parse import urlencode
 import random
 import discord
 
@@ -10,13 +11,13 @@ from .consts import POSSIBLE_URLS, SITE_URL
 
 
 def get_url(type: str, style: str | None, query: str | None):
-    query_params = []
+    params = {}
     if style:
-        query_params.append(f'style={style}')
+        params['style'] = style
     if query:
-        query_params.append(f'keywords={query}')
-    query_str = '&'.join(query_params)
-    return f'{POSSIBLE_URLS[type]}?{query_str}'
+        params['keywords'] = query
+    query_str = urlencode(params)
+    return f'{POSSIBLE_URLS[type]}?{query_str}' if query_str else POSSIBLE_URLS[type]
 
 
 def fetch_stickers_list(type: str, style: str, query: str):

@@ -1,3 +1,5 @@
+from psycopg2 import sql
+
 from modules.db import get_cursor
 from commands.config.consts import SUPPORTED_CHANNEL_CONFIG_FIELDS
 
@@ -33,7 +35,9 @@ def set_config(guild_id: int, key: str, value: str, is_prod: bool) -> list:
         raise ValueError(f"Invalid config key: {key}")
     with get_cursor() as cur:
         cur.execute(
-            f"UPDATE server_config SET {key} = %s WHERE guild_id = %s AND prod_config = %s RETURNING *",
+            sql.SQL("UPDATE server_config SET {} = %s WHERE guild_id = %s AND prod_config = %s RETURNING *").format(
+                sql.Identifier(key)
+            ),
             (value, guild_id, is_prod),
         )
         return cur.fetchall()

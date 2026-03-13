@@ -3,6 +3,7 @@ import discord
 from activities import activity
 from discord.ext import tasks
 from modules.config import fetch_configs
+from modules.db import close_pool
 
 CHANGE_STATUS_INTERVAL_HOURS = 1
 
@@ -30,6 +31,10 @@ class TWPlaceClient(discord.Client):
     async def setup_hook(self) -> None:
         # start the task to run in the background
         self.set_activity.start()
+
+    async def close(self):
+        await super().close()
+        close_pool()
 
     def fetch_config(self):
         self.guilds_dict = fetch_configs(self.is_prod)
