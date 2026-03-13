@@ -7,19 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Build DSN from individual POSTGRES_* environment variables
-_dsn = "postgresql://{user}:{password}@{host}:{port}/{db}".format(
+_pool = psycopg2.pool.ThreadedConnectionPool(
+    minconn=1,
+    maxconn=5,
     user=os.getenv("POSTGRES_USER", "botuser"),
     password=os.getenv("POSTGRES_PASSWORD", ""),
     host=os.getenv("POSTGRES_HOST", "localhost"),
     port=os.getenv("POSTGRES_PORT", "5432"),
-    db=os.getenv("POSTGRES_DB", "discord_bot"),
-)
-
-_pool = psycopg2.pool.ThreadedConnectionPool(
-    minconn=1,
-    maxconn=5,
-    dsn=_dsn,
+    dbname=os.getenv("POSTGRES_DB", "discord_bot"),
 )
 
 

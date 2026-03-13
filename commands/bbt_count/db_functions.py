@@ -25,7 +25,6 @@ def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, **kwargs):
             values,
         )
         row = cur.fetchone()
-    print(row)
     return row["id"]
 
 

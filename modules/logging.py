@@ -71,7 +71,6 @@ async def log_event(
         )
     if log_to_channel:
         await logging.log_to_channel(data, color)
-    print(row)
 
 
 async def log_message_event(message: discord.Message, events: list[str]):
@@ -95,7 +94,6 @@ async def log_message_event(message: discord.Message, events: list[str]):
                 """,
                 row,
             )
-    print(rows)
 
 
 async def fetch_event_log(guild_id: int, generated_id: str, event: str):
