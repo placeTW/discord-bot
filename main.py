@@ -7,19 +7,11 @@ load_dotenv()
 
 IS_PROD = len(sys.argv) > 1 and sys.argv[1] == "prod"
 
-_required_vars = [
-    "DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN",
-    "PLACETW_SERVER_ID",
-    "LOG_CHANNEL",
-    "POSTGRES_HOST",
-    "POSTGRES_DB",
-    "POSTGRES_USER",
-    "POSTGRES_PASSWORD",
-    "GITHUB_TOKEN",
-]
-_missing = [v for v in _required_vars if not os.getenv(v)]
-if _missing:
-    raise EnvironmentError(f"Missing required environment variables: {', '.join(_missing)}")
+import logging
+logging.basicConfig(
+    level=logging.DEBUG if not IS_PROD else logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 import discord
 from discord import app_commands
@@ -212,5 +204,19 @@ class BotInitialiser:
 
 
 if __name__ == "__main__":
+    _required_vars = [
+        "DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN",
+        "PLACETW_SERVER_ID",
+        "LOG_CHANNEL",
+        "POSTGRES_HOST",
+        "POSTGRES_DB",
+        "POSTGRES_USER",
+        "POSTGRES_PASSWORD",
+        "GITHUB_TOKEN",
+    ]
+    _missing = [v for v in _required_vars if not os.getenv(v)]
+    if _missing:
+        raise EnvironmentError(f"Missing required environment variables: {', '.join(_missing)}")
+
     discord_bot = BotInitialiser()
     discord_bot.run()

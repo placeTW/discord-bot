@@ -1,10 +1,13 @@
 import datetime
 import json
+import logging as _stdlib_logging
 import os
 from pathlib import Path
 import discord
 
 from modules.db import get_cursor
+
+_logger = _stdlib_logging.getLogger(__name__)
 
 
 class Logging:
@@ -66,6 +69,7 @@ async def log_event(
             """,
             row,
         )
+    _logger.debug(str(row))
     if log_to_channel:
         await logging.log_to_channel(data, color)
 
@@ -91,6 +95,7 @@ async def log_message_event(message: discord.Message, events: list[str]):
                 """,
                 row,
             )
+    _logger.debug(str(rows))
 
 
 async def fetch_event_log(guild_id: int, generated_id: str, event: str):

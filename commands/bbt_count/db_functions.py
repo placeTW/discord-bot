@@ -1,8 +1,11 @@
 import datetime
+import logging
 
 from psycopg2 import sql
 
 from modules.db import get_cursor
+
+_logger = logging.getLogger(__name__)
 
 TABLE = "bubble_tea_entries"
 _TABLE_ID = sql.Identifier(TABLE)
@@ -30,6 +33,7 @@ def add_bbt_entry(created_at: datetime, user_id: int, guild_id: int, **kwargs):
             values,
         )
         row = cur.fetchone()
+    _logger.debug(str(row))
     return row["id"]
 
 
@@ -40,6 +44,7 @@ def remove_bbt_entry(id: int, user_id: int):
             sql.SQL("DELETE FROM {} WHERE id = %s AND user_id = %s").format(_TABLE_ID),
             (id, user_id),
         )
+    _logger.debug(f"Removed entry {id}")
 
 
 # Gets a bubble tea entry from the database by id
@@ -69,6 +74,7 @@ def edit_bbt_entry(id: int, owner_user_id: int, **kwargs):
             sql.SQL("UPDATE {} SET {} WHERE id = %s AND user_id = %s").format(_TABLE_ID, set_sql),
             values,
         )
+    _logger.debug(f"Updated entry {id}")
 
 
 # Gets all bubble tea entries from the database for a user in a given year

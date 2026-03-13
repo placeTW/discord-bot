@@ -1,9 +1,11 @@
 import discord
+import logging
 import os
 import aiohttp
 import asyncio
 
 API_KEY = os.getenv("MODERATE_CONTENT_API_KEY")
+_logger = logging.getLogger(__name__)
 API_URL = 'https://api.moderatecontent.com/moderate/'
 
 
@@ -17,6 +19,7 @@ async def review_image(file: discord.Attachment) -> bool:
             async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as response:
                 # convert response to json
                 data = await response.json()
+                _logger.debug(str(data))
                 # check if image is safe (rating of everyone)
                 return data.get('rating_index') == 1
     except (aiohttp.ClientError, asyncio.TimeoutError, KeyError) as e:
