@@ -124,7 +124,8 @@ def register_commands(
                 f"Removed entry {id}",
                 ephemeral=True,
             )
-        except:
+        except Exception as e:
+            print(f"Failed to remove entry {id}: {e}")
             await interaction.response.send_message(
                 f"Failed to remove {id}",
                 ephemeral=True,
@@ -354,7 +355,7 @@ def register_commands(
         await interaction.response.defer()
         leaderboard = get_bbt_leaderboard(
             interaction.guild.id,
-            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
+            datetime.datetime(year, 12, 31, 23, 59, 59) if year else interaction.created_at,
         )
         
         if not leaderboard:
@@ -403,12 +404,9 @@ def register_commands(
     ):
         await interaction.response.defer()
         user_id = user.id if user else interaction.user.id
-        stats = get_bubble_tea_stats(
-            user_id,
-            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
-            group_by_location,
-        )
-        
+        date = datetime.datetime(year, 12, 31, 23, 59, 59) if year else interaction.created_at
+        stats = get_bubble_tea_stats(user_id, date, group_by_location)
+
         if not stats:
             embed = discord.Embed(
                 title="No stats found",
@@ -417,11 +415,8 @@ def register_commands(
             )
             await interaction.followup.send(embed=embed)
             return
-            
-        monthly_counts = get_bubble_tea_monthly_counts(
-            user_id,
-            (datetime.datetime(year=year, month=1, day=1) if year else interaction.created_at),
-        ) or []
+
+        monthly_counts = get_bubble_tea_monthly_counts(user_id, date) or []
 
         latest = (
             get_latest_bubble_tea_entry(user_id)

@@ -1,6 +1,5 @@
 from enum import StrEnum
 import json
-from operator import and_, not_, or_
 from pathlib import Path
 from pydantic import BaseModel
 from re import search, IGNORECASE, UNICODE
@@ -273,7 +272,7 @@ def evaluate_event_condition(condition: str, criteria_links: set[str] | None = N
 
     Raises:
         SyntaxError: If the condition string contains invalid Python syntax.
-        NameError: If an unrecognized operation is used in the condition.
+        ValueError: If an unsupported expression type is used in the condition.
 
     Example:
         >>> match_link_ids = {'baltic_meows', 'tw'}
@@ -283,9 +282,9 @@ def evaluate_event_condition(condition: str, criteria_links: set[str] | None = N
         False
 
     Note:
-        This function uses AST transformation to safely evaluate the condition
-        without using eval() on raw input. It's designed to prevent arbitrary
-        code execution while allowing flexible condition specifications.
+        This function directly evaluates AST nodes without using eval(),
+        preventing any potential arbitrary code execution while allowing
+        flexible condition specifications.
     """
     if criteria_links is None:
         return True
@@ -294,32 +293,25 @@ def evaluate_event_condition(condition: str, criteria_links: set[str] | None = N
         return link_id in criteria_links
 
     # Parse the condition string into an AST
-    parsed_expr = ast.parse(condition, mode='eval')
+    parsed_expr = ast.parse(condition, mode='eval').body
 
-    allowed_names = {
-        'or': or_,
-        'and': and_,
-        'not': not_,
-        'True': True,
-        'False': False,
-    }
+    # Evaluate AST nodes directly without eval()
+    def eval_node(node):
+        if isinstance(node, ast.BoolOp):
+            if isinstance(node.op, ast.And):
+                return all(eval_node(v) for v in node.values)
+            elif isinstance(node.op, ast.Or):
+                return any(eval_node(v) for v in node.values)
+        elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            return not eval_node(node.operand)
+        elif isinstance(node, ast.Constant):
+            return bool(node.value)
+        elif isinstance(node, ast.Name):
+            if node.id in ('True', 'False'):
+                return node.id == 'True'
+            # Treat unknown names as link IDs
+            return link_id_exists(node.id)
+        else:
+            raise ValueError(f"Unsupported expression type: {type(node).__name__}")
 
-    class LinkIdTransformer(ast.NodeTransformer):
-        def visit_Name(self, node):
-            if node.id not in allowed_names:
-                return ast.Call(
-                    func=ast.Name(id='link_id_exists', ctx=ast.Load()),
-                    args=[ast.Constant(node.id)],
-                    keywords=[],
-                    lineno=node.lineno,
-                    col_offset=node.col_offset,
-                )
-            return node
-
-    transformed_expr = LinkIdTransformer().visit(parsed_expr)
-
-    # Fix the AST by adding missing attributes
-    ast.fix_missing_locations(transformed_expr)
-
-    compiled_expr = compile(transformed_expr, '<string>', 'eval')
-    return eval(compiled_expr, {"__builtins__": {}}, allowed_names | {'link_id_exists': link_id_exists})
+    return eval_node(parsed_expr)

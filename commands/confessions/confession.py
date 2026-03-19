@@ -7,7 +7,6 @@ import validators
 
 from bot import TWPlaceClient
 from modules import logging, content_moderation
-from modules.supabase import supabaseClient
 
 
 @dataclass
@@ -125,7 +124,14 @@ def register_commands(
                     reply_to_id = int(reply_to)
                 elif validators.url(reply_to):
                     reply_to_type = 'url'
-                    reply_to_id = int(reply_to.split('/')[-1])
+                    try:
+                        reply_to_id = int(reply_to.split('/')[-1])
+                    except ValueError:
+                        await interaction.response.send_message(
+                            "Invalid message URL. Please provide a valid Discord message link.",
+                            ephemeral=True,
+                        )
+                        return
                     reply_to = reply_to_id
                 else:
                     reply_to_type = 'generated_id'
@@ -181,7 +187,11 @@ def register_commands(
                 suppress_embeds=True,
             )
         except Exception as e:
-            await interaction.response.send_message(f"Failed to send confession: {e}", ephemeral=True)
+            print(f"Failed to send confession: {e}")  # Server-side logging
+            await interaction.response.send_message(
+                "Failed to send confession. Please try again later.",
+                ephemeral=True
+            )
 
     @confess_group.command(
         name="report",
@@ -253,6 +263,7 @@ def register_commands(
         name="restore",
         description="Restores a confession (requires manage server permissions)",
     )
+    @app_commands.default_permissions(manage_guild=True)
     async def restore_confession(interaction: discord.Interaction, confession_id: str):
         if not interaction.permissions.manage_guild:
             await interaction.response.send_message(

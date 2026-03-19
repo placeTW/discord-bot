@@ -95,7 +95,11 @@ async def compare_two_cities(city_choice1: str, city_choice2: str):
     city1_country = CITIES_DICT[city_choice1]["country"]
     city2_country = CITIES_DICT[city_choice2]["country"]
 
-    url = f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1={city1_country}&country2={city2_country}&city1={city1_name}&city2={city2_name}"
+    url = (
+        f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?"
+        f"country1={url_quote(city1_country)}&country2={url_quote(city2_country)}&"
+        f"city1={url_quote(city1_name)}&city2={url_quote(city2_name)}"
+    )
     html = await _async_get_html(url)
     soup = _extract_html(html)
     if _htmlsoup_is_valid(soup):

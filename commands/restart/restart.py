@@ -6,6 +6,7 @@ import discord
 from discord import app_commands
 import os
 from discord.app_commands import Choice
+import re
 
 from commands.restart.bot_git_utils import list_of_branches
 
@@ -43,6 +44,15 @@ def register_commands(tree, this_guild: discord.Object):
         print("restart: Fetching from repo and installing requirements...")
 
         if branch is not None:
+            # Validate branch name format as defense-in-depth
+            # (alphanumeric, dash, underscore, slash for namespaced branches)
+            if not re.match(r'^[a-zA-Z0-9/_-]+$', branch.value):
+                print(f"Invalid branch name format: {branch.value}")
+                await interaction.followup.send(
+                    "Invalid branch name format",
+                    ephemeral=True
+                )
+                return
             print(branch.value)
             subprocess.call(["git", "checkout", branch.value])
         subprocess.call(["git", "pull"])

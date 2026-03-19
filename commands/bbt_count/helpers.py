@@ -119,9 +119,15 @@ def cost_string(prices: list[float], currency: str):
     return f"{numbers.format_currency(sum, currency, locale='en_US')} ({p.size}, avg {numbers.format_currency(p[p.nonzero()].mean() if sum else 0, currency, locale='en_US')}/🧋)"
 
 
+def _to_datetime(value) -> datetime.datetime:
+    if isinstance(value, datetime.datetime):
+        return value
+    return datetime.datetime.fromisoformat(str(value))
+
+
 def entry_string(entry: dict, timezone: datetime.tzinfo):
     entry_string = (
-        f"`{entry['id']}: {str(datetime.datetime.fromisoformat(entry.get('created_at')).astimezone(timezone).date())}`"
+        f"`{entry['id']}: {str(_to_datetime(entry.get('created_at')).astimezone(timezone).date())}`"
     )
     entry_string += f" - {bubble_tea_string(entry.get('description'), entry.get('location'), entry.get('price'), entry.get('currency'))}"
     entry_string += f"{' (no image)' if not entry.get('image') else ''}"

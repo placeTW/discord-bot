@@ -1,9 +1,5 @@
 from os import getenv
-from dotenv import load_dotenv
 from github import Auth, Github
-
-load_dotenv()
-
 
 GITHUB_TOKEN = getenv("GITHUB_TOKEN")
 # using an access token

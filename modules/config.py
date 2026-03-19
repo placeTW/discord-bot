@@ -1,52 +1,52 @@
-from modules.supabase import supabaseClient
+from psycopg2 import sql
+
+from modules.db import get_cursor
+from commands.config.consts import SUPPORTED_CHANNEL_CONFIG_FIELDS
 
 
 def fetch_configs(is_prod: bool):
-    supabase_data = supabaseClient.table("server_config").select("*").eq('prod_config', is_prod).execute().data
-    transformed_dict = {
-        item['guild_id']: {key: value for key, value in item.items() if key != 'guild_id'} for item in supabase_data
-    }
-    return transformed_dict
+    with get_cursor() as cur:
+        cur.execute("SELECT * FROM server_config WHERE prod_config = %s", (is_prod,))
+        rows = cur.fetchall()
+    return {row['guild_id']: {k: v for k, v in row.items() if k != 'guild_id'} for row in rows}
 
 
 def fetch_guild_config(guild_id: int, is_prod: bool):
-    response = (
-        supabaseClient.table("server_config").select("*").eq("guild_id", guild_id).eq("prod_config", is_prod).execute()
-    )
-    # if there is no data, return an empty dict
-    if len(response.data) == 0:
-        return {}
-    return response.data[0]
+    with get_cursor() as cur:
+        cur.execute(
+            "SELECT * FROM server_config WHERE guild_id = %s AND prod_config = %s",
+            (guild_id, is_prod),
+        )
+        row = cur.fetchone()
+    return dict(row) if row else {}
 
 
 def create_new_config(guild_id: int, server_name: str, is_prod: bool):
-    response = (
-        supabaseClient.table("server_config")
-        .insert(
-            {
-                "guild_id": guild_id,
-                "server_name": server_name,
-                "prod_config": is_prod,
-            }
+    with get_cursor() as cur:
+        cur.execute(
+            "INSERT INTO server_config (guild_id, server_name, prod_config) VALUES (%s, %s, %s) RETURNING *",
+            (guild_id, server_name, is_prod),
         )
-        .execute()
-    )
-    return response.data
+        return cur.fetchall()
 
 
 def set_config(guild_id: int, key: str, value: str, is_prod: bool) -> list:
-    response = (
-        supabaseClient.table("server_config")
-        .update({key: value})
-        .eq("guild_id", guild_id)
-        .eq("prod_config", is_prod)
-        .execute()
-    )
-    return response.data
+    if key not in SUPPORTED_CHANNEL_CONFIG_FIELDS:
+        raise ValueError(f"Invalid config key: {key}")
+    with get_cursor() as cur:
+        cur.execute(
+            sql.SQL("UPDATE server_config SET {} = %s WHERE guild_id = %s AND prod_config = %s RETURNING *").format(
+                sql.Identifier(key)
+            ),
+            (value, guild_id, is_prod),
+        )
+        return cur.fetchall()
 
 
 def remove_config(guild_id: int, is_prod: bool) -> list:
-    response = (
-        supabaseClient.table("server_config").delete().eq("guild_id", guild_id).eq("prod_config", is_prod).execute()
-    )
-    return response.data
+    with get_cursor() as cur:
+        cur.execute(
+            "DELETE FROM server_config WHERE guild_id = %s AND prod_config = %s RETURNING *",
+            (guild_id, is_prod),
+        )
+        return cur.fetchall()

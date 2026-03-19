@@ -1,9 +1,20 @@
 import os
+import sys
+from dotenv import load_dotenv
+
+# Load env vars before any other imports — several modules read env vars at import time
+load_dotenv()
+
+IS_PROD = len(sys.argv) > 1 and sys.argv[1] == "prod"
+
+import logging
+logging.basicConfig(
+    level=logging.DEBUG if not IS_PROD else logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 import discord
-
-# from discord.ext import commands
-from dotenv import load_dotenv
+from discord import app_commands
 import datetime
 
 # user commands
@@ -37,13 +48,9 @@ from mentioned import mention_responses
 
 from modules import config
 import bot
-import sys
 from git import Repo
 import platform
 
-# load environment vars (from .env)
-load_dotenv()
-IS_PROD = len(sys.argv) > 1 and sys.argv[1] == "prod"
 TOKEN = os.getenv("DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN")
 
 DEPLOYMENT_DATE = datetime.datetime.now()
@@ -82,6 +89,27 @@ class BotInitialiser:
             msg = "\n".join(msg_list)
             await interaction.response.send_message(msg)
 
+        @self.tree.command(
+            name="leave-server",
+            description="Make the bot leave a specified server by ID (admin only)",
+            guild=self.placetw_guild,
+        )
+        @app_commands.checks.has_permissions(administrator=True)
+        @app_commands.default_permissions(administrator=True)  # hides command from non-admins in Discord UI
+        async def leave_server(interaction: discord.Interaction, guild_id: str):
+            guild = self.client.get_guild(int(guild_id))
+            if guild is None:
+                await interaction.response.send_message("❌ Guild not found.", ephemeral=True)
+                return
+            await interaction.response.send_message(f"✅ Leaving **{guild.name}**...", ephemeral=True)
+            await guild.leave()
+
+        @leave_server.error
+        async def leave_server_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+            if isinstance(error, app_commands.MissingPermissions):
+                await interaction.response.send_message("❌ You need Administrator permissions to use this command.", ephemeral=True)
+
+
         # * register commands the just the placetw server
         edit_entry_cmd.register_commands(self.tree, self.placetw_guild, self.client)
         restart.register_commands(self.tree, self.placetw_guild)
@@ -89,25 +117,27 @@ class BotInitialiser:
         tocfl.register_commands(self.tree, self.placetw_guild, self.client)
         taiwanese_entry.register_commands(self.tree, self.placetw_guild, self.client)
 
-    def register_commands_in_all_servers(self):
+    def register_commands_in_all_servers(self, guilds: list = None):
         # * register commands to the other servers
-        bbt_count.register_commands(self.tree, self.client, self.guilds)
-        cat.register_commands(self.tree, self.guilds)
-        fetch_entry_cmd.register_commands(self.tree, self.guilds)
-        fetch_entry_ui.register_commands(self.tree, self.guilds)
-        one_o_one.register_commands(self.tree, self.guilds)
-        hgs.register_commands(self.tree, self.guilds)
-        random_shiba.register_commands(self.tree, self.guilds)
-        random_capoo.register_commands(self.tree, self.guilds)
-        fucking.register_commands(self.tree, self.guilds)
-        basic_commands.register_commands(self.tree, self.guilds)
-        config_commands.register_commands(self.tree, self.client, self.guilds)
-        stats.register_commands(self.tree, self.client, self.guilds)
-        pat.register_commands(self.tree, self.client, self.guilds)
-        formosa_stickers.register_commands(self.tree, self.guilds)
+        target_guilds = guilds if guilds is not None else self.guilds
+        
+        bbt_count.register_commands(self.tree, self.client, target_guilds)
+        cat.register_commands(self.tree, target_guilds)
+        fetch_entry_cmd.register_commands(self.tree, target_guilds)
+        fetch_entry_ui.register_commands(self.tree, target_guilds)
+        one_o_one.register_commands(self.tree, target_guilds)
+        hgs.register_commands(self.tree, target_guilds)
+        random_shiba.register_commands(self.tree, target_guilds)
+        random_capoo.register_commands(self.tree, target_guilds)
+        fucking.register_commands(self.tree, target_guilds)
+        basic_commands.register_commands(self.tree, target_guilds)
+        config_commands.register_commands(self.tree, self.client, target_guilds)
+        stats.register_commands(self.tree, self.client, target_guilds)
+        pat.register_commands(self.tree, self.client, target_guilds)
+        formosa_stickers.register_commands(self.tree, target_guilds)
         confession.register_commands(self.tree, self.client)
-        trains.register_commands(self.tree, self.client, self.guilds)
-        compare_cmd.register_commands(self.tree, self.client, self.guilds)
+        trains.register_commands(self.tree, self.client, target_guilds)
+        compare_cmd.register_commands(self.tree, self.client, target_guilds)
 
     def register_event_callbacks(self):
         # sync the slash commands servers when the bot is ready
@@ -116,7 +146,10 @@ class BotInitialiser:
             self.tree.clear_commands(guild=None)
             await self.tree.sync()
 
-            for guild in self.guilds:
+            guilds_to_sync = self.guilds
+            if self.placetw_guild not in self.guilds:
+                guilds_to_sync = self.guilds + [self.placetw_guild]
+            for guild in guilds_to_sync:
                 await self.tree.sync(guild=guild)
             # Enable logging
             logging.init(self.client, DEPLOYMENT_DATE)
@@ -128,9 +161,9 @@ class BotInitialiser:
             message_reacts_enabled = True
             try:
                 message_reacts_enabled = self.client.guilds_dict[message.guild.id]["message_reacts_enabled"]
-            except:
-                # default true
-                pass
+            except (KeyError, TypeError):
+                # default true - guild config may not be loaded yet
+                message_reacts_enabled = True
 
             # don't respond to bots, bot's own posts or if message reacts are disabled
             if (message.author == self.client.user) or (not message_reacts_enabled) or message.author.bot:
@@ -152,13 +185,18 @@ class BotInitialiser:
         async def on_guild_join(guild: discord.Guild):
             print(f"Guild {guild.name} ({guild.id}) joined")
             config.create_new_config(guild.id, guild.name, IS_PROD)
-            await self.tree.sync(guild=guild)        
+            guild_obj = discord.Object(id=guild.id)
+            self.guilds.append(guild_obj)
+            self.register_commands_in_all_servers(guilds=[guild_obj])
+            await self.tree.sync(guild=guild_obj)
+  
             
         @self.client.event
         async def on_guild_remove(guild: discord.Guild):
             print(f"Guild {guild.name} ({guild.id}) removed")
-            self.guilds.remove(discord.Object(id=guild.id))
-            del self.client.guilds_dict[guild.id]
+            self.guilds = [g for g in self.guilds if g.id != guild.id]
+            if guild.id in self.client.guilds_dict:
+                del self.client.guilds_dict[guild.id]
             config.remove_config(guild.id, IS_PROD)
 
     def run(self):
@@ -166,5 +204,19 @@ class BotInitialiser:
 
 
 if __name__ == "__main__":
+    _required_vars = [
+        "DISCORD_TOKEN_DEV" if not IS_PROD else "DISCORD_TOKEN",
+        "PLACETW_SERVER_ID",
+        "LOG_CHANNEL",
+        "POSTGRES_HOST",
+        "POSTGRES_DB",
+        "POSTGRES_USER",
+        "POSTGRES_PASSWORD",
+        "GITHUB_TOKEN",
+    ]
+    _missing = [v for v in _required_vars if not os.getenv(v)]
+    if _missing:
+        raise EnvironmentError(f"Missing required environment variables: {', '.join(_missing)}")
+
     discord_bot = BotInitialiser()
     discord_bot.run()

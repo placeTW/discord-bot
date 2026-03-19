@@ -32,4 +32,11 @@ def register_commands(
     )
     @app_commands.describe(given_str="The string you want echoed backed")
     async def echo(interaction: discord.Interaction, given_str: str):
+        # Discord message limit is 2000 characters
+        if len(given_str) > 1900:  # Leave room for "You sent this: " prefix and backticks
+            await interaction.response.send_message(
+                "Message too long. Please keep it under 1900 characters.",
+                ephemeral=True
+            )
+            return
         await interaction.response.send_message(f"You sent this: `{given_str}`")

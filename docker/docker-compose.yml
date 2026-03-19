@@ -1,9 +1,31 @@
 services:
   placetw-discord-bot:
     image: ghcr.io/placetw/discord-bot:main
-  restart: unless-stopped
-  container_name: placetw-discord-bot
-  volumes: 
-    - ./discord-bot:/app
-  env_file:
-    - .env
+    restart: unless-stopped
+    container_name: placetw-discord-bot
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./discord-bot:/app
+      - ../migration:/app/migration:ro
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    container_name: placetw-postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

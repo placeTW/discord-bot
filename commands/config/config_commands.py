@@ -5,7 +5,6 @@ from modules import logging
 import discord
 from bot import TWPlaceClient
 from commands.config.consts import POSSIBLE_CHANNEL_CONFIG_FIELDS
-from modules.supabase import supabaseClient
 from modules.config import set_config
 
 
